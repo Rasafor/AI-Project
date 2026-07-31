@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Match</title>
+    <style>
+      :root {
+        --bg: #fff7d6;
+        --panel: #ffffff;
+        --accent: #ff7a59;
+        --accent-2: #4ecdc4;
+        --accent-3: #6a5cff;
+        --text: #2f2a4a;
+        --shadow: 0 10px 25px rgba(47, 42, 74, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #fff7d6 0%, #ffe4f0 100%);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .game-shell {
+        width: min(92vw, 760px);
+        background: var(--panel);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.7rem;
+      }
+
+      .badge {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        margin: 6px 0 0;
+        color: #6b6588;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .card {
+        aspect-ratio: 1 / 1;
+        border: none;
+        border-radius: 18px;
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--accent-3) 0%, #8b6dff 100%);
+        color: white;
+        box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.12), 0 6px 12px rgba(0, 0, 0, 0.12);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+        transform-style: preserve-3d;
+        position: relative;
+      }
+
+      .card:hover {
+        transform: translateY(-2px) scale(1.01);
+      }
+
+      .card:disabled {
+        cursor: default;
+      }
+
+      .card.flipped {
+        transform: rotateY(180deg);
+        background: linear-gradient(135deg, #fff 0%, #ffeef8 100%);
+        color: var(--text);
+        box-shadow: inset 0 0 0 2px rgba(106, 92, 255, 0.16);
+      }
+
+      .card.matched {
+        background: linear-gradient(135deg, #7ef0b2 0%, #2ecb7f 100%);
+        color: white;
+        box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.14);
+      }
+
+      .card-face {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+      }
+
+      .card.flipped .card-face {
+        transform: rotateY(180deg);
+      }
+
+      .card .card-back {
+        font-size: 2rem;
+      }
+
+      .win-banner {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #ffef8a 0%, #ffbf69 100%);
+        color: #5a3200;
+        font-weight: 700;
+        text-align: center;
+        display: none;
+      }
+
+      .win-banner.show {
+        display: block;
+        animation: pop 300ms ease;
+      }
+
+      @keyframes pop {
+        from {
+          transform: scale(0.95);
+          opacity: 0.8;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .game-shell {
+          padding: 16px;
+        }
+
+        .board {
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-shell">
+      <div class="top-bar">
+        <div>
+          <h1>✨ Memory Match</h1>
+          <p class="subtitle">Flip two cards at a time and find every cheerful pair.</p>
+        </div>
+        <div class="badge" id="moves">Moves: 0</div>
+      </div>
+
+      <div class="board" id="board"></div>
+
+      <div class="win-banner" id="winBanner">
+        🎉 You win! You matched every pair in <span id="finalMoves">0</span> moves.
+      </div>
+    </div>
+
+    <script>
+      const emojiPool = ["🐶", "🐱", "🦊", "🐸", "🐼", "🐰", "🦄", "🌟"];
+      const cards = [...emojiPool, ...emojiPool];
+      const shuffled = cards.sort(() => Math.random() - 0.5);
+
+      const board = document.getElementById("board");
+      const movesDisplay = document.getElementById("moves");
+      const winBanner = document.getElementById("winBanner");
+      const finalMoves = document.getElementById("finalMoves");
+
+      let flipped = [];
+      let matched = 0;
+      let moves = 0;
+      let lockBoard = false;
+
+      function createCard(emoji, index) {
+        const button = document.createElement("button");
+        button.className = "card";
+        button.dataset.index = index;
+        button.innerHTML = '<span class="card-face card-back">❓</span>';
+        button.addEventListener("click", () => handleCardClick(index));
+        board.appendChild(button);
+      }
+
+      function handleCardClick(index) {
+        const card = board.children[index];
+        if (lockBoard || flipped.includes(index) || card.classList.contains("matched")) return;
+
+        card.classList.add("flipped");
+        card.innerHTML = `<span class="card-face">${shuffled[index]}</span>`;
+        flipped.push(index);
+
+        if (flipped.length === 2) {
+          moves += 1;
+          movesDisplay.textContent = `Moves: ${moves}`;
+          lockBoard = true;
+
+          const [firstIndex, secondIndex] = flipped;
+          const firstCard = board.children[firstIndex];
+          const secondCard = board.children[secondIndex];
+
+          if (shuffled[firstIndex] === shuffled[secondIndex]) {
+            firstCard.classList.add("matched");
+            secondCard.classList.add("matched");
+            matched += 1;
+            flipped = [];
+            lockBoard = false;
+
+            if (matched === emojiPool.length) {
+              finalMoves.textContent = moves;
+              winBanner.classList.add("show");
+            }
+          } else {
+            setTimeout(() => {
+              firstCard.classList.remove("flipped");
+              firstCard.innerHTML = '<span class="card-face card-back">❓</span>';
+              secondCard.classList.remove("flipped");
+              secondCard.innerHTML = '<span class="card-face card-back">❓</span>';
+              flipped = [];
+              lockBoard = false;
+            }, 900);
+          }
+        }
+      }
+
+      shuffled.forEach((emoji, index) => createCard(emoji, index));
+    </script>
+  </body>
+</html>
