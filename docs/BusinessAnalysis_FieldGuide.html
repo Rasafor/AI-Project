@@ -1,0 +1,1827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Analyst Field Guide — Colaberry Enterprise AI Leadership Accelerator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================= Design Tokens ================= */
+:root{
+  --cherry:#FB2832;
+  --berry:#367895;
+  --leaf:#5BA63C;
+  --amber:#E8920C;
+  --text:#1A1A1A;
+  --muted:#6B6B6B;
+  --border:#E4E4E3;
+  --surface:#FFFFFF;
+  --surface-2:#F8F8F7;
+  --font-body:"Roboto","Segoe UI",system-ui,Arial,sans-serif;
+  --font-mono:"Roboto Mono","Consolas",monospace;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(26,26,26,.06),0 4px 16px rgba(26,26,26,.05);
+  --sidenav-w:280px;
+  --header-h:64px;
+}
+:root[data-theme="dark"]{
+  --cherry:#FF5960;
+  --berry:#5EA9C4;
+  --leaf:#8AC759;
+  --amber:#E8920C;
+  --text:#F2F2F1;
+  --muted:#A6A6A4;
+  --border:#2A2A2A;
+  --surface:#0F0F0F;
+  --surface-2:#181818;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --cherry:#FF5960;--berry:#5EA9C4;--leaf:#8AC759;--amber:#E8920C;
+    --text:#F2F2F1;--muted:#A6A6A4;--border:#2A2A2A;--surface:#0F0F0F;--surface-2:#181818;
+  }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:var(--surface-2);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+h1,h2,h3,h4{color:var(--berry);font-weight:700;margin:0 0 .5em;letter-spacing:-.01em;}
+h1{font-size:2rem;}
+h2{font-size:1.5rem;padding-bottom:.35em;border-bottom:2px solid var(--border);}
+h3{font-size:1.15rem;}
+h4{font-size:1rem;color:var(--text);}
+p{margin:0 0 1em;}
+a{color:var(--berry);}
+code,.mono{font-family:var(--font-mono);}
+small.mono{font-family:var(--font-mono);color:var(--muted);}
+ul,ol{margin:0 0 1em;padding-left:1.3em;}
+.container{max-width:1220px;margin:0 auto;padding:0 24px;}
+
+/* ================= Header ================= */
+header.app-header{
+  position:sticky;top:0;z-index:50;
+  height:var(--header-h);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:20px;
+  padding:0 20px;
+}
+header.app-header .brand{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+header.app-header .brand img{height:38px;display:block;}
+header.app-header .brand .titles{line-height:1.15;}
+header.app-header .brand .titles strong{display:block;font-size:.98rem;color:var(--text);}
+header.app-header .brand .titles span{display:block;font-size:.72rem;color:var(--muted);}
+.search-wrap{flex:1;max-width:520px;position:relative;}
+.search-wrap input{
+  width:100%;padding:10px 14px 10px 38px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text);
+  font-family:var(--font-body);font-size:.92rem;
+}
+.search-wrap input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);}
+#search-results{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+  max-height:400px;overflow:auto;display:none;z-index:60;
+}
+#search-results.open{display:block;}
+#search-results a{display:block;padding:10px 14px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);}
+#search-results a:last-child{border-bottom:none;}
+#search-results a:hover{background:var(--surface-2);}
+#search-results a .grp{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--berry);font-weight:700;}
+#search-results a .snip{font-size:.8rem;color:var(--muted);margin-top:2px;}
+#search-results .none{padding:14px;color:var(--muted);font-size:.85rem;}
+.header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.btn{
+  font-family:var(--font-body);font-size:.85rem;font-weight:500;
+  border-radius:8px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  text-decoration:none;line-height:1;
+}
+.btn:hover{border-color:var(--berry);color:var(--berry);}
+.btn-primary{background:var(--cherry);border-color:var(--cherry);color:#fff;}
+.btn-primary:hover{opacity:.92;color:#fff;filter:brightness(1.03);}
+.btn-ghost{background:transparent;border-color:transparent;}
+.btn-sm{padding:6px 10px;font-size:.76rem;}
+
+/* ================= Layout ================= */
+.shell{display:flex;align-items:flex-start;}
+nav.sidenav{
+  width:var(--sidenav-w);flex-shrink:0;position:sticky;top:var(--header-h);
+  height:calc(100vh - var(--header-h));overflow-y:auto;
+  border-right:1px solid var(--border);background:var(--surface);padding:22px 16px 60px;
+}
+nav.sidenav .navgroup{margin-bottom:22px;}
+nav.sidenav .navgroup > .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;padding:0 10px;margin-bottom:8px;}
+nav.sidenav a{
+  display:block;padding:7px 10px;border-radius:7px;color:var(--text);text-decoration:none;font-size:.87rem;
+}
+nav.sidenav a:hover{background:var(--surface-2);}
+nav.sidenav a.active{background:rgba(54,120,149,.12);color:var(--berry);font-weight:700;}
+main.content{flex:1;min-width:0;padding:36px 40px 100px;}
+main.content .container{max-width:960px;margin:0;padding:0;}
+section.topic{margin-bottom:64px;scroll-margin-top:calc(var(--header-h) + 12px);}
+section.topic > .eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--cherry);font-weight:700;margin-bottom:6px;}
+
+/* ================= Components ================= */
+.callout{border-left:4px solid var(--berry);background:var(--surface);border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;box-shadow:var(--shadow);}
+.callout > .head{font-weight:700;color:var(--berry);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.callout.good{border-color:var(--leaf);} .callout.good > .head{color:var(--leaf);}
+.callout.bad{border-color:var(--cherry);} .callout.bad > .head{color:var(--cherry);}
+.callout.warn{border-color:var(--amber);} .callout.warn > .head{color:var(--amber);}
+
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:.86rem;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+table caption{caption-side:top;text-align:left;font-weight:700;color:var(--berry);padding:6px 0;font-size:.9rem;}
+thead th{background:var(--berry);color:#fff;text-align:left;padding:10px 12px;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+tbody td,tbody th{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:nth-child(even){background:var(--surface-2);}
+.table-scroll{overflow-x:auto;}
+
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.7rem;font-weight:700;font-family:var(--font-mono);letter-spacing:.02em;white-space:nowrap;}
+.pill-must{background:rgba(251,40,50,.12);color:var(--cherry);}
+.pill-should{background:rgba(54,120,149,.14);color:var(--berry);}
+.pill-could{background:rgba(91,166,60,.14);color:var(--leaf);}
+.pill-wont{background:rgba(107,107,107,.15);color:var(--muted);}
+.pill-status{background:rgba(91,166,60,.14);color:var(--leaf);}
+.pill-status.dev{background:rgba(54,120,149,.14);color:var(--berry);}
+.pill-status.test{background:rgba(232,146,12,.15);color:var(--amber);}
+.pill-status.backlog{background:rgba(107,107,107,.15);color:var(--muted);}
+.pill-status.deferred{background:rgba(107,107,107,.15);color:var(--muted);}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.persona-card,.stake-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0;}
+.kpi-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.kpi-tile .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.kpi-tile .val{font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:var(--berry);line-height:1;}
+.kpi-tile .delta{font-size:.76rem;font-weight:700;margin-top:6px;}
+.kpi-tile .delta.pos{color:var(--leaf);}
+.kpi-tile .delta.neg{color:var(--cherry);}
+
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:16px 0;box-shadow:var(--shadow);}
+.chart-box .chart-title{font-weight:700;font-size:.88rem;margin-bottom:10px;color:var(--text);}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.78rem;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+.diagram-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:16px 0;box-shadow:var(--shadow);overflow-x:auto;}
+
+/* Document rendering: cover, control strip, sign-off */
+.doc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-top:16px;}
+.doc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface-2);border-bottom:1px solid var(--border);padding:12px 20px;}
+.doc-toolbar .idline{font-family:var(--font-mono);font-size:.74rem;color:var(--muted);}
+.doc-toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+.doc-cover{padding:34px 32px 20px;border-bottom:1px solid var(--border);}
+.doc-cover img.cover-logo{height:34px;margin-bottom:18px;}
+.doc-cover h1{margin-bottom:6px;}
+.doc-cover .doc-sub{color:var(--muted);font-size:.95rem;}
+.doc-control{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;border-bottom:1px solid var(--border);background:var(--surface-2);}
+.doc-control > div{padding:12px 18px;border-right:1px solid var(--border);}
+.doc-control > div:last-child{border-right:none;}
+.doc-control span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px;}
+.doc-control strong{font-family:var(--font-mono);font-size:.82rem;}
+.doc-body{padding:8px 32px 4px;}
+.doc-body h2{margin-top:34px;}
+.doc-body h2:first-child{margin-top:8px;}
+.signoff{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--border);margin:30px 0 0;}
+.signoff > div{padding:16px 18px;border-right:1px solid var(--border);}
+.signoff > div:last-child{border-right:none;}
+.signoff .role{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--cherry);font-weight:700;margin-bottom:8px;}
+.signoff .name{font-weight:700;}
+.signoff .title{font-size:.8rem;color:var(--muted);}
+.signoff .sigline{margin-top:18px;border-top:1px solid var(--border);padding-top:6px;font-size:.72rem;color:var(--muted);}
+.doc-footer{padding:16px 32px 26px;font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border);margin-top:10px;}
+
+/* Ask assistant */
+.ask-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:16px 0;}
+.ask-panel textarea{width:100%;min-height:64px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font-body);font-size:.9rem;resize:vertical;background:var(--surface-2);color:var(--text);}
+.ask-answer{margin-top:14px;border-left:4px solid var(--leaf);background:var(--surface-2);border-radius:0 8px 8px 0;padding:14px 16px;}
+.ask-answer .q{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.ask-answer .src{margin-top:10px;font-size:.78rem;}
+.ask-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.ask-chip{font-size:.76rem;padding:5px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);cursor:pointer;color:var(--text);}
+.ask-chip:hover{border-color:var(--berry);color:var(--berry);}
+
+/* Overview hero */
+.hero{background:linear-gradient(135deg,var(--berry),#26576c);border-radius:16px;color:#fff;padding:40px 36px;margin-bottom:8px;}
+.hero h1{color:#fff;font-size:2.1rem;}
+.hero p{color:rgba(255,255,255,.88);max-width:640px;}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.16);border-radius:999px;padding:4px 12px;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px;font-weight:700;}
+
+footer.app-footer{border-top:1px solid var(--border);padding:26px 40px;color:var(--muted);font-size:.78rem;background:var(--surface);}
+
+@media (max-width:920px){
+  nav.sidenav{display:none;}
+  main.content{padding:24px 18px 80px;}
+  .doc-control{grid-template-columns:repeat(2,1fr);}
+  .signoff{grid-template-columns:1fr;}
+}
+
+@media print{
+  header.app-header,nav.sidenav,.doc-toolbar,footer.app-footer,#ask-section,.no-print{display:none !important;}
+  main.content{padding:0;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASMAAABSCAYAAAAfKbL9AABJ9klEQVR4nO29CZBc13UleN7f8ue+1L6iCoUCUFgJAiQBcKcoSqQoyZIoS7Kktt2W29N2O9wOt3vaHZ6JmYiJjnHbjnC3PR7LY8tyWBKthRIlUzJFijtBYiMIAsRahdr3qszK/e//Tdz3CySx1IJNIqQ8wWIVWZlZP3++d99dzj2Xcc5RQw011PCzhvSzvoAaaqihBkLNGNVQQw3vC9SMUQ011PC+QM0Y1VBDDe8L1IxRDTXU8L5AzRjVUEMN7wvUjFENNdTwvkDNGNVQQw3vCyi4SVCq5rjplOAzHyrTkYm3sJ/1NdVQQw2/YMZoauEkPzb2bahKEr7kwnSykJ0o39D4Yaxt31UzSjXU8HMAdjO0g7x2+pvcUmaRSaTgexJsn2M2l0WlPIWezB3Y1H4PotG6mlGqoYabGDeFMeqfPcjPTP8IrU2dcLkCRXJg2ioWihUsZM8izHRs7/4kOjI9UEMyJClZM0w11HCT4aYwRoQ3zj3J58rHkGxrA3wJilOFVfaxULbwyvGnwPQSbmn/MHZ0/TI2tm+vGaMaarjJcNMYo5IxzYen92M0fwqp+mbA82BUfBTNOew/+T1kjWGEQhKSWgc2td+F9c13o7P+VsTDGcT0VM041VDD+xw3jTGynDwPqSl2YvAZPjDzGmzJRtVRMTx5EAMjB8GZDDXsQQ27sDwZYVlBd6YP3fV3oqvpFjQlu5AINyMd76wZphpqeB/ipjFG78VcYZjP5Pvx+slv48Dpp1F1qwAcSDwCX3KghDyomg7H96GHolBlhpgeRzLahbpkMzLxFNJyHeJaGyJaMxQ1Aof7qNpFlKwBFO1x2IUywpEENnd9FL0Ne2oGrIYabjBuSmN0HtnCJD989im8cuJrGMuegOkCkqSD8TIY08ElGXrYh6aosGGA+RwMCmSmQVU5FJUeC/i+C0lmoFvheRwWN+F6dHcU3Nr+IP7NvX+CRLipZpBqqOEXnWe0FOqSrexDt/07bFy7m+9/6ykcHnwa87lRlF2AowKdpWA4FqqqAeaGoMkOmOLAd1QU5Aog2QiHZKghH65rQWE6mSowS4HtleH5CSzk5uE5PhD+Wb/b9ycKrs2TilYz1DW8vzwjx81zajBRpZ9+wtioLvD5whROjL6Ot4Z/iMG5t1Cxi/BtRRgYm1vgIRuypcBXJEieI7wiRXUBpoKpMpgMcDI8jgPXi4JLDB/e9QV88YE/vS7vx3ZyXFMz4rVcb4Ercvqm3cQF1+FJRb1pr7+GX4AwzfIWuOfb8HwHjl+Bxx0Ef0EC/S2JKVBlHaqkQ2UaGAPU67wps/lJPlM6i8nCII6c+hFOjD8PaBEwT8GGxjuxUB3FbG4InmeC+xI8nwEKg+sZUKFChgYLHM31LfiND/4ptnd/4Jqvr1Ad5FVvDpypgB1FMpZAVLt5W1oKRpWPTxRguT4szYGu6tjR0XzTvp8afo7CtIJ1jucrA1gwJlF0+mFZeZieAccxRTeuJ3FIPARZcqHIEsJqPdJKD/RQB5LxFp7We6Er18coxcI6UtHt6KjbgrOjbyKcTuL2NZ/EwPiPwVI2PnfL/wrTtDBZOItsZQKma8GgvjduQUYYYT2BukQSvc13Yl3jzmu6FtvLcU3OsNOzT2G09DQkMnY8gh0dXyJjhJsVc8US/vyFfRjKFkCHT0dDGv/Xp+7n3Zlabq2Gn5ExGss/x8fz+5Ezp1A2RmG7BXBZgcwVwJXBZRncsyHJgAcOn7uQyDqxKUx7x2DLHsLzaaTCW9Ca2svXRLYiHmm/JqMUCmWYY0/xobG3MTD1Ejqb1uLhrb+JNzOd+N7Rv8KrnoSP7frfsOeWT7GKneeuy8HIg+M+GFMhyzKi14mbRIaIvtuooOQYkH0bsmwKj/FmhswUFAsuzJwLDx5KIQbFuXmLITXcRMbIdPKcS1Ru4ghrGTYxd4CfLH4Pk+Wz8JwcVK7DgwxXCgMegyox+MyhUlXAAfIk+L4PJknw4EOCjDIY4DO4RgVm9SAmKm/gnN6DruTDvCN+CzLR1ncMAud5ztjqDYRhMxwbewFFbx47Eh9HKpHGbdpnUSqU8PyZv0L0VBqfSf4JF0ZHww0HYxo4FPi+BIlpAFdxM4PRZ8cg8moU6TPGIFHMXUMNN9oY6WpgCPLGMH9r9jt8MPsiXGMWDpOh+DHYig9XdqHZHArnMCQOxiSwsgHuk1cESD7AdIZKBNB9GTEWQpVyS5w4Qjq4rWHKOolC4SxGEzuwqelR3pO+S/zdKzFEhPnqON6e/DHCkQjWt9+JsNbEJH+Bf2DL5zFbnsWJ8f0Yzh7DhuaNXJEbbvgucjwfrscgcS48MP8mplQEoM+XPhf6icNnHLxmi2q4kcbIdrNcU4KO+JHCAX5s8nFMlIbggyHMIwA3YMiu8IDIy6nMVxAbdpEa85HotxErcvhUuWIUAjG4kod8awhmdxhmpwynDeCpOhRUIGotQFFCMDwFVuE4is4YCtUxvrHufkT0K0uOvjn0I8yXRrG+8270Nm4X/89TGOoz3ewTt/8Of/zVQewf+C7WpP93xCK44SBj7HHyIlz4HoNHFvomBplSKkgEBRD6qlmiGm60Z+QHDxmce4m/OPFVmOYMmOvD1DxwXxbuTsU00XAGaHg1j8xRA/U5D1GZUkY2FO5DcSWRR6LT02MepKEqpFdLKIJhsj2K7E4b87dG4XUnwGwfpgIofhFOieNA9buw3AL6Gj7KU5G2Va34yYUBfnzwx0jEmnDfpl9BJhZUrSJK4F19191ODeZoDF1SsBxefFP4hUgpKN1t4tuJPHwqNSeGz0V5x5FIWEHZseC4Ptp0Cbeuqcfnb+9AR7L2/dTws4W0gnVOFCoDWDAmUXT6YVl5mJ4BxzFFN64ncUg8BFlyocgSwmo90koP9FAHkvEWntZ7oSvXxyjFwjpS0e3oqNuCs6NvIpxO4vY1n8TA+I/BUjY+d8v/CtO0MFk4i2xlAqZrwaC+N25BRhhhPYG6RBK9zXdiXePOa7oW28txTc6w07NPYbT0NCQydjyCHR1fImOEmxVzxRL+/IV9GMoWQIdPR0Ma/9en7ufdmVpurYaf85BW+wJvT36LzZfHYFXKgKfCcm2wcAqSGoZUqEK1i5DVGCTFhCVXETaBiOHDdBmyvIzTEztx98a/wZoUJXhrqOFnBOWTn/zkkTPZAv5tvoJTHscPJ+dxYCSPN0aLGCk4qEsr6EiHkdRlmA5H0eGYtTn6ay62DUpo/ZaB48kIWpMR3Neu463VaXTGVGxJK2iOSOA88KRezZbxvYFxtEXCaAjrOJ0v40edE6h4wOaGCJKq9Cnnw+z//eyzP7VfEUY8pilYm4wgygB5wgD7ig4Y1IYTF3AqXNwYVNlZ+lBpx6mcQVdVdIaAcGgOTs8IdFVBNKzhX4ZH8W8mCriv3sBoTMcXn5vG40cLuJvJqLdVzM/PYdQwEfF9pMIhKI6D5tky0oaNU6qEkzEZzbaN25UyStwBUxSMDo/gj/78D/H8kUM4NDCB8oiF7voE0lqI5sPCcQBb1qGrIfjRJGaqNsY9GfGwjgTz0Nk3g0/Wp5FMxHFOU9Fq2rifq7iN25gxTQxaFsA5ZM4RUmXcv3MDQpqCsm2Db0zjGSbjLmZDkxUcTiVwLBVBSFPFZ0BB5J7WFN66LSX+3iAxxDwPQxYHFB1z3AXTFEDyMWZ7iEZC2Fifhh4KYag/i+5MHOsyMchcgqYw1CkyshUb26MhpMKauDaZceQ4x1jVQVpXsK4hCsPnGDMcRJmEkbKF/lIVDU063ID4tTBOJK+wpMcSXeGsQvJdgLI/Yqi+jjXm7QnObVfF6fkKvv3P/wsvvOb/nDX6Hb26tf/4W38Kb5CmveJb02EIRB5rHZfC0KnH+f18TN+Y1p9d+ZWM6FZmDpTPo9CDbUdBHVX8kK0FMdSxq7cAv/Jw1TDR+t5aphAM6TCoAQVBS7dLIsvzSGRC/8Hue45S5/kEG8B+hDMv+wRQlLo24hR89/gT/9Zc/6+3/oXdufKdY/L7cdSTe5X/D4wSfxrFsvfrKn3ecpHYCkAr/Rn9K/56KWJdMFDF41V9CN/UZaEbaOgifNGzeoiA0P4NoBhWkfMs9jrZ0MZZOM9RfeaJcz9BdRc0KTz9m86jjdkPk6dXaHTSuI7iDW+xxSl4Nfk0DjF+wpuqiuOw3rWCblIRy2ii4LEEHOa1LZfnv4tvpN23Tv0GX0dHXHc7wg9r3npf4B6bl0AiN7hCPZWuh4dY2WuG9pAbdgtvzXQyKnbYnndhQI0Jn4EM7DTU8FTWCn/AEyk8vNUkR8mPuKPeu2rZjFAAAAAElFTkSuQmCC" alt="Colaberry" onerror="this.style.opacity=0">
+    <div class="titles">
+      <strong>Business Analyst Field Guide</strong>
+      <span>Colaberry Enterprise AI Leadership Accelerator</span>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search-box" type="text" placeholder="Search the guide — try &quot;MoSCoW&quot;, &quot;ROI&quot;, &quot;stakeholder&quot;..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" id="ask-btn" type="button">Ask the Guide</button>
+    <button class="btn btn-ghost" id="theme-toggle" type="button" title="Toggle dark mode">Theme</button>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidenav" id="sidenav">
+  <div class="navgroup">
+    <div class="label">Start Here</div>
+    <a href="#overview" data-nav>Welcome &amp; How to Use This Guide</a>
+    <a href="#ask-section" data-nav>Ask the Field Guide</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">The Discipline</div>
+    <a href="#why-ba" data-nav>Why Business Analysis Exists</a>
+    <a href="#the-20-percent" data-nav>The 20% an Architect Must Know</a>
+    <a href="#good-bad" data-nav>Good vs. Bad Requirements</a>
+    <a href="#kpis" data-nav>KPIs &amp; Measurable Outcomes</a>
+    <a href="#review-lens" data-nav>The Architect&rsquo;s Review Lens</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">The Example</div>
+    <a href="#the-example" data-nav>Harvest &amp; Hearth Restaurant Group</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">Documents</div>
+    <a href="#doc-brd" data-nav>1. Business Requirements Document</a>
+    <a href="#doc-vision" data-nav>2. Vision &amp; Business Case</a>
+    <a href="#doc-stories" data-nav>3. User Stories</a>
+    <a href="#doc-usecases" data-nav>4. Use Cases</a>
+    <a href="#doc-personas" data-nav>5. Personas</a>
+    <a href="#doc-stakeholders" data-nav>6. Stakeholder Matrix</a>
+    <a href="#doc-process" data-nav>7. Current &amp; Future State</a>
+    <a href="#doc-rtm" data-nav>8. Traceability Matrix</a>
+    <a href="#doc-exec" data-nav>9. Executive Summary</a>
+  </div>
+</nav>
+
+<main class="content">
+<div class="container">
+
+<!-- ============================================================ OVERVIEW ============================================================ -->
+<section class="topic" id="overview" data-search-title="Welcome and how to use this guide">
+  <div class="hero">
+    <span class="tag">Deep Dive · Week 1 · Business Analyst</span>
+    <h1>Business Analyst Field Guide</h1>
+    <p>Built for learners in the Colaberry Enterprise AI Leadership Accelerator who are becoming AI Solution Architects. You will not write every requirements document yourself — AI will draft most of them. Your job is to know enough business analysis to <strong>direct, evaluate, and approve</strong> what the AI produces. This guide teaches that discipline, then shows it applied end-to-end against one realistic initiative.</p>
+  </div>
+  <div class="callout">
+    <div class="head">How this guide works</div>
+    <p>Use the left navigation or the search box at the top to jump to any topic. Every one of the nine BA documents below is a genuine, fully-designed deliverable — not a placeholder — and each one can be downloaded as a standalone branded HTML file, printed to PDF, or (for the tabular documents) exported to CSV using the buttons on its toolbar. Type a question into <a href="#ask-section">Ask the Field Guide</a> and it will answer using this guide&rsquo;s own content — no internet connection required.</p>
+  </div>
+  <div class="card-grid">
+    <div class="persona-card">
+      <h4>Who this is for</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">Architects who must direct AI-generated requirements work, not analysts who write BRDs full-time. The bar is judgment, not authorship.</p>
+    </div>
+    <div class="persona-card">
+      <h4>What&rsquo;s inside</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">A concise discipline primer, then nine complete, interlinked documents for one invented initiative: an AI demand-forecasting platform for a 42-location restaurant group.</p>
+    </div>
+    <div class="persona-card">
+      <h4>What &ldquo;done&rdquo; looks like</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">You can look at any AI-drafted requirement and immediately tell whether it is specific, testable, prioritized, traceable, and free of orphan or inflated-priority items.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ WHY BA ============================================================ -->
+<section class="topic" id="why-ba" data-search-title="Why business analysis exists">
+  <div class="eyebrow">The Discipline</div>
+  <h2>Why Business Analysis Exists</h2>
+  <p>AI can generate a requirements document in thirty seconds. It cannot yet tell you whether the requirement is <em>correct</em> &mdash; whether it reflects what the business actually needs, whether it is testable, whether it conflicts with another requirement three documents away, or whether &ldquo;the system should be fast&rdquo; means 200ms or 2 seconds. That gap is why business analysis exists, and it is exactly the gap an AI Solution Architect is paid to close.</p>
+  <p>Business analysis is the discipline of translating a fuzzy business need into a precise, testable specification &mdash; before expensive engineering work begins. Skipping it does not remove the ambiguity; it just moves the cost of resolving that ambiguity from a cheap conversation on a whiteboard to an expensive rewrite in production. Every dollar spent clarifying a requirement before code is written is, by long-standing industry experience, worth roughly ten dollars saved after.</p>
+  <div class="callout bad">
+    <div class="head">What happens without it</div>
+    <p>An AI agent is asked to &ldquo;build a system that reduces food waste.&rdquo; It ships a dashboard. Nobody defined what &ldquo;reduce&rdquo; means, by how much, by when, measured how, or who is accountable if it doesn&rsquo;t happen. Six months later, the initiative is judged a failure &mdash; not because the AI built the wrong dashboard, but because no one specified the right one.</p>
+  </div>
+  <p>As an AI Solution Architect, you sit between business stakeholders and AI-generated technical work. Business analysis is your shared vocabulary with both sides &mdash; the thing that lets you catch a bad requirement before it becomes a bad system.</p>
+</section>
+
+<!-- ============================================================ THE 20 PERCENT ============================================================ -->
+<section class="topic" id="the-20-percent" data-search-title="The 20 percent an architect must know functional non-functional user stories acceptance criteria MoSCoW personas use cases traceability">
+  <div class="eyebrow">The Discipline</div>
+  <h2>The 20% an Architect Must Know</h2>
+  <p>You do not need to become a full-time business analyst. You need the subset of the discipline that lets you evaluate AI output critically. That subset is seven ideas.</p>
+
+  <h3>1. Functional vs. non-functional requirements</h3>
+  <p>A <strong>functional requirement</strong> describes what the system does &mdash; a behavior, a feature, an action a user can take. A <strong>non-functional requirement</strong> (NFR) describes how well the system must do it &mdash; performance, security, availability, scalability, usability, compliance. AI-generated requirements sets are almost always functional-heavy and NFR-thin, because functional behavior is easier to imagine from a prompt than an operational constraint. An architect&rsquo;s first pass on any AI-drafted BRD should be: <em>where are the NFRs, and are they measurable numbers or adjectives?</em></p>
+  <div class="callout bad"><div class="head">Adjective, not a requirement</div><p class="mono" style="margin:0;">&ldquo;The system shall be fast and reliable.&rdquo;</p></div>
+  <div class="callout good"><div class="head">Measurable, testable</div><p class="mono" style="margin:0;">&ldquo;The prep-list screen shall render in under 2 seconds at the 95th percentile on standard restaurant Wi-Fi, and the platform shall maintain 99.5% uptime during operating hours.&rdquo;</p></div>
+
+  <h3>2. User stories</h3>
+  <p>A user story captures a requirement from the perspective of the person who needs it, in the form <span class="mono">As a &lt;role&gt;, I want &lt;capability&gt;, so that &lt;benefit&gt;</span>. Its value is that it forces every requirement to name a real beneficiary and a real reason &mdash; a story with no clear &ldquo;so that&rdquo; is usually a requirement nobody actually asked for.</p>
+
+  <h3>3. Acceptance criteria (Given / When / Then)</h3>
+  <p>A user story states intent; acceptance criteria state the test. The Given/When/Then format &mdash; <span class="mono">Given</span> a starting state, <span class="mono">When</span> an action occurs, <span class="mono">Then</span> an outcome is guaranteed &mdash; turns a story into something a QA engineer (human or AI) can pass or fail objectively. A story without acceptance criteria cannot be verified, only debated.</p>
+
+  <h3>4. MoSCoW prioritization</h3>
+  <p><strong>Must</strong> have (the initiative fails without it), <strong>Should</strong> have (important, painful to omit, not fatal), <strong>Could</strong> have (nice, cut first under pressure), <strong>Won&rsquo;t</strong> have this time (explicitly, deliberately, out of scope &mdash; written down so nobody re-litigates it mid-project). MoSCoW only works if the distribution is honest. If everything is a Must, nothing is.</p>
+
+  <h3>5. Personas</h3>
+  <p>A persona is not a demographic profile. &ldquo;35-year-old general manager, married, drives a Honda&rdquo; tells you nothing useful about what to build. A usable persona names <strong>goals</strong> (what this person is trying to accomplish) and <strong>frustrations</strong> (what currently gets in the way) &mdash; because those two things are what a requirement should actually respond to.</p>
+
+  <h3>6. Use cases</h3>
+  <p>A use case is a structured description of an actor achieving a goal through a system, including the main (happy) path <em>and</em> the alternate and exception paths &mdash; what happens when a system is unavailable, when a user does something unexpected, or when a business rule blocks the obvious action. An AI-drafted requirements set that only covers the happy path is not describing a system; it is describing a demo.</p>
+
+  <h3>7. Traceability</h3>
+  <p>Every requirement should trace forward to a test case that verifies it and backward to a business objective that justifies it. A requirement with no traceable objective is an <strong>orphan requirement</strong> &mdash; someone&rsquo;s pet feature that slipped in without anyone asking why it exists. A Requirements Traceability Matrix (RTM) is the tool that makes orphans visible.</p>
+</section>
+
+<!-- ============================================================ GOOD VS BAD ============================================================ -->
+<section class="topic" id="good-bad" data-search-title="Good versus bad requirements examples specific testable prioritized">
+  <div class="eyebrow">The Discipline</div>
+  <h2>Good vs. Bad Requirements</h2>
+  <p>Every AI-drafted requirement should pass four checks before an architect approves it: is it <strong>specific</strong>, is it <strong>testable</strong>, is it <strong>prioritized</strong> honestly, and is it <strong>traceable</strong> to a business objective. The table below shows the same requirement before and after that review.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th style="width:8%">#</th><th>Bad (as AI often drafts it)</th><th>Why it fails</th><th>Good (after architect review)</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>The system should reduce food waste.</td><td>No number, no owner, no deadline &mdash; unfalsifiable.</td><td>The forecasting platform shall reduce food-waste cost as a % of food cost from 11% to 7.7% within two quarters of full rollout, measured against monthly P&amp;L food-cost reporting.</td></tr>
+      <tr><td>2</td><td>The app should be easy to use.</td><td>&ldquo;Easy&rdquo; is not observable or testable.</td><td>90% of General Managers shall complete the prep-list review workflow without support after one 30-minute onboarding session, measured via a post-onboarding task-completion survey.</td></tr>
+      <tr><td>3</td><td>The system must support all future integrations.</td><td>Unbounded scope; &ldquo;all&rdquo; and &ldquo;future&rdquo; cannot be tested.</td><td>The platform architecture shall support scaling to 120 locations without redesign, to accommodate the defined Phase 2 franchise rollout.</td></tr>
+      <tr><td>4</td><td>Everything in this document is a Must-have.</td><td>Priority inflation &mdash; signals no real trade-off analysis occurred.</td><td>16 Must, 12 Should, 4 Could, 2 Won&rsquo;t-this-phase, each independently justified against a business objective (see the BRD).</td></tr>
+      <tr><td>5</td><td>The system should handle errors gracefully.</td><td>&ldquo;Gracefully&rdquo; is undefined; no fallback behavior specified.</td><td>If the POS integration is unreachable, the system shall fall back to a 7-day rolling average forecast, flag the output &ldquo;Degraded,&rdquo; and alert the IT Integration Lead within 5 minutes.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ KPIs ============================================================ -->
+<section class="topic" id="kpis" data-search-title="KPIs measurable outcomes metrics">
+  <div class="eyebrow">The Discipline</div>
+  <h2>KPIs &amp; Measurable Outcomes</h2>
+  <p>A requirement without a KPI behind it is an opinion. Every business objective in this guide&rsquo;s example initiative is backed by a specific, currently-measured baseline and a target &mdash; not an aspiration. See the KPI tiles in the <a href="#doc-exec">Executive Summary</a> and the ROI table in the <a href="#doc-vision">Vision &amp; Business Case</a> for the worked numbers. When you review an AI-generated business case, insist on the same three things every time: a <strong>baseline</strong> (where are we now), a <strong>target</strong> (where must we be, and by when), and a <strong>measurement method</strong> (how will anyone know).</p>
+</section>
+
+<!-- ============================================================ REVIEW LENS ============================================================ -->
+<section class="topic" id="review-lens" data-search-title="architect review lens red flags checklist reviewing AI generated requirements">
+  <div class="eyebrow">The Discipline</div>
+  <h2>The Architect&rsquo;s Review Lens</h2>
+  <p>When an AI agent hands you a requirements artifact, run this checklist before you approve it. This is the actual lens applied to every document in this guide.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Check</th><th>Question to ask</th><th>Red flag</th></tr></thead>
+    <tbody>
+      <tr><td>Specificity</td><td>Could two different engineers build two different things from this sentence?</td><td>Adjectives without numbers (&ldquo;fast,&rdquo; &ldquo;secure,&rdquo; &ldquo;user-friendly&rdquo;)</td></tr>
+      <tr><td>Testability</td><td>Is there a Given/When/Then or a pass/fail test that proves this is done?</td><td>Acceptance criteria that restate the requirement instead of testing it</td></tr>
+      <tr><td>Priority honesty</td><td>What is this a Must relative to &mdash; would the initiative genuinely fail without it?</td><td>More than ~50% of items marked Must; zero items marked Won&rsquo;t</td></tr>
+      <tr><td>Traceability</td><td>Which business objective does this serve? Which test case verifies it?</td><td>Requirements with no linked objective (orphans) in the RTM</td></tr>
+      <tr><td>Unhappy paths</td><td>What does this use case do when the dependency is down, or the user does the wrong thing?</td><td>Use cases with only a main flow, no alternate or exception flow</td></tr>
+      <tr><td>NFR presence</td><td>Are performance, security, availability, and compliance addressed, or only features?</td><td>A BRD that is 100% functional requirements</td></tr>
+      <tr><td>Stakeholder completeness</td><td>Does the list include people who are affected but have low power (e.g., front-line staff)?</td><td>Only executives and IT named as stakeholders</td></tr>
+      <tr><td>Scope boundary</td><td>Is out-of-scope stated explicitly, not just left unmentioned?</td><td>No &ldquo;out of scope&rdquo; section at all</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout">
+    <div class="head">Rule of thumb</div>
+    <p>If you can approve an AI-generated requirement without being able to explain, in one sentence, how someone would prove it was met, send it back.</p>
+  </div>
+</section>
+
+<!-- ============================================================ THE EXAMPLE ============================================================ -->
+<section class="topic" id="the-example" data-search-title="Harvest and Hearth Restaurant Group SmartServe AI initiative overview restaurant industry example">
+  <div class="eyebrow">Worked Example</div>
+  <h2>The Example: Harvest &amp; Hearth Restaurant Group</h2>
+  <p>Every document in this guide applies to one invented, concrete initiative so that nothing below is abstract.</p>
+  <div class="table-scroll">
+  <table>
+    <tbody>
+      <tr><th style="width:220px">Company</th><td>Harvest &amp; Hearth Restaurant Group &mdash; a 42-location casual-upscale American dining chain headquartered in Columbus, Ohio. Approximately $210M in annual revenue.</td></tr>
+      <tr><th>Industry</th><td>Restaurant / Food Service</td></tr>
+      <tr><th>Initiative</th><td><strong>SmartServe AI</strong> &mdash; an AI-powered demand forecasting and dynamic prep-planning platform</td></tr>
+      <tr><th>The problem</th><td>Prep planning today is manual and reactive: chefs estimate tomorrow&rsquo;s prep from a printed &ldquo;same day last week&rdquo; report and gut feel. Food waste runs at 11% of food cost. Stockouts (&ldquo;86&rsquo;d&rdquo; items) spike on weekends. Waste is only visible at month-end, once the damage is already on the P&amp;L.</td></tr>
+      <tr><th>The initiative</th><td>Ingest POS transactions, on-hand inventory, and local event/weather signals to forecast order volume and mix per location per daypart; auto-generate prep lists and draft purchase orders; give managers real-time (not month-end) waste visibility.</td></tr>
+      <tr><th>Scope</th><td><strong>In scope:</strong> all 42 corporate-owned locations, Toast POS integration, prep-list generation, reorder-suggestion engine, manager override, regional reporting.<br><strong>Out of scope (this phase):</strong> 18 franchise locations, delivery-app order data (DoorDash/UberEats), supplier contract renegotiation, payroll/scheduling integration.</td></tr>
+      <tr><th>Executive sponsor</th><td>Thomas Whitfield, VP of Operations</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ ASK SECTION ============================================================ -->
+<section class="topic" id="ask-section" data-search-title="ask the field guide offline question answering assistant FAQ">
+  <div class="eyebrow">Ask the Guide</div>
+  <h2>Ask the Field Guide</h2>
+  <p>Type a question in plain language. This assistant matches your question against this guide&rsquo;s own content and FAQ entries &mdash; it does not call any external service, and works fully offline.</p>
+  <div class="ask-panel">
+    <textarea id="ask-input" placeholder="e.g. What&#39;s the ROI of SmartServe AI? Who are the stakeholders? What happens if the POS goes down?"></textarea>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="btn btn-primary" id="ask-submit" type="button">Ask</button>
+      <button class="btn btn-ghost" id="ask-clear" type="button">Clear</button>
+    </div>
+    <div class="ask-chip-row" id="ask-suggestions"></div>
+    <div id="ask-answer-wrap"></div>
+  </div>
+</section>
+
+<!-- ============================================================ DOCUMENTS ============================================================ -->
+<section class="topic" id="documents-intro">
+  <div class="eyebrow">Deliverables</div>
+  <h2>The Nine Documents</h2>
+  <p>Each document below is styled as a genuine, standalone deliverable &mdash; cover page, document-control strip, sign-off block, and footer &mdash; and can be downloaded individually as branded HTML, printed to PDF, or (where tabular) exported to CSV.</p>
+</section>
+
+<!-- ===== 1. BRD ===== -->
+<section class="topic" id="doc-brd" data-search-title="Business Requirements Document BRD functional non-functional requirements">
+  <div class="eyebrow">Document 1 of 9</div>
+  <h2>Business Requirements Document (BRD)</h2>
+  <div class="doc-wrap" id="export-brd">
+    <div class="doc-toolbar">
+      <span class="idline">BRD-HH-2026-001 &middot; v1.3 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="brd">Download HTML</button>
+        <button class="btn btn-sm" data-print="brd">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Business Requirements Document</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>BRD-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.3</strong></div>
+      <div><span>Owner</span><strong>Priya Raman</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-07-10</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Purpose</h2>
+      <p>This document specifies the business requirements for SmartServe AI, an AI-powered demand forecasting and dynamic prep-planning platform for Harvest &amp; Hearth Restaurant Group. It is the basis for solution design, AI-agent-assisted development, and UAT sign-off.</p>
+
+      <h2>2. Business Objectives</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Objective</th><th>Baseline</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>O1</td><td>Reduce food-waste cost as a % of food cost</td><td>11.0%</td><td>7.7% within 2 quarters of full rollout</td></tr>
+          <tr><td>O2</td><td>Improve daily forecast accuracy (MAPE)</td><td>~24% (manual estimation)</td><td>&le;8% within 8 weeks of go-live per location</td></tr>
+          <tr><td>O3</td><td>Reduce stockout (&ldquo;86&rsquo;d&rdquo;) incidents per week, chain-wide</td><td>46/week</td><td>&lt;23/week</td></tr>
+          <tr><td>O4</td><td>Reduce manager admin hours spent on manual prep planning</td><td>7.5 hrs/week/location</td><td>2.5 hrs/week/location</td></tr>
+          <tr><td>O5</td><td>Achieve positive cumulative ROI</td><td>N/A (new investment)</td><td>Within 24 months of program launch</td></tr>
+          <tr><td>O6</td><td>Maintain full data-governance and food-safety compliance</td><td>Manual, paper-based recordkeeping</td><td>100% of forecasting data auditable under Data Governance Policy v3</td></tr>
+        </tbody>
+      </table>
+
+      <h2>3. Scope</h2>
+      <p><strong>In scope:</strong> All 42 corporate-owned locations; Toast POS integration; nightly forecast generation; prep-list publishing; GM override workflow; automated draft-PO generation; regional and chain-wide reporting dashboards.</p>
+      <p><strong>Out of scope (this phase):</strong> 18 franchise-operated locations (Phase 2 candidate); third-party delivery-app order data as a forecasting input; supplier contract renegotiation; payroll/scheduling system integration.</p>
+
+      <h2>4. Functional Requirements</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:7%">ID</th><th>Requirement</th><th style="width:10%">Priority</th></tr></thead>
+        <tbody id="tbl-fr"></tbody>
+      </table>
+      </div>
+
+      <h2>5. Non-Functional Requirements</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:7%">ID</th><th>Requirement</th><th style="width:14%">Category</th><th style="width:10%">Priority</th></tr></thead>
+        <tbody id="tbl-nfr"></tbody>
+      </table>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-title">Requirement priority mix (MoSCoW, all 34 FR + NFR items)</div>
+        <div id="chart-moscow"></div>
+      </div>
+
+      <h2>6. Assumptions</h2>
+      <ul>
+        <li>All 42 corporate locations run Toast POS with API access enabled prior to rollout.</li>
+        <li>Each location can provide at least 90 days of historical POS data at onboarding; locations with less use a category-average proxy (see BRD FR-list note on new items).</li>
+        <li>Regional Operations Directors will designate one GM per region as a pilot champion during the 8-week pilot.</li>
+      </ul>
+
+      <h2>7. Constraints</h2>
+      <ul>
+        <li>No changes to the existing Toast POS contract or hardware are authorized under this initiative&rsquo;s budget.</li>
+        <li>Solution must operate within the company&rsquo;s existing cloud hosting agreement (data residency: United States).</li>
+        <li>Kitchen-facing UI must function on the existing in-store tablets (no new hardware procurement).</li>
+      </ul>
+
+      <h2>8. Dependencies</h2>
+      <ul>
+        <li>Toast POS API access and rate limits (IT Integration Lead, Marcus Bell).</li>
+        <li>Inventory system data feed from the existing supply-chain platform (Procurement Director, Elena Cho).</li>
+        <li>Data Governance Policy v3 sign-off for the 24-month retention design (Compliance Officer, Grace Adeyemi).</li>
+      </ul>
+
+      <h2>9. Risks</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>Toast POS API rate limits throttle 15-minute ingestion at peak hours</td><td>Medium</td><td>High</td><td>Negotiate a dedicated rate-limit tier with Toast; fall back to 30-minute polling as an interim measure</td></tr>
+          <tr><td>GMs distrust AI forecasts and override every item, eroding value</td><td>Medium</td><td>High</td><td>Confidence indicators, override reason-code logging, and a visible &ldquo;forecast accuracy&rdquo; scoreboard per location</td></tr>
+          <tr><td>New-menu-item forecasts are unreliable for the first 14 days</td><td>High</td><td>Medium</td><td>Category-average proxy forecasting with a Low Confidence flag (FR-07)</td></tr>
+          <tr><td>Data-retention design fails a compliance audit</td><td>Low</td><td>High</td><td>Compliance Officer sign-off on NFR-04/NFR-14 prior to go-live; quarterly audit-log review</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>10. Glossary</h2>
+      <div class="table-scroll">
+      <table>
+        <tbody>
+          <tr><th style="width:160px">86&rsquo;d</th><td>Restaurant-industry term for a menu item that has run out and must be removed from availability.</td></tr>
+          <tr><th>MAPE</th><td>Mean Absolute Percentage Error &mdash; the standard accuracy measure for a demand forecast.</td></tr>
+          <tr><th>Daypart</th><td>A defined service period (e.g., breakfast, lunch, dinner) used to segment forecasting and prep.</td></tr>
+          <tr><th>Safety stock</th><td>The buffer inventory held above forecasted need to absorb demand variability.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Marcus Bell</div><div class="title">IT Integration Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Thomas Whitfield</div><div class="title">VP of Operations, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>BRD-HH-2026-001 v1.3</span></div>
+  </div>
+</section>
+
+<!-- ===== 2. Vision & Business Case ===== -->
+<section class="topic" id="doc-vision" data-search-title="Vision and Business Case ROI cost benefit analysis payback">
+  <div class="eyebrow">Document 2 of 9</div>
+  <h2>Vision &amp; Business Case</h2>
+  <div class="doc-wrap" id="export-vision">
+    <div class="doc-toolbar">
+      <span class="idline">VBC-HH-2026-001 &middot; v1.1 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="vision">Download HTML</button>
+        <button class="btn btn-sm" data-print="vision">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Vision &amp; Business Case</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>VBC-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.1</strong></div>
+      <div><span>Owner</span><strong>Thomas Whitfield</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-06-05</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Problem Statement</h2>
+      <p>Harvest &amp; Hearth loses an estimated $1.28M annually to preventable food waste and recaptures none of the roughly $756K in sales lost to stockouts on high-demand items. Both problems trace to the same root cause: prep planning is a manual, gut-feel process with no forward visibility, and waste is only measured 30&ndash;45 days after it happens &mdash; long after a Regional Operations Director could have coached a struggling location.</p>
+
+      <h2>2. Vision Statement</h2>
+      <p><em>&ldquo;Every location knows what it will sell tomorrow before the kitchen opens &mdash; and every manager sees waste and stockout risk in near real time, not at month-end.&rdquo;</em></p>
+
+      <h2>3. Strategic Alignment</h2>
+      <p>SmartServe AI directly supports Harvest &amp; Hearth&rsquo;s FY26&ndash;28 operating-margin improvement plan and its stated commitment to reducing food waste as part of its sustainability reporting.</p>
+
+      <h2>4. Options Considered</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Description</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td>A &mdash; Status quo</td><td>Continue manual, spreadsheet-based prep planning</td><td>Rejected &mdash; waste and stockout costs continue uncontrolled</td></tr>
+          <tr><td>B &mdash; Off-the-shelf inventory software (no forecasting)</td><td>Adopt a generic inventory-management SaaS product</td><td>Rejected &mdash; does not address the root forecasting gap</td></tr>
+          <tr><td>C &mdash; Build SmartServe AI (recommended)</td><td>Purpose-built AI forecasting layer on top of existing Toast POS and inventory systems</td><td><strong>Recommended</strong> &mdash; directly targets the root cause with measurable ROI</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>5. Business Case &mdash; Cost / Benefit</h2>
+      <div class="kpi-row">
+        <div class="kpi-tile"><div class="lbl">One-Time Implementation</div><div class="val">$1.85M</div></div>
+        <div class="kpi-tile"><div class="lbl">Annual Subscription</div><div class="val">$420K</div></div>
+        <div class="kpi-tile"><div class="lbl">Annual Savings (Steady State)</div><div class="val">$2.34M</div></div>
+        <div class="kpi-tile"><div class="lbl">Projected Payback</div><div class="val">~21 mo</div></div>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Year</th><th>Cost</th><th>Savings (ramped)</th><th>Net</th><th>Cumulative</th></tr></thead>
+        <tbody>
+          <tr><td>Year 1</td><td>$2,270,000 (impl. + subscription)</td><td>$934,752 (40% ramp &mdash; phased rollout)</td><td>&minus;$1,335,248</td><td>&minus;$1,335,248</td></tr>
+          <tr><td>Year 2</td><td>$420,000 (subscription)</td><td>$2,103,192 (90% ramp)</td><td>$1,683,192</td><td>$347,944 &mdash; <strong>breakeven crossed</strong></td></tr>
+          <tr><td>Year 3</td><td>$420,000 (subscription)</td><td>$2,336,880 (100%, steady state)</td><td>$1,916,880</td><td>$2,264,824</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="font-size:.85rem;color:var(--muted);">Savings basis: food-waste reduction ($1,275,120/yr across 42 locations at 30% reduction on an 11%-of-$920K average food-cost baseline), labor efficiency (5 hrs/week/location redirected at $28/hr blended manager rate, $305,760/yr), and recaptured stockout sales ($756,000/yr). Ramp reflects phased rollout across four regional waves.</p>
+
+      <h2>6. Success Metrics</h2>
+      <p>See Business Objectives O1&ndash;O6 in the <a href="#doc-brd">Business Requirements Document</a> and the KPI tiles in the <a href="#doc-exec">Executive Summary</a>.</p>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Sofia Rinaldi</div><div class="title">Finance Controller</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Thomas Whitfield</div><div class="title">VP of Operations, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>VBC-HH-2026-001 v1.1</span></div>
+  </div>
+</section>
+
+<!-- ===== 3. User Stories ===== -->
+<section class="topic" id="doc-stories" data-search-title="User Stories acceptance criteria Given When Then MoSCoW story points">
+  <div class="eyebrow">Document 3 of 9</div>
+  <h2>User Stories &amp; Acceptance Criteria</h2>
+  <div class="doc-wrap" id="export-stories">
+    <div class="doc-toolbar">
+      <span class="idline">US-HH-2026-001 &middot; v2.0 &middot; In Development</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="stories">Download HTML</button>
+        <button class="btn btn-sm" data-print="stories">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="stories">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>User Stories &amp; Acceptance Criteria</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>US-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>2.0</strong></div>
+      <div><span>Owner</span><strong>Priya Raman</strong></div>
+      <div><span>Status</span><strong>In Development</strong></div>
+      <div><span>Date</span><strong>2026-07-22</strong></div>
+    </div>
+    <div class="doc-body">
+      <p>Given/When/Then acceptance criteria for every story below use the same format taught in <a href="#the-20-percent">The 20% an Architect Must Know</a>. Format: Given (starting state) &rarr; When (action) &rarr; Then (guaranteed, testable outcome).</p>
+      <div id="stories-list"></div>
+      <div class="chart-box">
+        <div class="chart-title">User story priority mix</div>
+        <div id="chart-story-priority"></div>
+      </div>
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">James Okafor</div><div class="title">General Manager, Pilot Location SME</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Maria Delgado</div><div class="title">Regional Operations Director</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>US-HH-2026-001 v2.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 4. Use Cases ===== -->
+<section class="topic" id="doc-usecases" data-search-title="Use Cases alternate flows exception unhappy paths actors preconditions">
+  <div class="eyebrow">Document 4 of 9</div>
+  <h2>Use Cases</h2>
+  <div class="doc-wrap" id="export-usecases">
+    <div class="doc-toolbar">
+      <span class="idline">UC-HH-2026-001 &middot; v1.2 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="usecases">Download HTML</button>
+        <button class="btn btn-sm" data-print="usecases">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Use Cases</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>UC-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.2</strong></div>
+      <div><span>Owner</span><strong>Priya Raman</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-07-15</strong></div>
+    </div>
+    <div class="doc-body">
+
+      <h2>UC-01 &mdash; Generate Daily Prep &amp; Reorder Forecast</h2>
+      <table>
+        <tbody>
+          <tr><th style="width:180px">Primary Actor</th><td>Forecasting Engine (system)</td></tr>
+          <tr><th>Secondary Actors</th><td>Head Chef, General Manager, Procurement System</td></tr>
+          <tr><th>Trigger</th><td>Nightly batch schedule (11:30 PM local) or manual re-run by a GM</td></tr>
+          <tr><th>Preconditions</th><td>Location onboarded with &ge;90 days POS history (or using rolling-average fallback); POS integration active</td></tr>
+        </tbody>
+      </table>
+      <h4>Main Flow</h4>
+      <ol>
+        <li>Scheduler triggers the nightly forecast job for the location.</li>
+        <li>System pulls the last 24 hours of POS transactions plus the rolling historical window.</li>
+        <li>System pulls current on-hand inventory counts.</li>
+        <li>System pulls calendar flags (weather, local events) if present.</li>
+        <li>Forecasting model generates predicted order volume and mix by daypart and menu item.</li>
+        <li>System calculates required prep quantities per item using recipe yield data.</li>
+        <li>System compares forecasted ingredient usage to on-hand inventory plus safety stock.</li>
+        <li>Where usage exceeds inventory, system drafts a purchase order.</li>
+        <li>System publishes the prep list and confidence indicators to the location dashboard by 5:00 AM.</li>
+        <li>Head Chef and GM review the prep list at shift start.</li>
+      </ol>
+      <h4>Alternate Flows</h4>
+      <ul>
+        <li><strong>A1 &mdash; Manual re-run:</strong> GM triggers a re-run mid-afternoon after learning of a same-day event; steps 2&ndash;9 repeat using the latest data and are timestamped as a same-day update.</li>
+        <li><strong>A2 &mdash; New menu item, insufficient history:</strong> System detects fewer than 14 days of history for an item; forecast uses a category-average proxy and is flagged Low Confidence.</li>
+      </ul>
+      <h4>Exception / Unhappy Paths</h4>
+      <ul>
+        <li><strong>E1 &mdash; POS data unavailable:</strong> Step 2 fails; system falls back to a 7-day rolling average, flags output &ldquo;Degraded,&rdquo; and alerts the IT Integration Lead within 5 minutes.</li>
+        <li><strong>E2 &mdash; Inventory system unavailable:</strong> Step 3 fails; prep list still generates without auto-drafted POs; flagged &ldquo;Inventory sync failed &mdash; manual PO review required&rdquo; and Procurement is notified.</li>
+        <li><strong>E3 &mdash; Forecast job exceeds time window:</strong> If runtime exceeds 90 minutes, the job is terminated, yesterday&rsquo;s successful forecast is republished as &ldquo;Stale,&rdquo; and an incident ticket is auto-filed.</li>
+      </ul>
+      <p><strong>Business Rules:</strong> Safety stock = 1.5 days of forecasted usage (configurable per ingredient class). Confidence &lt;70% triggers a Low Confidence flag.<br><strong>Related Requirements:</strong> FR-01, FR-02, FR-05, FR-07, FR-17, NFR-01, NFR-03, NFR-13.</p>
+
+      <h2>UC-02 &mdash; Manager Overrides AI-Suggested Prep Quantity</h2>
+      <table>
+        <tbody>
+          <tr><th style="width:180px">Primary Actor</th><td>General Manager</td></tr>
+          <tr><th>Secondary Actors</th><td>Forecasting Engine, Regional Operations Director (reviewer)</td></tr>
+          <tr><th>Trigger</th><td>GM reviews the prep list and disagrees with a quantity</td></tr>
+          <tr><th>Preconditions</th><td>Prep list published for the location/day; GM authenticated with GM-role access</td></tr>
+        </tbody>
+      </table>
+      <h4>Main Flow</h4>
+      <ol>
+        <li>GM opens today&rsquo;s prep list.</li>
+        <li>GM selects an item and enters a revised quantity.</li>
+        <li>System requires a reason code (Local event, Known regular, Weather, Other).</li>
+        <li>GM submits the override.</li>
+        <li>System saves the override with user ID, timestamp, original value, new value, and reason code.</li>
+        <li>System recalculates dependent ingredient usage and updates any draft PO.</li>
+        <li>Override is flagged for weekly aggregate model-retraining review.</li>
+      </ol>
+      <h4>Alternate Flows</h4>
+      <ul><li><strong>A1 &mdash; Bulk override:</strong> GM applies a percentage adjustment across all items ahead of a known citywide event; logged as a single bulk-override event.</li></ul>
+      <h4>Exception / Unhappy Paths</h4>
+      <ul>
+        <li><strong>E1 &mdash; Missing reason code:</strong> Submission blocked with inline validation: &ldquo;Reason code required for all overrides.&rdquo;</li>
+        <li><strong>E2 &mdash; Override below safety-stock floor:</strong> Allowed, but displays an amber warning callout and requires a secondary confirmation click.</li>
+        <li><strong>E3 &mdash; Override after prep cutoff:</strong> Accepted for logging/learning only: &ldquo;Too late to affect today&rsquo;s prep &mdash; will apply to tomorrow&rsquo;s forecast only.&rdquo;</li>
+      </ul>
+      <p><strong>Related Requirements:</strong> FR-03, FR-04.</p>
+
+      <h2>UC-03 &mdash; System Detects Anomalous Order Pattern and Triggers Alert</h2>
+      <table>
+        <tbody>
+          <tr><th style="width:180px">Primary Actor</th><td>Forecasting Engine (anomaly-detection component)</td></tr>
+          <tr><th>Secondary Actors</th><td>General Manager, Regional Operations Director</td></tr>
+          <tr><th>Trigger</th><td>Real-time order volume deviates from forecast by more than the anomaly threshold (default &plusmn;25%)</td></tr>
+          <tr><th>Preconditions</th><td>Location live on the platform with an active real-time POS feed</td></tr>
+        </tbody>
+      </table>
+      <h4>Main Flow</h4>
+      <ol>
+        <li>System continuously compares actual order pace to forecast throughout each daypart.</li>
+        <li>System detects actual volume exceeding forecast by &gt;25% at the 1-hour mark.</li>
+        <li>System classifies the anomaly (volume spike vs. mix shift).</li>
+        <li>System sends an in-app and SMS alert with a suggested action.</li>
+        <li>GM acknowledges or dismisses the alert.</li>
+        <li>System logs the anomaly, GM response, and end-of-day actual-vs-forecast variance.</li>
+      </ol>
+      <h4>Alternate Flows</h4>
+      <ul><li><strong>A1 &mdash; Negative anomaly:</strong> Volume &gt;25% below forecast triggers a &ldquo;Slow pace&rdquo; notice with a labor-adjustment prompt instead of a reorder trigger.</li></ul>
+      <h4>Exception / Unhappy Paths</h4>
+      <ul>
+        <li><strong>E1 &mdash; Alert fatigue guard:</strong> After 3+ alerts in 2 hours for one location, further alerts are suppressed and a single consolidated alert escalates to the Regional Operations Director.</li>
+        <li><strong>E2 &mdash; SMS delivery failure:</strong> Falls back to in-app + email; failure is logged for the IT Integration Lead.</li>
+      </ul>
+      <p><strong>Related Requirements:</strong> FR-16, NFR-13.</p>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Andre Kowalski</div><div class="title">Head Chef, Kitchen Operations SME</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Maria Delgado</div><div class="title">Regional Operations Director</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>UC-HH-2026-001 v1.2</span></div>
+  </div>
+</section>
+
+<!-- ===== 5. Personas ===== -->
+<section class="topic" id="doc-personas" data-search-title="Personas goals frustrations">
+  <div class="eyebrow">Document 5 of 9</div>
+  <h2>Personas</h2>
+  <div class="doc-wrap" id="export-personas">
+    <div class="doc-toolbar">
+      <span class="idline">PER-HH-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="personas">Download HTML</button>
+        <button class="btn btn-sm" data-print="personas">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Personas</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>PER-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Priya Raman</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-06-20</strong></div>
+    </div>
+    <div class="doc-body">
+      <p>Personas here describe goals and frustrations &mdash; not demographics &mdash; because those are what actually drive requirements.</p>
+      <div class="card-grid">
+        <div class="persona-card">
+          <h3>Maria Delgado &mdash; Regional Operations Director</h3>
+          <p><strong>Goals:</strong> Consistent food-cost margins across her 8 locations; defensible data for board reporting; a rollout that doesn&rsquo;t disrupt service.</p>
+          <p><strong>Frustrations:</strong> Every GM uses a different prep spreadsheet; no visibility into waste until the month-end P&amp;L; corrective coaching always happens after the cost is already booked.</p>
+          <p style="color:var(--muted);font-style:italic;">&ldquo;By the time I see the number, the week that caused it is long over.&rdquo;</p>
+        </div>
+        <div class="persona-card">
+          <h3>James Okafor &mdash; General Manager</h3>
+          <p><strong>Goals:</strong> Hit labor and food-cost targets without burning out his team; never 86 a popular item on a Friday night; spend more time on the floor than on admin.</p>
+          <p><strong>Frustrations:</strong> Forecasting today is &ldquo;gut feel plus last week&rsquo;s numbers&rdquo;; too much time on manual prep sheets; gets blamed for waste driven by weather or events he couldn&rsquo;t have predicted.</p>
+          <p style="color:var(--muted);font-style:italic;">&ldquo;I need to know what&rsquo;s coming, not just what happened last week.&rdquo;</p>
+        </div>
+        <div class="persona-card">
+          <h3>Andre Kowalski &mdash; Head Chef</h3>
+          <p><strong>Goals:</strong> Consistent, high-quality plates; minimal last-minute 86&rsquo;d items; prep lists that actually match what will sell.</p>
+          <p><strong>Frustrations:</strong> Over-preps &ldquo;safe&rdquo; items and under-preps trending ones; throws away food he already suspected would go to waste; no visibility into why the system suggests what it suggests.</p>
+          <p style="color:var(--muted);font-style:italic;">&ldquo;If I don&rsquo;t understand why the number is what it is, I won&rsquo;t trust it.&rdquo;</p>
+        </div>
+        <div class="persona-card">
+          <h3>Priya Raman &mdash; AI Solution Architect</h3>
+          <p><strong>Goals:</strong> Ensure AI-generated requirements are correct, testable, and traceable before they reach engineering; prevent scope creep and unmeasurable requirements; enforce non-functional requirements, not just the functional wish list.</p>
+          <p><strong>Frustrations:</strong> AI-drafted BRDs that look complete but have vague acceptance criteria; requirements with no owner or priority; &ldquo;everything is a Must&rdquo; priority inflation that hides the real trade-offs.</p>
+          <p style="color:var(--muted);font-style:italic;">&ldquo;My job isn&rsquo;t to write the BRD. It&rsquo;s to know when the AI-written one is wrong.&rdquo;</p>
+        </div>
+      </div>
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">James Okafor</div><div class="title">General Manager, Pilot Location SME</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Maria Delgado</div><div class="title">Regional Operations Director</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>PER-HH-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 6. Stakeholder Matrix ===== -->
+<section class="topic" id="doc-stakeholders" data-search-title="Stakeholder Matrix RACI power interest engagement strategy">
+  <div class="eyebrow">Document 6 of 9</div>
+  <h2>Stakeholder Matrix</h2>
+  <div class="doc-wrap" id="export-stakeholders">
+    <div class="doc-toolbar">
+      <span class="idline">SH-HH-2026-001 &middot; v1.4 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="stakeholders">Download HTML</button>
+        <button class="btn btn-sm" data-print="stakeholders">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="stakeholders">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Stakeholder Matrix</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>SH-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.4</strong></div>
+      <div><span>Owner</span><strong>Maria Delgado</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-06-12</strong></div>
+    </div>
+    <div class="doc-body">
+      <div class="chart-box">
+        <div class="chart-title">Power / Interest grid</div>
+        <div id="chart-stake-scatter"></div>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Stakeholder</th><th>Role</th><th>Power</th><th>Interest</th><th>Engagement Strategy</th></tr></thead>
+        <tbody id="tbl-stakeholders"></tbody>
+      </table>
+      </div>
+      <h3>RACI &mdash; Key Approval Gates</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Stakeholder</th><th>BRD Approval</th><th>UAT Sign-off</th><th>Go-Live Decision</th></tr></thead>
+        <tbody>
+          <tr><td>Thomas Whitfield (VP Operations)</td><td>A</td><td>I</td><td>A</td></tr>
+          <tr><td>Maria Delgado (Regional Ops Director)</td><td>C</td><td>A</td><td>C</td></tr>
+          <tr><td>Priya Raman (AI Solution Architect)</td><td>R</td><td>R</td><td>C</td></tr>
+          <tr><td>Marcus Bell (IT Integration Lead)</td><td>C</td><td>R</td><td>C</td></tr>
+          <tr><td>Elena Cho (Procurement Director)</td><td>C</td><td>C</td><td>I</td></tr>
+          <tr><td>Grace Adeyemi (Compliance Officer)</td><td>C</td><td>C</td><td>C</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="font-size:.82rem;color:var(--muted);">R = Responsible, A = Accountable, C = Consulted, I = Informed.</p>
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Thomas Whitfield</div><div class="title">VP of Operations</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Maria Delgado</div><div class="title">Regional Operations Director</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>SH-HH-2026-001 v1.4</span></div>
+  </div>
+</section>
+
+<!-- ===== 7. Current & Future State ===== -->
+<section class="topic" id="doc-process" data-search-title="Current state future state process as-is to-be flow diagram">
+  <div class="eyebrow">Document 7 of 9</div>
+  <h2>Current-State &amp; Future-State Process</h2>
+  <div class="doc-wrap" id="export-process">
+    <div class="doc-toolbar">
+      <span class="idline">PROC-HH-2026-001 &middot; v1.1 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="process">Download HTML</button>
+        <button class="btn btn-sm" data-print="process">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Current-State &amp; Future-State Process</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>PROC-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.1</strong></div>
+      <div><span>Owner</span><strong>Andre Kowalski &amp; Priya Raman</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-06-25</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>Current State (As-Is)</h2>
+      <p>Prep planning today is manual and backward-looking. Waste is only visible at month-end, roughly 30&ndash;45 days after it happens &mdash; long after a Regional Director could have intervened.</p>
+      <div class="diagram-box"><div id="diagram-asis"></div></div>
+      <ol>
+        <li>Head Chef pulls a &ldquo;same day last week&rdquo; sales report from the POS (manual export).</li>
+        <li>Chef estimates today&rsquo;s prep quantities by gut-feel adjustment.</li>
+        <li>Chef writes the prep list on paper.</li>
+        <li>Kitchen staff prep to the paper list.</li>
+        <li>GM performs a visual walk-in inventory check each morning.</li>
+        <li>If a shortage is noticed, GM calls the supplier directly &mdash; often a same-day rush order.</li>
+        <li>Waste is logged inconsistently at week&rsquo;s end (most locations estimate rather than weigh).</li>
+        <li>At month-end, Finance reports food-cost variance; Regional Ops follows up on outliers 30&ndash;45 days after the fact.</li>
+      </ol>
+
+      <h2>Future State (To-Be)</h2>
+      <p>SmartServe AI moves every one of the current state&rsquo;s reactive steps to a proactive, data-driven equivalent, and compresses the waste-visibility loop from months to days.</p>
+      <div class="diagram-box"><div id="diagram-tobe"></div></div>
+      <ol>
+        <li>System pulls POS, inventory, and calendar data overnight.</li>
+        <li>AI generates the prep list and confidence flags by 5:00 AM.</li>
+        <li>Chef reviews the list on an in-kitchen tablet; prep begins against system-driven quantities.</li>
+        <li>System auto-drafts POs where inventory gaps are forecasted; GM approves with one tap.</li>
+        <li>Real-time anomaly detection alerts the GM same-day if actual pace deviates from forecast.</li>
+        <li>Waste is logged via an in-kitchen scale/scan step, feeding the dashboard directly.</li>
+        <li>Regional Ops sees a live weekly (not monthly) food-waste dashboard ranked by location.</li>
+        <li>Finance reconciles modeled savings to actual P&amp;L monthly, with an auditable variance explanation.</li>
+      </ol>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Andre Kowalski</div><div class="title">Head Chef, Kitchen Operations SME</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Maria Delgado</div><div class="title">Regional Operations Director</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>PROC-HH-2026-001 v1.1</span></div>
+  </div>
+</section>
+
+<!-- ===== 8. RTM ===== -->
+<section class="topic" id="doc-rtm" data-search-title="Requirements Traceability Matrix RTM orphan requirements test cases">
+  <div class="eyebrow">Document 8 of 9</div>
+  <h2>Requirements Traceability Matrix (RTM)</h2>
+  <div class="doc-wrap" id="export-rtm">
+    <div class="doc-toolbar">
+      <span class="idline">RTM-HH-2026-001 &middot; v2.1 &middot; Living Document</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="rtm">Download HTML</button>
+        <button class="btn btn-sm" data-print="rtm">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="rtm">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Requirements Traceability Matrix</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>RTM-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>2.1</strong></div>
+      <div><span>Owner</span><strong>Priya Raman</strong></div>
+      <div><span>Status</span><strong>Living Document &mdash; Updated Weekly</strong></div>
+      <div><span>Date</span><strong>2026-07-28</strong></div>
+    </div>
+    <div class="doc-body">
+      <p>Every functional and non-functional requirement in the BRD traces to a business objective and, unless explicitly deferred, to a test case. The two Won&rsquo;t-this-phase items are traced to a future objective and marked Deferred rather than left as silent orphans.</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Req ID</th><th>Requirement (short)</th><th>Objective</th><th>Story / Use Case</th><th>Priority</th><th>Test Case</th><th>Status</th></tr></thead>
+        <tbody id="tbl-rtm"></tbody>
+      </table>
+      </div>
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Marcus Bell</div><div class="title">IT Integration Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Thomas Whitfield</div><div class="title">VP of Operations, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>RTM-HH-2026-001 v2.1</span></div>
+  </div>
+</section>
+
+<!-- ===== 9. Executive Summary ===== -->
+<section class="topic" id="doc-exec" data-search-title="Executive Summary one page KPI recommendation ask">
+  <div class="eyebrow">Document 9 of 9</div>
+  <h2>Executive Summary</h2>
+  <div class="doc-wrap" id="export-exec">
+    <div class="doc-toolbar">
+      <span class="idline">EXEC-HH-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="exec">Download HTML</button>
+        <button class="btn btn-sm" data-print="exec">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Executive Summary</h1>
+      <p class="doc-sub">SmartServe AI &mdash; Demand Forecasting &amp; Dynamic Prep Planning Platform</p>
+      <p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>EXEC-HH-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Thomas Whitfield</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-07-29</strong></div>
+    </div>
+    <div class="doc-body">
+      <p><strong>Situation:</strong> Manual, gut-feel prep planning costs Harvest &amp; Hearth an estimated $1.28M/year in preventable food waste and $756K/year in stockout-driven lost sales, visible to management only after a 30&ndash;45 day P&amp;L lag.</p>
+      <p><strong>Recommendation:</strong> Approve SmartServe AI, an AI-powered forecasting and prep-planning platform, for phased rollout across all 42 corporate locations.</p>
+      <div class="kpi-row">
+        <div class="kpi-tile"><div class="lbl">Food Waste</div><div class="val">11.0% &rarr; 7.7%</div><div class="delta pos">Target: -30%</div></div>
+        <div class="kpi-tile"><div class="lbl">Forecast Accuracy (MAPE)</div><div class="val">&le;8%</div><div class="delta pos">from ~24%</div></div>
+        <div class="kpi-tile"><div class="lbl">Stockouts / Week</div><div class="val">46 &rarr; &lt;23</div><div class="delta pos">Target: -50%</div></div>
+        <div class="kpi-tile"><div class="lbl">Manager Admin Hrs/Wk</div><div class="val">7.5 &rarr; 2.5</div><div class="delta pos">-5 hrs/location</div></div>
+        <div class="kpi-tile"><div class="lbl">ROI Payback</div><div class="val">~21 mo</div><div class="delta pos">3-yr net: $2.26M</div></div>
+        <div class="kpi-tile"><div class="lbl">Locations in Scope</div><div class="val">42</div><div class="delta">Phase 2: +18 franchise</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Forecast accuracy (MAPE) improvement during 8-week pilot, vs. target</div>
+        <div id="chart-mape-trend"></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Current order mix by menu category (pilot locations, trailing 90 days)</div>
+        <div id="chart-order-mix"></div>
+      </div>
+      <p><strong>The ask:</strong> $1.85M one-time implementation budget plus $420K/year subscription, approved for the FY26 capital plan. Payback projected at Month 21; positive cumulative ROI by end of Year 2, meeting Business Objective O5.</p>
+      <p><strong>Next milestone:</strong> 8-week pilot across 4 locations completes 2026-09-15; go/no-go decision for chain-wide rollout at the October Operations Review.</p>
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Priya Raman</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Sofia Rinaldi</div><div class="title">Finance Controller</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Thomas Whitfield</div><div class="title">VP of Operations, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group &mdash; Internal Use</span><span>EXEC-HH-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+
+<footer class="app-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <span>Colaberry Enterprise AI Leadership Accelerator &mdash; Business Analyst Field Guide</span>
+    <span>Generated by Claude Code &middot; 2026-07-30 &middot; v1.0.0</span>
+  </div>
+</footer>
+
+<script type="application/json" id="deepdive-metadata">
+{
+  "guide_type": "Business Analyst Field Guide",
+  "curriculum_type": "deep_dive",
+  "week": 1,
+  "discipline": "Business Analyst",
+  "student_id": "regina.asafor",
+  "project_id": "BA-FieldGuide-Restaurant-Deepdive",
+  "repository": "AI-Project",
+  "generated_by": "Claude Code",
+  "generated_date": "2026-07-30",
+  "version": "1.0.0",
+  "build_number": "1"
+}
+</script>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================ Logo ============================================================ */
+var LOGO_DATA_URI = document.querySelector('.brand img').getAttribute('src');
+document.querySelectorAll('[data-logo]').forEach(function(img){ img.src = LOGO_DATA_URI; });
+
+/* ============================================================ Theme toggle ============================================================ */
+var root = document.documentElement;
+var savedTheme = null;
+try{ savedTheme = localStorage.getItem('bafg-theme'); }catch(e){}
+if(savedTheme){ root.setAttribute('data-theme', savedTheme); }
+document.getElementById('theme-toggle').addEventListener('click', function(){
+  var current = root.getAttribute('data-theme');
+  var next = current === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try{ localStorage.setItem('bafg-theme', next); }catch(e){}
+});
+
+/* ============================================================ Data: Requirements ============================================================ */
+var FR = [
+  ["FR-01","System shall ingest POS transaction data from all 42 corporate locations no less than every 15 minutes.","must"],
+  ["FR-02","System shall generate a daily prep list per location per daypart by 5:00 AM local time.","must"],
+  ["FR-03","System shall allow GMs to override AI-suggested prep quantities with a mandatory reason code.","must"],
+  ["FR-04","System shall log all overrides with user ID, timestamp, original value, new value, and reason code.","must"],
+  ["FR-05","System shall auto-generate draft purchase orders when forecasted ingredient usage exceeds on-hand inventory plus safety stock.","must"],
+  ["FR-06","System shall route draft POs to the GM for approval before transmission to suppliers.","must"],
+  ["FR-07","System shall display a forecast confidence indicator (High / Medium / Low) for each menu item.","should"],
+  ["FR-08","System shall allow chefs to flag suspected forecast errors per item.","should"],
+  ["FR-09","System shall auto-create a model-review ticket after 3+ correction flags on the same item within 14 days.","should"],
+  ["FR-10","System shall provide a regional weekly food-waste dashboard ranked by location.","should"],
+  ["FR-11","System shall provide a monthly reconciliation report comparing modeled savings to actual P&amp;L food-cost variance.","should"],
+  ["FR-12","System shall support manual event-flagging (local sports game, holiday) to adjust forecasts.","should"],
+  ["FR-13","System shall provide an event-simulation view comparing baseline vs. event-adjusted forecast.","should"],
+  ["FR-14","System shall provide a mobile-responsive view of the next day&rsquo;s prep list.","could"],
+  ["FR-15","System shall support CSV export of any dashboard view.","could"],
+  ["FR-16","System shall send a push/SMS alert to the GM when a Low Confidence forecast is generated for a top-10 selling item.","could"],
+  ["FR-17","System shall fall back to a 7-day rolling average forecast and flag output &ldquo;Degraded&rdquo; if POS data is unavailable.","must"],
+  ["FR-18","System shall restrict prep-list override and PO-approval actions to users with GM role or above.","must"],
+  ["FR-19","System shall provide franchise-location access to the forecasting tool.","wont"],
+  ["FR-20","System shall integrate third-party delivery-app order data (DoorDash, UberEats) as a forecasting input.","wont"]
+];
+var NFR = [
+  ["NFR-01","Nightly forecast batch job shall complete for all 42 locations within a 90-minute window (11:30 PM&ndash;1:00 AM aggregation).","Performance","must"],
+  ["NFR-02","Prep-list screen shall render in under 2 seconds at the 95th percentile on standard restaurant Wi-Fi.","Performance","must"],
+  ["NFR-03","Platform shall maintain 99.5% uptime during operating hours (6 AM&ndash;11 PM local, all time zones served).","Availability","must"],
+  ["NFR-04","POS and inventory data used for forecasting shall be retained no longer than 24 months, then auto-purged.","Data Retention","must"],
+  ["NFR-05","All POS data in transit shall be encrypted using TLS 1.2 or higher.","Security","must"],
+  ["NFR-06","Role-based access control shall restrict PO approval to GM role or above; all access shall be logged.","Security","must"],
+  ["NFR-07","Forecast accuracy shall achieve a MAPE of 8% or lower within 8 weeks of go-live at a given location.","Accuracy","should"],
+  ["NFR-08","90% of GMs shall complete the prep-list review workflow without support after one 30-minute onboarding session.","Usability","should"],
+  ["NFR-09","Platform architecture shall support scaling to 120 locations without redesign.","Scalability","should"],
+  ["NFR-10","All AI-generated forecasts and overrides shall be retrievable for audit for the full 24-month retention window.","Auditability","should"],
+  ["NFR-11","Prep-list units shall support both imperial (lb/oz) and metric (kg/g) display, configurable per location.","Localization","could"],
+  ["NFR-12","System shall degrade gracefully rather than fail silently on any upstream data-source outage.","Reliability","must"],
+  ["NFR-13","All forecast-job failures or degraded runs shall trigger an alert to the IT Integration Lead within 5 minutes.","Observability","should"],
+  ["NFR-14","System shall comply with the company&rsquo;s internal Data Governance Policy v3 and applicable state food-safety recordkeeping requirements.","Compliance","must"]
+];
+var PRI_LABEL = {must:"Must", should:"Should", could:"Could", wont:"Won&rsquo;t"};
+var PRI_CLASS = {must:"pill-must", should:"pill-should", could:"pill-could", wont:"pill-wont"};
+
+function fillReqTable(tbodyId, rows, hasCategory){
+  var tbody = document.getElementById(tbodyId);
+  var html = rows.map(function(r){
+    if(hasCategory){
+      return '<tr><td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td><span class="pill '+PRI_CLASS[r[3]]+'">'+PRI_LABEL[r[3]]+'</span></td></tr>';
+    }
+    return '<tr><td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td><span class="pill '+PRI_CLASS[r[2]]+'">'+PRI_LABEL[r[2]]+'</span></td></tr>';
+  }).join('');
+  tbody.innerHTML = html;
+}
+fillReqTable('tbl-fr', FR, false);
+fillReqTable('tbl-nfr', NFR, true);
+
+/* ============================================================ Data: User Stories ============================================================ */
+var STORIES = [
+  {id:"US-01", persona:"Head Chef", priority:"must", points:8,
+   as:"Head Chef", want:"an AI-generated prep list by daypart", so:"I can prep the right quantity of each menu item",
+   given:"a location with at least 90 days of POS history", when:"the daily forecast job runs", then:"a prep list broken out by breakfast/lunch/dinner daypart is available in the app by 5:00 AM local time."},
+  {id:"US-02", persona:"General Manager", priority:"must", points:5,
+   as:"General Manager", want:"to override an AI-suggested prep quantity", so:"I can account for known local events not in the system",
+   given:"a prep list has been generated", when:"a GM edits a quantity and provides a reason code", then:"the override is saved, timestamped, and flagged for model-retraining review."},
+  {id:"US-03", persona:"Regional Ops Director", priority:"must", points:5,
+   as:"Regional Operations Director", want:"a weekly food-waste dashboard across my region", so:"I can spot outlier locations",
+   given:"waste data logged at all locations in my region", when:"I open the weekly dashboard", then:"I see waste $ and % by location ranked highest to lowest, with a 4-week trend line."},
+  {id:"US-04", persona:"Procurement Director", priority:"must", points:8,
+   as:"Procurement / Supply Chain Director", want:"an auto-generated suggested purchase order when forecasted usage exceeds current inventory", so:"stockouts are prevented",
+   given:"forecasted usage for an ingredient exceeds on-hand inventory plus safety stock", when:"the nightly inventory job runs", then:"a draft PO is created and routed to the location&rsquo;s approved supplier list for GM approval."},
+  {id:"US-05", persona:"General Manager", priority:"should", points:3,
+   as:"General Manager", want:"a forecast-confidence indicator (High/Medium/Low) next to each item", so:"I know when to trust vs. double-check the AI",
+   given:"a forecast is generated for an item", when:"confidence is below 70% (e.g., new item, insufficient history)", then:"the item is flagged Low Confidence in the UI."},
+  {id:"US-06", persona:"Head Chef", priority:"should", points:3,
+   as:"Head Chef", want:"to flag a systematic forecast error (e.g., always over-predicting a dish)", so:"the model can be corrected",
+   given:"a chef submits 3+ correction flags for the same item within 14 days", when:"the threshold is met", then:"a model-review ticket is auto-created for the data science team."},
+  {id:"US-07", persona:"Finance Controller", priority:"should", points:5,
+   as:"Finance Controller", want:"modeled food-waste savings to reconcile against the actual P&amp;L food-cost line", so:"reported ROI is auditable",
+   given:"monthly P&amp;L close", when:"the reconciliation report runs", then:"modeled savings and actual food-cost variance are shown side-by-side, with a variance explanation for any gap greater than 5%."},
+  {id:"US-08", persona:"General Manager", priority:"could", points:2,
+   as:"General Manager", want:"a mobile-friendly view of tomorrow&rsquo;s prep list", so:"I can review it from home the night before",
+   given:"a GM is logged in on a mobile device", when:"they open &ldquo;Tomorrow&rsquo;s Prep&rdquo;", then:"the list renders in under 2 seconds on a standard 4G connection."},
+  {id:"US-09", persona:"Regional Ops Director", priority:"could", points:5,
+   as:"Regional Operations Director", want:"to simulate the impact of a local event (e.g., a football game) on forecasted volume", so:"I can plan staffing ahead of time",
+   given:"an event is manually flagged on the calendar", when:"&ldquo;Simulate Impact&rdquo; is run", then:"a side-by-side forecast (baseline vs. event-adjusted) is displayed."},
+  {id:"US-10", persona:"IT Integration Lead", priority:"must", points:5,
+   as:"IT Integration Lead", want:"the forecast job to gracefully handle a POS data outage", so:"prep lists are still available",
+   given:"the Toast POS API is unreachable", when:"the nightly forecast job runs", then:"the system falls back to the prior 7-day rolling average and flags the forecast &ldquo;Degraded &mdash; POS data unavailable&rdquo; rather than failing silently."},
+  {id:"US-11", persona:"Franchise Owner", priority:"wont", points:0,
+   as:"Franchise Owner", want:"access to the same forecasting tool for my franchise location", so:"I can reduce waste too",
+   given:"n/a &mdash; explicitly Won&rsquo;t this phase", when:"n/a", then:"deferred to the Phase 2 franchise-rollout candidate list; see BRD Section 3 (Scope)."},
+  {id:"US-12", persona:"Compliance Officer", priority:"should", points:3,
+   as:"Data Privacy / Compliance Officer", want:"all POS and inventory data used for forecasting to be retained no longer than 24 months and access-logged", so:"we meet our internal data-governance policy",
+   given:"data ingestion from POS", when:"data reaches 24 months of age", then:"it is automatically purged from the active forecasting store, and the purge is logged with a timestamp and record count."}
+];
+
+function renderStories(){
+  var wrap = document.getElementById('stories-list');
+  wrap.innerHTML = STORIES.map(function(s){
+    return '<div class="callout" data-story-priority="'+s.priority+'" style="margin:16px 0;">'+
+      '<div class="head" style="display:flex;justify-content:space-between;align-items:center;">'+
+        '<span class="mono">'+s.id+' &middot; '+s.persona+'</span>'+
+        '<span class="pill '+PRI_CLASS[s.priority]+'">'+PRI_LABEL[s.priority]+(s.points?(' &middot; '+s.points+' pts'):'')+'</span>'+
+      '</div>'+
+      '<p style="margin:6px 0 8px;"><strong>As a</strong> '+s.as+', <strong>I want</strong> '+s.want+', <strong>so that</strong> '+s.so+'.</p>'+
+      '<p class="mono" style="font-size:.82rem;margin:0;color:var(--muted);"><strong style="color:var(--text);">Given</strong> '+s.given+' &middot; <strong style="color:var(--text);">When</strong> '+s.when+' &middot; <strong style="color:var(--text);">Then</strong> '+s.then+'</p>'+
+    '</div>';
+  }).join('');
+}
+renderStories();
+
+/* ============================================================ Data: Stakeholders ============================================================ */
+var STAKEHOLDERS = [
+  {name:"Thomas Whitfield", role:"VP of Operations (Executive Sponsor)", power:9, interest:9, strategy:"Manage Closely"},
+  {name:"Maria Delgado", role:"Regional Operations Director", power:8, interest:9, strategy:"Manage Closely"},
+  {name:"James Okafor", role:"Restaurant General Manager", power:5, interest:9, strategy:"Keep Informed"},
+  {name:"Andre Kowalski", role:"Head Chef / Kitchen Manager", power:4, interest:8, strategy:"Keep Informed"},
+  {name:"Elena Cho", role:"Supply Chain &amp; Procurement Director", power:8, interest:6, strategy:"Keep Satisfied"},
+  {name:"Marcus Bell", role:"IT Integration Lead", power:6, interest:7, strategy:"Manage Closely"},
+  {name:"Sofia Rinaldi", role:"Finance Controller", power:8, interest:5, strategy:"Keep Satisfied"},
+  {name:"Kitchen &amp; Line Staff", role:"Front-line kitchen team", power:2, interest:6, strategy:"Keep Informed"},
+  {name:"Franchise Advisory Council", role:"Observing for Phase 2", power:3, interest:8, strategy:"Keep Informed"},
+  {name:"Grace Adeyemi", role:"Data Privacy &amp; Compliance Officer", power:6, interest:4, strategy:"Keep Satisfied"},
+  {name:"Priya Raman", role:"AI Solution Architect", power:6, interest:9, strategy:"Manage Closely"},
+  {name:"Daniel Fischer", role:"SmartServe AI Vendor, Implementation Director", power:5, interest:6, strategy:"Keep Satisfied"}
+];
+
+function renderStakeholderTable(){
+  var tbody = document.getElementById('tbl-stakeholders');
+  tbody.innerHTML = STAKEHOLDERS.map(function(s){
+    return '<tr><td><strong>'+s.name+'</strong></td><td>'+s.role+'</td><td>'+s.power+'/10</td><td>'+s.interest+'/10</td><td>'+s.strategy+'</td></tr>';
+  }).join('');
+}
+renderStakeholderTable();
+
+/* ============================================================ Data: RTM ============================================================ */
+var OBJ = {O1:"Reduce food waste", O2:"Forecast accuracy", O3:"Reduce stockouts", O4:"Reduce admin hours", O5:"Positive ROI", O6:"Governance / compliance"};
+var RTM = [
+  ["FR-01","Ingest POS data every 15 min","O2","UC-01","must","TC-01","done"],
+  ["FR-02","Generate daily prep list by 5 AM","O1","US-01 / UC-01","must","TC-02","done"],
+  ["FR-03","GM override with reason code","O4","US-02 / UC-02","must","TC-03","done"],
+  ["FR-04","Log all overrides","O4","US-02 / UC-02","must","TC-04","done"],
+  ["FR-05","Auto-draft PO on inventory gap","O3","US-04 / UC-01","must","TC-05","test"],
+  ["FR-06","Route draft PO for GM approval","O3","US-04 / UC-01","must","TC-06","test"],
+  ["FR-07","Forecast confidence indicator","O2","US-05 / UC-01","should","TC-07","dev"],
+  ["FR-08","Chef flags forecast error","O2","US-06","should","TC-08","dev"],
+  ["FR-09","Auto model-review ticket","O2","US-06","should","TC-09","dev"],
+  ["FR-10","Regional weekly waste dashboard","O1","US-03","should","TC-10","dev"],
+  ["FR-11","Monthly reconciliation report","O5","US-07","should","TC-11","backlog"],
+  ["FR-12","Manual event-flagging","O3","US-09 / UC-03","should","TC-12","dev"],
+  ["FR-13","Event-simulation view","O2","US-09","should","TC-13","backlog"],
+  ["FR-14","Mobile prep-list view","O4","US-08","could","TC-14","backlog"],
+  ["FR-15","CSV export of dashboards","O4","&mdash;","could","TC-15","backlog"],
+  ["FR-16","Low-confidence push/SMS alert","O3","UC-03","could","TC-16","backlog"],
+  ["FR-17","Graceful POS-outage fallback","O2","US-10 / UC-01 (E1)","must","TC-17","done"],
+  ["FR-18","RBAC on override / PO approval","O6","UC-02","must","TC-18","done"],
+  ["FR-19","Franchise-location access","O5 (future)","&mdash;","wont","&mdash;","deferred"],
+  ["FR-20","Delivery-app data integration","O2 (future)","&mdash;","wont","&mdash;","deferred"],
+  ["NFR-01","90-min nightly batch window","O2","UC-01 (E3)","must","TC-19","test"],
+  ["NFR-02","Prep-list render &lt;2s p95","O4","&mdash;","must","TC-20","dev"],
+  ["NFR-03","99.5% uptime, operating hours","O4","&mdash;","must","TC-21","dev"],
+  ["NFR-04","24-month data retention","O6","US-12","must","TC-22","backlog"],
+  ["NFR-05","TLS 1.2+ in transit","O6","&mdash;","must","TC-23","done"],
+  ["NFR-06","RBAC + access logging","O6","UC-02","must","TC-24","done"],
+  ["NFR-07","MAPE &le;8% within 8 weeks","O2","&mdash;","should","TC-25","test"],
+  ["NFR-08","90% GM self-service post-onboarding","O4","&mdash;","should","TC-26","backlog"],
+  ["NFR-09","Scalable to 120 locations","O5 (future)","&mdash;","should","TC-27","backlog"],
+  ["NFR-10","24-month audit retrievability","O6","&mdash;","should","TC-28","backlog"],
+  ["NFR-11","Imperial / metric unit toggle","O4","&mdash;","could","TC-29","backlog"],
+  ["NFR-12","Graceful degradation on outage","O2","UC-01 (E1, E2)","must","TC-30","done"],
+  ["NFR-13","Alert IT lead within 5 min","O2","UC-01 (E1), UC-03 (E2)","should","TC-31","dev"],
+  ["NFR-14","Comply with Data Governance Policy v3","O6","US-12","must","TC-32","backlog"]
+];
+var STATUS_LABEL = {done:"Complete &ndash; Verified", test:"In Testing", dev:"In Development", backlog:"Backlog", deferred:"Deferred &ndash; Phase 2"};
+var STATUS_CLASS = {done:"pill-status", test:"pill-status test", dev:"pill-status dev", backlog:"pill-status backlog", deferred:"pill-status deferred"};
+
+function renderRTM(){
+  var tbody = document.getElementById('tbl-rtm');
+  tbody.innerHTML = RTM.map(function(r){
+    return '<tr><td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+' <span style="color:var(--muted);font-size:.78rem;">('+ (OBJ[r[2].split(' ')[0]]||'') +')</span></td><td>'+r[3]+'</td>'+
+      '<td><span class="pill '+PRI_CLASS[r[4]]+'">'+PRI_LABEL[r[4]]+'</span></td><td class="mono">'+r[5]+'</td>'+
+      '<td><span class="'+STATUS_CLASS[r[6]]+'">'+STATUS_LABEL[r[6]]+'</span></td></tr>';
+  }).join('');
+}
+renderRTM();
+
+/* ============================================================ Mini SVG chart library ============================================================ */
+var NS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs){
+  var el = document.createElementNS(NS, tag);
+  for(var k in attrs){ el.setAttribute(k, attrs[k]); }
+  return el;
+}
+function colorVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function makeDonut(containerId, data){
+  var el = document.getElementById(containerId); if(!el) return;
+  var size = 220, cx = size/2, cy = size/2, r = 78, stroke = 34;
+  var total = data.reduce(function(a,d){return a+d.value;},0);
+  var svg = svgEl('svg', {viewBox:'0 0 '+(size+180)+' '+size, width:'100%', height:'260', role:'img', 'aria-label':'Donut chart'});
+  var circumference = 2*Math.PI*r;
+  var offset = 0;
+  data.forEach(function(d){
+    var frac = d.value/total;
+    var dash = frac*circumference;
+    var circle = svgEl('circle', {
+      cx:cx, cy:cy, r:r, fill:'none', stroke:d.color, 'stroke-width':stroke,
+      'stroke-dasharray': dash+' '+(circumference-dash),
+      'stroke-dashoffset': -offset,
+      transform:'rotate(-90 '+cx+' '+cy+')'
+    });
+    svg.appendChild(circle);
+    offset += dash;
+  });
+  var label = svgEl('text', {x:cx, y:cy-4, 'text-anchor':'middle', 'font-family':'Roboto Mono, monospace', 'font-size':'22', 'font-weight':'700', fill:colorVar('--text')});
+  label.textContent = total+'%';
+  svg.appendChild(label);
+  var label2 = svgEl('text', {x:cx, y:cy+16, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'11', fill:colorVar('--muted')});
+  label2.textContent = 'of orders';
+  svg.appendChild(label2);
+  var legendX = size + 20, legendY = 40;
+  data.forEach(function(d, i){
+    var y = legendY + i*26;
+    svg.appendChild(svgEl('rect', {x:legendX, y:y-11, width:12, height:12, rx:2, fill:d.color}));
+    var t = svgEl('text', {x:legendX+18, y:y-1, 'font-family':'Roboto, sans-serif', 'font-size':'12.5', fill:colorVar('--text')});
+    t.textContent = d.label+' — '+d.value+'%';
+    svg.appendChild(t);
+  });
+  el.appendChild(svg);
+}
+
+function makeBarChart(containerId, data, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var w = 560, h = 240, padL = 40, padB = 34, padT = 14, padR = 14;
+  var maxVal = opts.maxValue || Math.max.apply(null, data.map(function(d){return d.value;}));
+  var chartW = w - padL - padR, chartH = h - padT - padB;
+  var barW = chartW/data.length*0.55;
+  var gap = chartW/data.length;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:'260', role:'img', 'aria-label':'Bar chart'});
+  // axis
+  svg.appendChild(svgEl('line', {x1:padL, y1:padT, x2:padL, y2:h-padB, stroke:colorVar('--border'), 'stroke-width':1}));
+  svg.appendChild(svgEl('line', {x1:padL, y1:h-padB, x2:w-padR, y2:h-padB, stroke:colorVar('--border'), 'stroke-width':1}));
+  [0,0.25,0.5,0.75,1].forEach(function(f){
+    var y = h-padB-f*chartH;
+    var gl = svgEl('line', {x1:padL, y1:y, x2:w-padR, y2:y, stroke:colorVar('--border'), 'stroke-width':0.5, 'stroke-dasharray':'3,3'});
+    svg.appendChild(gl);
+    var lbl = svgEl('text', {x:padL-6, y:y+4, 'text-anchor':'end', 'font-family':'Roboto Mono, monospace', 'font-size':'9.5', fill:colorVar('--muted')});
+    lbl.textContent = Math.round(f*maxVal);
+    svg.appendChild(lbl);
+  });
+  data.forEach(function(d, i){
+    var x = padL + i*gap + (gap-barW)/2;
+    var barH = (d.value/maxVal)*chartH;
+    var y = h - padB - barH;
+    svg.appendChild(svgEl('rect', {x:x, y:y, width:barW, height:barH, rx:4, fill:d.color}));
+    var vt = svgEl('text', {x:x+barW/2, y:y-6, 'text-anchor':'middle', 'font-family':'Roboto Mono, monospace', 'font-size':'11.5', 'font-weight':'700', fill:colorVar('--text')});
+    vt.textContent = d.value;
+    svg.appendChild(vt);
+    var lt = svgEl('text', {x:x+barW/2, y:h-padB+16, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'11', fill:colorVar('--muted')});
+    lt.textContent = d.label;
+    svg.appendChild(lt);
+  });
+  el.appendChild(svg);
+}
+
+function makeLineChart(containerId, points, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var w = 600, h = 240, padL = 40, padB = 30, padT = 16, padR = 20;
+  var chartW = w-padL-padR, chartH = h-padT-padB;
+  var maxY = opts.maxY || Math.max.apply(null, points.map(function(p){return p.y;}))*1.15;
+  var minY = 0;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:'260', role:'img', 'aria-label':'Line chart'});
+  svg.appendChild(svgEl('line', {x1:padL, y1:padT, x2:padL, y2:h-padB, stroke:colorVar('--border'), 'stroke-width':1}));
+  svg.appendChild(svgEl('line', {x1:padL, y1:h-padB, x2:w-padR, y2:h-padB, stroke:colorVar('--border'), 'stroke-width':1}));
+  function px(i){ return padL + (i/(points.length-1))*chartW; }
+  function py(v){ return h-padB-((v-minY)/(maxY-minY))*chartH; }
+  if(opts.target){
+    var ty = py(opts.target);
+    svg.appendChild(svgEl('line', {x1:padL, y1:ty, x2:w-padR, y2:ty, stroke:colorVar('--cherry'), 'stroke-width':1.5, 'stroke-dasharray':'5,4'}));
+    var tl = svgEl('text', {x:w-padR, y:ty-6, 'text-anchor':'end', 'font-family':'Roboto Mono, monospace', 'font-size':'10.5', fill:colorVar('--cherry')});
+    tl.textContent = 'Target ' + opts.target + '%';
+    svg.appendChild(tl);
+  }
+  var d = points.map(function(p,i){ return (i===0?'M':'L')+px(i)+' '+py(p.y); }).join(' ');
+  svg.appendChild(svgEl('path', {d:d, fill:'none', stroke:colorVar('--berry'), 'stroke-width':2.5}));
+  points.forEach(function(p,i){
+    svg.appendChild(svgEl('circle', {cx:px(i), cy:py(p.y), r:3.5, fill:colorVar('--berry')}));
+    var lbl = svgEl('text', {x:px(i), y:h-padB+15, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'10', fill:colorVar('--muted')});
+    lbl.textContent = p.x;
+    svg.appendChild(lbl);
+  });
+  el.appendChild(svg);
+}
+
+function makeScatter(containerId, points){
+  var el = document.getElementById(containerId); if(!el) return;
+  var w = 620, h = 340, pad = 46;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:'380', role:'img', 'aria-label':'Power interest scatter plot'});
+  var chartW = w-2*pad, chartH = h-2*pad;
+  // quadrant background labels
+  var quads = [
+    {x:pad, y:pad, txt:'Keep Informed'}, {x:pad+chartW/2, y:pad, txt:'Manage Closely'},
+    {x:pad, y:pad+chartH/2, txt:'Monitor'}, {x:pad+chartW/2, y:pad+chartH/2, txt:'Keep Satisfied'}
+  ];
+  quads.forEach(function(q){
+    var t = svgEl('text', {x:q.x+chartW/4, y:q.y+16, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'10.5', 'font-weight':'700', fill:colorVar('--muted'), opacity:'0.65'});
+    t.textContent = q.txt;
+    svg.appendChild(t);
+  });
+  svg.appendChild(svgEl('line', {x1:pad+chartW/2, y1:pad, x2:pad+chartW/2, y2:h-pad, stroke:colorVar('--border'), 'stroke-width':1}));
+  svg.appendChild(svgEl('line', {x1:pad, y1:pad+chartH/2, x2:w-pad, y2:pad+chartH/2, stroke:colorVar('--border'), 'stroke-width':1}));
+  svg.appendChild(svgEl('rect', {x:pad, y:pad, width:chartW, height:chartH, fill:'none', stroke:colorVar('--border'), 'stroke-width':1}));
+  var xlbl = svgEl('text', {x:pad+chartW/2, y:h-8, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'11', 'font-weight':700, fill:colorVar('--text')});
+  xlbl.textContent = 'Interest →'; svg.appendChild(xlbl);
+  var ylbl = svgEl('text', {x:14, y:pad+chartH/2, 'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'11', 'font-weight':700, fill:colorVar('--text'), transform:'rotate(-90 14 '+(pad+chartH/2)+')'});
+  ylbl.textContent = 'Power →'; svg.appendChild(ylbl);
+  points.forEach(function(p){
+    var x = pad + (p.interest/10)*chartW;
+    var y = h - pad - (p.power/10)*chartH;
+    svg.appendChild(svgEl('circle', {cx:x, cy:y, r:6, fill:colorVar('--berry'), 'fill-opacity':'0.85'}));
+    var t = svgEl('text', {x:x+9, y:y+3, 'font-family':'Roboto, sans-serif', 'font-size':'9.5', fill:colorVar('--text')});
+    t.textContent = p.short;
+    svg.appendChild(t);
+  });
+  el.appendChild(svg);
+}
+
+/* ============================================================ Render all charts ============================================================ */
+function moscowCounts(rows, idx){
+  var c = {must:0, should:0, could:0, wont:0};
+  rows.forEach(function(r){ c[r[idx]]++; });
+  return c;
+}
+function renderCharts(){
+  var frC = moscowCounts(FR, 2), nfrC = moscowCounts(NFR, 3);
+  var total = {must:frC.must+nfrC.must, should:frC.should+nfrC.should, could:frC.could+nfrC.could, wont:frC.wont+nfrC.wont};
+  document.getElementById('chart-moscow').innerHTML = '';
+  makeBarChart('chart-moscow', [
+    {label:'Must', value:total.must, color:colorVar('--cherry')},
+    {label:'Should', value:total.should, color:colorVar('--berry')},
+    {label:'Could', value:total.could, color:colorVar('--leaf')},
+    {label:"Won't", value:total.wont, color:colorVar('--muted')}
+  ]);
+
+  var storyC = {must:0, should:0, could:0, wont:0};
+  STORIES.forEach(function(s){ storyC[s.priority]++; });
+  document.getElementById('chart-story-priority').innerHTML = '';
+  makeBarChart('chart-story-priority', [
+    {label:'Must', value:storyC.must, color:colorVar('--cherry')},
+    {label:'Should', value:storyC.should, color:colorVar('--berry')},
+    {label:'Could', value:storyC.could, color:colorVar('--leaf')},
+    {label:"Won't", value:storyC.wont, color:colorVar('--muted')}
+  ], {maxValue:6});
+
+  document.getElementById('chart-stake-scatter').innerHTML = '';
+  makeScatter('chart-stake-scatter', STAKEHOLDERS.map(function(s){
+    return {power:s.power, interest:s.interest, short:s.name.split(' ')[0]};
+  }));
+
+  document.getElementById('chart-mape-trend').innerHTML = '';
+  makeLineChart('chart-mape-trend', [
+    {x:'Wk 1', y:26}, {x:'Wk 2', y:22}, {x:'Wk 3', y:19}, {x:'Wk 4', y:15},
+    {x:'Wk 5', y:12}, {x:'Wk 6', y:9}, {x:'Wk 7', y:7.5}, {x:'Wk 8', y:7.1}
+  ], {target:8, maxY:30});
+
+  document.getElementById('chart-order-mix').innerHTML = '';
+  makeDonut('chart-order-mix', [
+    {label:'Entrees', value:38, color:colorVar('--berry')},
+    {label:'Beverages', value:22, color:colorVar('--leaf')},
+    {label:'Appetizers', value:18, color:colorVar('--cherry')},
+    {label:'Desserts', value:12, color:colorVar('--amber')},
+    {label:'Sides / Other', value:10, color:colorVar('--muted')}
+  ]);
+}
+renderCharts();
+window.addEventListener('resize', function(){ /* SVGs are viewBox-responsive; no re-render needed */ });
+document.getElementById('theme-toggle').addEventListener('click', function(){ setTimeout(renderCharts, 30); });
+
+/* ============================================================ Process diagrams (hand-authored inline SVG) ============================================================ */
+function flowDiagram(containerId, steps, accent){
+  var el = document.getElementById(containerId); if(!el) return;
+  var w = 720, boxH = 46, gap = 20, boxW = 640, padX = 40;
+  var h = steps.length*(boxH+gap)+20;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:Math.min(h,560), role:'img', 'aria-label':'Process flow diagram'});
+  steps.forEach(function(s, i){
+    var y = 10 + i*(boxH+gap);
+    var rect = svgEl('rect', {x:padX, y:y, width:boxW, height:boxH, rx:8, fill:colorVar('--surface-2'), stroke:accent, 'stroke-width':1.5});
+    svg.appendChild(rect);
+    var num = svgEl('circle', {cx:padX+22, cy:y+boxH/2, r:13, fill:accent});
+    svg.appendChild(num);
+    var numT = svgEl('text', {x:padX+22, y:y+boxH/2+4, 'text-anchor':'middle', 'font-family':'Roboto Mono, monospace', 'font-size':'12', 'font-weight':'700', fill:'#fff'});
+    numT.textContent = (i+1);
+    svg.appendChild(numT);
+    var t = svgEl('text', {x:padX+46, y:y+boxH/2+4, 'font-family':'Roboto, sans-serif', 'font-size':'12', fill:colorVar('--text')});
+    t.textContent = s.length > 78 ? s.slice(0,76)+'…' : s;
+    svg.appendChild(t);
+    if(i < steps.length-1){
+      var arrow = svgEl('line', {x1:padX+boxW/2, y1:y+boxH, x2:padX+boxW/2, y2:y+boxH+gap, stroke:accent, 'stroke-width':2, 'marker-end':'url(#arrow-'+containerId+')'});
+      svg.appendChild(arrow);
+    }
+  });
+  var defs = svgEl('defs', {});
+  var marker = svgEl('marker', {id:'arrow-'+containerId, markerWidth:8, markerHeight:8, refX:4, refY:4, orient:'auto'});
+  var mpath = svgEl('path', {d:'M0,0 L8,4 L0,8 Z', fill:accent});
+  marker.appendChild(mpath); defs.appendChild(marker); svg.insertBefore(defs, svg.firstChild);
+  el.appendChild(svg);
+}
+flowDiagram('diagram-asis', [
+  "Chef pulls ‘same day last week’ POS report (manual export)",
+  "Chef estimates prep by gut-feel adjustment",
+  "Chef writes prep list on paper",
+  "Kitchen preps to the paper list",
+  "GM does a visual walk-in inventory check",
+  "GM calls supplier directly if shortage found (rush order)",
+  "Waste logged inconsistently at week's end",
+  "Month-end: Finance reports variance, Ops follows up 30-45 days late"
+], colorVar('--cherry'));
+flowDiagram('diagram-tobe', [
+  "System pulls POS + inventory + calendar data overnight",
+  "AI publishes prep list + confidence flags by 5:00 AM",
+  "Chef reviews list on tablet; preps to system quantities",
+  "System auto-drafts PO on inventory gap; GM approves in one tap",
+  "Real-time anomaly alert if actual pace deviates from forecast",
+  "Waste logged via in-kitchen scale/scan, feeds dashboard directly",
+  "Regional Ops sees a live weekly waste dashboard by location",
+  "Finance reconciles modeled savings to actual P&L monthly"
+], colorVar('--leaf'));
+
+/* ============================================================ Search ============================================================ */
+var searchIndex = [];
+function buildSearchIndex(){
+  document.querySelectorAll('section.topic[id]').forEach(function(sec){
+    var titleEl = sec.querySelector('h2') || sec.querySelector('h1');
+    var title = titleEl ? titleEl.textContent.trim() : sec.id;
+    var extra = sec.getAttribute('data-search-title') || '';
+    var text = (sec.textContent || '').replace(/\s+/g,' ').trim();
+    searchIndex.push({id:sec.id, title:title, extra:extra, text:text});
+  });
+}
+buildSearchIndex();
+
+function runSearch(query){
+  query = query.trim().toLowerCase();
+  var box = document.getElementById('search-results');
+  if(!query){ box.classList.remove('open'); box.innerHTML=''; return; }
+  var terms = query.split(/\s+/);
+  var results = searchIndex.map(function(item){
+    var hay = (item.title+' '+item.extra+' '+item.text).toLowerCase();
+    var score = 0;
+    terms.forEach(function(t){ if(hay.indexOf(t) !== -1) score++; });
+    var idx = item.text.toLowerCase().indexOf(terms[0]);
+    var snippet = idx >= 0 ? item.text.substring(Math.max(0,idx-40), idx+90) : item.text.substring(0,90);
+    return {item:item, score:score, snippet:snippet};
+  }).filter(function(r){ return r.score>0; }).sort(function(a,b){ return b.score-a.score; }).slice(0,8);
+
+  if(!results.length){ box.innerHTML = '<div class="none">No matches. Try a different term, or ask the Field Guide below.</div>'; box.classList.add('open'); return; }
+  box.innerHTML = results.map(function(r){
+    return '<a href="#'+r.item.id+'" data-jump="'+r.item.id+'"><div class="grp">'+r.item.title+'</div><div class="snip">…'+r.snippet+'…</div></a>';
+  }).join('');
+  box.classList.add('open');
+}
+var searchBox = document.getElementById('search-box');
+searchBox.addEventListener('input', function(){ runSearch(this.value); });
+searchBox.addEventListener('focus', function(){ if(this.value) runSearch(this.value); });
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.search-wrap')){ document.getElementById('search-results').classList.remove('open'); }
+  var jump = e.target.closest('[data-jump]');
+  if(jump){ document.getElementById('search-results').classList.remove('open'); searchBox.value=''; }
+});
+
+/* Active-link highlighting */
+var navLinks = document.querySelectorAll('nav.sidenav a[data-nav]');
+var sections = Array.prototype.slice.call(document.querySelectorAll('section.topic[id]'));
+function updateActiveNav(){
+  var pos = window.scrollY + 120;
+  var current = sections[0] && sections[0].id;
+  sections.forEach(function(s){ if(s.offsetTop <= pos) current = s.id; });
+  navLinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === '#'+current); });
+}
+window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+
+/* ============================================================ Ask the Field Guide (offline FAQ engine) ============================================================ */
+var FAQ = [
+  {q:"What is a BRD?", a:"A Business Requirements Document specifies the business objectives, scope, functional and non-functional requirements, assumptions, constraints, risks, and glossary for an initiative. It is the basis for solution design and UAT sign-off.", sec:"doc-brd", kw:"brd business requirements document what is"},
+  {q:"What's the difference between functional and non-functional requirements?", a:"A functional requirement describes what the system does (a behavior or feature). A non-functional requirement describes how well it must do it — performance, security, availability, scalability, compliance — and should always include a measurable number, not an adjective.", sec:"the-20-percent", kw:"functional non-functional nfr difference requirements"},
+  {q:"What is MoSCoW prioritization?", a:"Must have (fails without it), Should have (important, not fatal), Could have (nice, cut first), Won't have this time (explicitly out of scope). In this guide's BRD, the 34 requirements split 16 Must / 12 Should / 4 Could / 2 Won't — a deliberately honest mix, not \"everything is a Must.\"", sec:"the-20-percent", kw:"moscow priority must should could wont prioritization"},
+  {q:"What are acceptance criteria and Given/When/Then?", a:"Acceptance criteria turn a user story's intent into a testable outcome using Given (starting state), When (action), Then (guaranteed result). Every story in the User Stories document uses this format.", sec:"doc-stories", kw:"acceptance criteria given when then testable"},
+  {q:"What makes a good persona?", a:"A persona names goals and frustrations, not demographics. See the four personas — Maria (Regional Ops Director), James (GM), Andre (Head Chef), and Priya (AI Solution Architect) — each with goals, frustrations, and a quote.", sec:"doc-personas", kw:"persona goals frustrations demographics who is"},
+  {q:"What's the difference between a use case and a user story?", a:"A user story is a short statement of who wants what and why. A use case is a structured, step-by-step description of an actor achieving a goal through the system, including alternate and exception (unhappy) paths — see UC-01 through UC-03.", sec:"doc-usecases", kw:"use case user story difference"},
+  {q:"What is a Requirements Traceability Matrix and why does it matter?", a:"An RTM links every requirement to a business objective and a test case. It exposes orphan requirements — items with no justification — and confirms every Must/Should item is actually going to be verified. See the RTM: all 34 requirements are traced; the 2 Won't items are explicitly marked Deferred rather than left dangling.", sec:"doc-rtm", kw:"rtm traceability matrix orphan requirements"},
+  {q:"What should I check before approving an AI-generated requirement?", a:"Run the Architect's Review Lens: specificity, testability, honest priority, traceability, unhappy-path coverage, NFR presence, stakeholder completeness, and an explicit scope boundary.", sec:"review-lens", kw:"review lens checklist red flags approve AI generated"},
+  {q:"What's the ROI of SmartServe AI?", a:"One-time implementation is $1.85M plus $420K/year subscription. Annual steady-state savings are $2.34M (waste reduction, labor efficiency, recaptured stockout sales). Projected payback is Month 21, with 3-year net benefit of about $2.26M. See the Vision & Business Case.", sec:"doc-vision", kw:"roi cost benefit payback business case savings"},
+  {q:"Who are the stakeholders?", a:"Twelve stakeholders spanning the executive sponsor (Thomas Whitfield), Regional Ops (Maria Delgado), restaurant-level roles (James, Andre), IT, Procurement, Finance, Compliance, front-line staff, the Franchise Advisory Council, the AI Solution Architect, and the implementation vendor. See the Stakeholder Matrix for the full power/interest grid.", sec:"doc-stakeholders", kw:"stakeholder matrix who raci power interest"},
+  {q:"What's the forecast accuracy target?", a:"MAPE (Mean Absolute Percentage Error) of 8% or lower within 8 weeks of go-live at a given location, down from roughly 24% under manual estimation today. See NFR-07 in the BRD and the pilot trend chart in the Executive Summary.", sec:"doc-exec", kw:"forecast accuracy mape target"},
+  {q:"What happens if the POS system goes down?", a:"Per FR-17/NFR-12, the system falls back to a 7-day rolling average forecast, flags the output “Degraded,” and alerts the IT Integration Lead within 5 minutes (NFR-13) rather than failing silently. See UC-01, Exception E1.", sec:"doc-usecases", kw:"pos down outage fallback degraded"},
+  {q:"How is food waste measured today vs. the future state?", a:"Today: inconsistent manual estimation, visible only at month-end (30–45 days late). Future: an in-kitchen scale/scan step feeds a live weekly regional dashboard. See Current-State & Future-State Process.", sec:"doc-process", kw:"food waste measured current future state process"},
+  {q:"What's out of scope for this phase?", a:"18 franchise-operated locations, third-party delivery-app order data (DoorDash/UberEats) as a forecasting input, supplier contract renegotiation, and payroll/scheduling integration. See BRD Section 3, and RTM items FR-19/FR-20 marked Deferred.", sec:"doc-brd", kw:"out of scope wont this phase franchise delivery"},
+  {q:"Who approves the BRD?", a:"Prepared by Priya Raman (AI Solution Architect), reviewed by Marcus Bell (IT Integration Lead), approved by Thomas Whitfield (VP of Operations, Executive Sponsor). See the sign-off block at the bottom of the BRD.", sec:"doc-brd", kw:"approve brd sign off prepared reviewed"},
+  {q:"Why does business analysis matter if AI can write requirements?", a:"AI can draft a document in seconds but cannot yet judge whether a requirement is correct, testable, or free of conflicts. Business analysis is the discipline an architect uses to catch a bad requirement before it becomes a bad system.", sec:"why-ba", kw:"why business analysis matter AI generated"},
+  {q:"What are the KPIs for this initiative?", a:"Food waste 11.0% → 7.7% of food cost, forecast accuracy MAPE ≤ 8%, stockouts 46/week → <23/week, manager admin hours 7.5 → 2.5 hrs/week/location, and positive ROI within 24 months. See the Executive Summary KPI tiles.", sec:"doc-exec", kw:"kpi metrics measurable outcomes"},
+  {q:"What does the current-state process look like?", a:"Eight manual steps: chef pulls last week's POS report, estimates by gut feel, writes a paper prep list, kitchen preps to it, GM does a visual inventory check, calls suppliers directly on shortage, waste is logged inconsistently, and Finance reports variance a month later.", sec:"doc-process", kw:"current state as-is process steps"},
+  {q:"What does the future-state process look like?", a:"Eight automated steps: overnight data pull, 5 AM AI-generated prep list, tablet review, one-tap PO approval, real-time anomaly alerts, scale/scan waste logging, a live weekly dashboard, and monthly P&L reconciliation.", sec:"doc-process", kw:"future state to-be process steps"},
+  {q:"How many requirements are there and how are they prioritized?", a:"34 total: 20 functional (FR-01–FR-20) and 14 non-functional (NFR-01–NFR-14), split 16 Must / 12 Should / 4 Could / 2 Won't. See the priority-mix chart in the BRD.", sec:"doc-brd", kw:"how many requirements total priority split"},
+  {q:"What is the executive ask?", a:"$1.85M one-time implementation budget plus $420K/year subscription, approved for the FY26 capital plan, with payback projected at Month 21. See the Executive Summary.", sec:"doc-exec", kw:"executive ask budget approval capital"}
+];
+
+function tokenize(s){ return s.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean); }
+function scoreFaq(queryTokens, faq){
+  var hay = tokenize(faq.q + ' ' + faq.kw + ' ' + faq.a);
+  var score = 0;
+  queryTokens.forEach(function(t){
+    if(t.length < 3) return;
+    hay.forEach(function(h){ if(h === t) score += 3; else if(h.indexOf(t) !== -1 || t.indexOf(h) !== -1) score += 1; });
+  });
+  return score;
+}
+function sectionTitle(id){
+  var sec = document.getElementById(id);
+  var h = sec && (sec.querySelector('h2') || sec.querySelector('h1'));
+  return h ? h.textContent.trim() : id;
+}
+function answerQuestion(raw){
+  var wrap = document.getElementById('ask-answer-wrap');
+  var q = (raw||'').trim();
+  if(!q){ wrap.innerHTML = ''; return; }
+  var qTokens = tokenize(q);
+  var best = null, bestScore = 0;
+  FAQ.forEach(function(f){
+    var s = scoreFaq(qTokens, f);
+    if(s > bestScore){ bestScore = s; best = f; }
+  });
+  if(!best || bestScore === 0){
+    wrap.innerHTML = '<div class="ask-answer" style="border-color:var(--amber);">'+
+      '<div class="q">No confident match</div>'+
+      '<p style="margin:0;">I couldn&rsquo;t match that to a specific section. Try the search box above, or one of the suggested questions below.</p></div>';
+    return;
+  }
+  wrap.innerHTML = '<div class="ask-answer">'+
+    '<div class="q">Matched: '+best.q+'</div>'+
+    '<p style="margin:0;">'+best.a+'</p>'+
+    '<div class="src">Source: <a href="#'+best.sec+'">'+sectionTitle(best.sec)+'</a></div>'+
+  '</div>';
+}
+document.getElementById('ask-submit').addEventListener('click', function(){ answerQuestion(document.getElementById('ask-input').value); });
+document.getElementById('ask-input').addEventListener('keydown', function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); answerQuestion(this.value); } });
+document.getElementById('ask-clear').addEventListener('click', function(){ document.getElementById('ask-input').value=''; document.getElementById('ask-answer-wrap').innerHTML=''; });
+document.getElementById('ask-btn').addEventListener('click', function(){
+  document.getElementById('ask-section').scrollIntoView({behavior:'smooth'});
+  document.getElementById('ask-input').focus();
+});
+var suggEl = document.getElementById('ask-suggestions');
+[0,8,9,11,13].forEach(function(i){
+  var chip = document.createElement('button');
+  chip.type = 'button'; chip.className = 'ask-chip'; chip.textContent = FAQ[i].q;
+  chip.addEventListener('click', function(){ document.getElementById('ask-input').value = FAQ[i].q; answerQuestion(FAQ[i].q); });
+  suggEl.appendChild(chip);
+});
+
+/* ============================================================ Download / Print / CSV ============================================================ */
+var DOC_META = {
+  brd: {title:"Business Requirements Document", docId:"BRD-HH-2026-001", version:"1.3", owner:"Priya Raman", status:"Approved", date:"2026-07-10"},
+  vision: {title:"Vision & Business Case", docId:"VBC-HH-2026-001", version:"1.1", owner:"Thomas Whitfield", status:"Approved", date:"2026-06-05"},
+  stories: {title:"User Stories & Acceptance Criteria", docId:"US-HH-2026-001", version:"2.0", owner:"Priya Raman", status:"In Development", date:"2026-07-22"},
+  usecases: {title:"Use Cases", docId:"UC-HH-2026-001", version:"1.2", owner:"Priya Raman", status:"Approved", date:"2026-07-15"},
+  personas: {title:"Personas", docId:"PER-HH-2026-001", version:"1.0", owner:"Priya Raman", status:"Approved", date:"2026-06-20"},
+  stakeholders: {title:"Stakeholder Matrix", docId:"SH-HH-2026-001", version:"1.4", owner:"Maria Delgado", status:"Approved", date:"2026-06-12"},
+  process: {title:"Current-State & Future-State Process", docId:"PROC-HH-2026-001", version:"1.1", owner:"Andre Kowalski & Priya Raman", status:"Approved", date:"2026-06-25"},
+  rtm: {title:"Requirements Traceability Matrix", docId:"RTM-HH-2026-001", version:"2.1", owner:"Priya Raman", status:"Living Document", date:"2026-07-28"},
+  exec: {title:"Executive Summary", docId:"EXEC-HH-2026-001", version:"1.0", owner:"Thomas Whitfield", status:"Approved", date:"2026-07-29"}
+};
+
+var EXPORT_CSS = document.querySelector('style').textContent;
+
+function buildStandaloneDoc(key){
+  var meta = DOC_META[key];
+  var srcWrap = document.getElementById('export-'+key);
+  var body = srcWrap.querySelector('.doc-body').innerHTML;
+  var signoff = ''; // already included inside .doc-body for all docs
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8">'+
+    '<title>'+meta.title+' — Harvest &amp; Hearth Restaurant Group</title>'+
+    '<style>'+EXPORT_CSS+'</style></head><body>'+
+    '<div class="doc-wrap" style="max-width:900px;margin:30px auto;">'+
+    '<div class="doc-cover"><img class="cover-logo" src="'+LOGO_DATA_URI+'"><h1>'+meta.title+'</h1>'+
+    '<p class="doc-sub">SmartServe AI — Demand Forecasting &amp; Dynamic Prep Planning Platform</p>'+
+    '<p class="doc-sub">Harvest &amp; Hearth Restaurant Group</p></div>'+
+    '<div class="doc-control">'+
+      '<div><span>Document ID</span><strong>'+meta.docId+'</strong></div>'+
+      '<div><span>Version</span><strong>'+meta.version+'</strong></div>'+
+      '<div><span>Owner</span><strong>'+meta.owner+'</strong></div>'+
+      '<div><span>Status</span><strong>'+meta.status+'</strong></div>'+
+      '<div><span>Date</span><strong>'+meta.date+'</strong></div>'+
+    '</div>'+
+    '<div class="doc-body">'+body+'</div>'+
+    '<div class="doc-footer"><span>Harvest &amp; Hearth Restaurant Group — Internal Use</span><span>'+meta.docId+' v'+meta.version+'</span></div>'+
+    '</div></body></html>';
+}
+
+function downloadHTML(filename, htmlStr){
+  var blob = new Blob([htmlStr], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+}
+function printDoc(key){
+  var html = buildStandaloneDoc(key);
+  var w = window.open('', '_blank');
+  if(!w){ alert('Please allow pop-ups to use Save as PDF.'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  var triggered = false;
+  function go(){ if(triggered) return; triggered = true; try{ w.focus(); w.print(); }catch(e){} }
+  w.addEventListener('load', go);
+  setTimeout(go, 500);
+}
+function csvEscape(v){ return '"'+String(v==null?'':v).replace(/<[^>]+>/g,'').replace(/&rsquo;/g,"'").replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&amp;/g,'&').replace(/"/g,'""')+'"'; }
+function toCSV(headers, rows){
+  var lines = [headers.map(csvEscape).join(',')];
+  rows.forEach(function(r){ lines.push(r.map(csvEscape).join(',')); });
+  return lines.join('\r\n');
+}
+function downloadCSV(filename, headers, rows){
+  var csv = toCSV(headers, rows);
+  var blob = new Blob(["﻿"+csv], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+}
+
+document.querySelectorAll('[data-download]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = btn.getAttribute('data-download');
+    downloadHTML(DOC_META[key].docId+'.html', buildStandaloneDoc(key));
+  });
+});
+document.querySelectorAll('[data-print]').forEach(function(btn){
+  btn.addEventListener('click', function(){ printDoc(btn.getAttribute('data-print')); });
+});
+document.querySelectorAll('[data-csv]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = btn.getAttribute('data-csv');
+    if(key === 'stories'){
+      downloadCSV('US-HH-2026-001.csv', ['ID','Persona','Priority','Points','As a','I want','So that','Given','When','Then'],
+        STORIES.map(function(s){ return [s.id,s.persona,PRI_LABEL[s.priority],s.points,s.as,s.want,s.so,s.given,s.when,s.then]; }));
+    } else if(key === 'stakeholders'){
+      downloadCSV('SH-HH-2026-001.csv', ['Name','Role','Power (0-10)','Interest (0-10)','Engagement Strategy'],
+        STAKEHOLDERS.map(function(s){ return [s.name,s.role,s.power,s.interest,s.strategy]; }));
+    } else if(key === 'rtm'){
+      downloadCSV('RTM-HH-2026-001.csv', ['Req ID','Requirement','Objective','Story / Use Case','Priority','Test Case','Status'],
+        RTM.map(function(r){ return [r[0],r[1],r[2],r[3],PRI_LABEL[r[4]],r[5],STATUS_LABEL[r[6]]]; }));
+    }
+  });
+});
+
+})();
+</script>
+</body>
+</html>

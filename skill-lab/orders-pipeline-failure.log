@@ -1,0 +1,23 @@
+2026-08-03 22:10:02 UTC INFO  orchestrator  Starting scheduled run job=orders_pipeline run_id=run-20260803-2210 schedule=hourly attempt=1
+2026-08-03 22:10:02 UTC INFO  extract       Connecting to source=orders_source_db table=raw_orders
+2026-08-03 22:10:03 UTC INFO  extract       Extract complete rows_read=1482 duration_ms=812
+2026-08-03 22:10:03 UTC INFO  transform     Starting transform stage=schema_validate
+2026-08-03 22:10:04 UTC WARN  transform     Column 'region' expected type=ENUM(NA,EMEA,APAC,LATAM) found type=VARCHAR(255) with out-of-domain values: 'North America', 'Europe', ''
+2026-08-03 22:10:04 UTC ERROR transform     Mapping step region_code_map: no mapping entry for source value 'North America' -> target enum; 214 rows unresolved
+2026-08-03 22:10:04 UTC ERROR transform     Mapping step region_code_map: no mapping entry for source value 'Europe' -> target enum; 96 rows unresolved
+2026-08-03 22:10:04 UTC ERROR transform     Mapping step region_code_map: 12 rows have null/blank region, no default mapping configured
+2026-08-03 22:10:04 UTC ERROR transform     Transform stage schema_validate FAILED: 322 of 1482 rows failed region mapping (21.7%) — threshold exceeded (max_allowed=5%)
+2026-08-03 22:10:04 UTC ERROR orchestrator  Job orders_pipeline run_id=run-20260803-2210 attempt=1 FAILED at stage=transform reason=region_mapping_threshold_exceeded
+2026-08-03 22:10:04 UTC INFO  orchestrator  Retry policy: max_attempts=2 backoff=fixed_5m
+2026-08-03 22:15:05 UTC INFO  orchestrator  Starting scheduled run job=orders_pipeline run_id=run-20260803-2210 schedule=hourly attempt=2 (retry)
+2026-08-03 22:15:05 UTC INFO  extract       Connecting to source=orders_source_db table=raw_orders
+2026-08-03 22:15:06 UTC INFO  extract       Extract complete rows_read=1486 duration_ms=799
+2026-08-03 22:15:06 UTC INFO  transform     Starting transform stage=schema_validate
+2026-08-03 22:15:07 UTC WARN  transform     Column 'region' expected type=ENUM(NA,EMEA,APAC,LATAM) found type=VARCHAR(255) with out-of-domain values: 'North America', 'Europe', ''
+2026-08-03 22:15:07 UTC ERROR transform     Mapping step region_code_map: no mapping entry for source value 'North America' -> target enum; 216 rows unresolved
+2026-08-03 22:15:07 UTC ERROR transform     Mapping step region_code_map: no mapping entry for source value 'Europe' -> target enum; 97 rows unresolved
+2026-08-03 22:15:07 UTC ERROR transform     Mapping step region_code_map: 13 rows have null/blank region, no default mapping configured
+2026-08-03 22:15:07 UTC ERROR transform     Transform stage schema_validate FAILED: 326 of 1486 rows failed region mapping (21.9%) — threshold exceeded (max_allowed=5%)
+2026-08-03 22:15:07 UTC ERROR orchestrator  Job orders_pipeline run_id=run-20260803-2210 attempt=2 FAILED at stage=transform reason=region_mapping_threshold_exceeded
+2026-08-03 22:15:07 UTC ERROR orchestrator  Retry attempts exhausted (2/2). Job marked FAILED. No further automatic retry scheduled.
+2026-08-03 22:15:08 UTC INFO  orchestrator  Notification dispatched to on-call channel=data-eng-alerts

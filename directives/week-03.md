@@ -1,21 +1,23 @@
 # Week 03 Directive
 
-> Status: TEMPLATE — fill in once the Week 3 assignment brief is available.
-
 ## Goal
-<!-- What is this week's assignment asking you to build/demonstrate? -->
+Implement `add(a, b)`, a function that returns the sum of two numbers.
+Used as a minimal worked example for the Plan Mode workflow.
 
 ## Inputs
-<!-- Starter code, data, or constraints given by the course -->
+Two numbers, `a` and `b`.
 
 ## Outputs
-<!-- What must exist when this is done: files, behavior, deliverables -->
+The numeric sum `a + b`.
 
 ## Edge cases
-<!-- Tricky requirements or edge cases called out in the assignment -->
+- Negative numbers (`add(-1, 1)` → `0`)
+- Zero (`add(0, 0)` → `0`)
 
 ## Safety / constraints
-<!-- Any constraints: no external libraries, must run standalone in-browser, etc. -->
+Plain JavaScript, no external libraries, no build tooling — matches the
+existing static-file stack in this repo.
 
 ## Verification
-<!-- How you'll know it's done: manual checklist, test file, "works in browser" -->
+Run `node -e "console.log(require('./src/week-03/add.js').add(2,3))"` and
+check output against `tests/week-03/add.test.md`.

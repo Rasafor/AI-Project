@@ -1,0 +1,1875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solution Architect Field Guide — Colaberry Enterprise AI Leadership Accelerator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================= Design Tokens ================= */
+:root{
+  --cherry:#FB2832;
+  --berry:#367895;
+  --leaf:#5BA63C;
+  --amber:#E8920C;
+  --text:#1A1A1A;
+  --muted:#6B6B6B;
+  --border:#E4E4E3;
+  --surface:#FFFFFF;
+  --surface-2:#F8F8F7;
+  --font-body:"Roboto","Segoe UI",system-ui,Arial,sans-serif;
+  --font-mono:"Roboto Mono","Consolas",monospace;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(26,26,26,.06),0 4px 16px rgba(26,26,26,.05);
+  --sidenav-w:290px;
+  --header-h:64px;
+}
+:root[data-theme="dark"]{
+  --cherry:#FF5960;
+  --berry:#5EA9C4;
+  --leaf:#8AC759;
+  --amber:#E8920C;
+  --text:#F2F2F1;
+  --muted:#A6A6A4;
+  --border:#2A2A2A;
+  --surface:#0F0F0F;
+  --surface-2:#181818;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --cherry:#FF5960;--berry:#5EA9C4;--leaf:#8AC759;--amber:#E8920C;
+    --text:#F2F2F1;--muted:#A6A6A4;--border:#2A2A2A;--surface:#0F0F0F;--surface-2:#181818;
+  }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:var(--surface-2);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+h1,h2,h3,h4{color:var(--berry);font-weight:700;margin:0 0 .5em;letter-spacing:-.01em;}
+h1{font-size:2rem;}
+h2{font-size:1.5rem;padding-bottom:.35em;border-bottom:2px solid var(--border);}
+h3{font-size:1.15rem;}
+h4{font-size:1rem;color:var(--text);}
+p{margin:0 0 1em;}
+a{color:var(--berry);}
+code,.mono{font-family:var(--font-mono);}
+small.mono{font-family:var(--font-mono);color:var(--muted);}
+ul,ol{margin:0 0 1em;padding-left:1.3em;}
+.container{max-width:1220px;margin:0 auto;padding:0 24px;}
+
+/* ================= Header ================= */
+header.app-header{
+  position:sticky;top:0;z-index:50;
+  height:var(--header-h);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:20px;
+  padding:0 20px;
+}
+header.app-header .brand{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+header.app-header .brand img{height:38px;display:block;}
+header.app-header .brand .titles{line-height:1.15;}
+header.app-header .brand .titles strong{display:block;font-size:.98rem;color:var(--text);}
+header.app-header .brand .titles span{display:block;font-size:.72rem;color:var(--muted);}
+.search-wrap{flex:1;max-width:520px;position:relative;}
+.search-wrap input{
+  width:100%;padding:10px 14px 10px 38px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text);
+  font-family:var(--font-body);font-size:.92rem;
+}
+.search-wrap input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);}
+#search-results{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+  max-height:400px;overflow:auto;display:none;z-index:60;
+}
+#search-results.open{display:block;}
+#search-results a{display:block;padding:10px 14px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);}
+#search-results a:last-child{border-bottom:none;}
+#search-results a:hover{background:var(--surface-2);}
+#search-results a .grp{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--berry);font-weight:700;}
+#search-results a .snip{font-size:.8rem;color:var(--muted);margin-top:2px;}
+#search-results .none{padding:14px;color:var(--muted);font-size:.85rem;}
+.header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.btn{
+  font-family:var(--font-body);font-size:.85rem;font-weight:500;
+  border-radius:8px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  text-decoration:none;line-height:1;
+}
+.btn:hover{border-color:var(--berry);color:var(--berry);}
+.btn-primary{background:var(--cherry);border-color:var(--cherry);color:#fff;}
+.btn-primary:hover{opacity:.92;color:#fff;filter:brightness(1.03);}
+.btn-ghost{background:transparent;border-color:transparent;}
+.btn-sm{padding:6px 10px;font-size:.76rem;}
+
+/* ================= Layout ================= */
+.shell{display:flex;align-items:flex-start;}
+nav.sidenav{
+  width:var(--sidenav-w);flex-shrink:0;position:sticky;top:var(--header-h);
+  height:calc(100vh - var(--header-h));overflow-y:auto;
+  border-right:1px solid var(--border);background:var(--surface);padding:22px 16px 60px;
+}
+nav.sidenav .navgroup{margin-bottom:22px;}
+nav.sidenav .navgroup > .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;padding:0 10px;margin-bottom:8px;}
+nav.sidenav a{
+  display:block;padding:7px 10px;border-radius:7px;color:var(--text);text-decoration:none;font-size:.87rem;
+}
+nav.sidenav a:hover{background:var(--surface-2);}
+nav.sidenav a.active{background:rgba(54,120,149,.12);color:var(--berry);font-weight:700;}
+main.content{flex:1;min-width:0;padding:36px 40px 100px;}
+main.content .container{max-width:980px;margin:0;padding:0;}
+section.topic{margin-bottom:64px;scroll-margin-top:calc(var(--header-h) + 12px);}
+section.topic > .eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--cherry);font-weight:700;margin-bottom:6px;}
+
+/* ================= Components ================= */
+.callout{border-left:4px solid var(--berry);background:var(--surface);border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;box-shadow:var(--shadow);}
+.callout > .head{font-weight:700;color:var(--berry);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.callout.good{border-color:var(--leaf);} .callout.good > .head{color:var(--leaf);}
+.callout.bad{border-color:var(--cherry);} .callout.bad > .head{color:var(--cherry);}
+.callout.warn{border-color:var(--amber);} .callout.warn > .head{color:var(--amber);}
+
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:.86rem;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+table caption{caption-side:top;text-align:left;font-weight:700;color:var(--berry);padding:6px 0;font-size:.9rem;}
+thead th{background:var(--berry);color:#fff;text-align:left;padding:10px 12px;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+tbody td,tbody th{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:nth-child(even){background:var(--surface-2);}
+.table-scroll{overflow-x:auto;}
+
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.7rem;font-weight:700;font-family:var(--font-mono);letter-spacing:.02em;white-space:nowrap;}
+.pill-must{background:rgba(251,40,50,.12);color:var(--cherry);}
+.pill-should{background:rgba(54,120,149,.14);color:var(--berry);}
+.pill-could{background:rgba(91,166,60,.14);color:var(--leaf);}
+.pill-wont{background:rgba(107,107,107,.15);color:var(--muted);}
+.pill-status{background:rgba(91,166,60,.14);color:var(--leaf);}
+.pill-status.open{background:rgba(232,146,12,.15);color:var(--amber);}
+.pill-status.mitigated{background:rgba(91,166,60,.14);color:var(--leaf);}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.persona-card,.stake-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0;}
+.kpi-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.kpi-tile .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.kpi-tile .val{font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:var(--berry);line-height:1;}
+.kpi-tile .delta{font-size:.76rem;font-weight:700;margin-top:6px;}
+.kpi-tile .delta.pos{color:var(--leaf);}
+.kpi-tile .delta.neg{color:var(--cherry);}
+
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin:16px 0;box-shadow:var(--shadow);}
+.chart-box .chart-title{font-weight:700;font-size:.88rem;margin-bottom:10px;color:var(--text);}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.78rem;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+.diagram-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:16px 0;box-shadow:var(--shadow);overflow-x:auto;}
+.diagram-legend{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 4px;font-size:.76rem;color:var(--muted);}
+.diagram-legend span{display:inline-flex;align-items:center;gap:6px;}
+.diagram-legend i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1.5px solid var(--muted);}
+
+/* Document rendering: cover, control strip, sign-off */
+.doc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-top:16px;}
+.doc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface-2);border-bottom:1px solid var(--border);padding:12px 20px;}
+.doc-toolbar .idline{font-family:var(--font-mono);font-size:.74rem;color:var(--muted);}
+.doc-toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+.doc-cover{padding:34px 32px 20px;border-bottom:1px solid var(--border);}
+.doc-cover img.cover-logo{height:34px;margin-bottom:18px;}
+.doc-cover h1{margin-bottom:6px;}
+.doc-cover .doc-sub{color:var(--muted);font-size:.95rem;}
+.doc-control{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;border-bottom:1px solid var(--border);background:var(--surface-2);}
+.doc-control > div{padding:12px 18px;border-right:1px solid var(--border);}
+.doc-control > div:last-child{border-right:none;}
+.doc-control span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px;}
+.doc-control strong{font-family:var(--font-mono);font-size:.82rem;}
+.doc-body{padding:8px 32px 4px;}
+.doc-body h2{margin-top:34px;}
+.doc-body h2:first-child{margin-top:8px;}
+.signoff{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--border);margin:30px 0 0;}
+.signoff > div{padding:16px 18px;border-right:1px solid var(--border);}
+.signoff > div:last-child{border-right:none;}
+.signoff .role{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--cherry);font-weight:700;margin-bottom:8px;}
+.signoff .name{font-weight:700;}
+.signoff .title{font-size:.8rem;color:var(--muted);}
+.signoff .sigline{margin-top:18px;border-top:1px solid var(--border);padding-top:6px;font-size:.72rem;color:var(--muted);}
+.doc-footer{padding:16px 32px 26px;font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border);margin-top:10px;}
+
+/* ADR cards */
+.adr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin:18px 0;}
+.adr-card .adr-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.adr-card .adr-id{font-family:var(--font-mono);font-size:.8rem;color:var(--muted);}
+.adr-card h3{margin:0;}
+.adr-card .adr-status{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:rgba(91,166,60,.14);color:var(--leaf);}
+.adr-card h4{color:var(--berry);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 6px;}
+.adr-card h4:first-of-type{margin-top:10px;}
+
+/* Ask assistant */
+.ask-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:16px 0;}
+.ask-panel textarea{width:100%;min-height:64px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font-body);font-size:.9rem;resize:vertical;background:var(--surface-2);color:var(--text);}
+.ask-answer{margin-top:14px;border-left:4px solid var(--leaf);background:var(--surface-2);border-radius:0 8px 8px 0;padding:14px 16px;}
+.ask-answer .q{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.ask-answer .src{margin-top:10px;font-size:.78rem;}
+.ask-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.ask-chip{font-size:.76rem;padding:5px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);cursor:pointer;color:var(--text);}
+.ask-chip:hover{border-color:var(--berry);color:var(--berry);}
+
+/* Overview hero */
+.hero{background:linear-gradient(135deg,var(--berry),#26576c);border-radius:16px;color:#fff;padding:40px 36px;margin-bottom:8px;}
+.hero h1{color:#fff;font-size:2.1rem;}
+.hero p{color:rgba(255,255,255,.88);max-width:640px;}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.16);border-radius:999px;padding:4px 12px;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px;font-weight:700;}
+
+footer.app-footer{border-top:1px solid var(--border);padding:26px 40px;color:var(--muted);font-size:.78rem;background:var(--surface);}
+
+@media (max-width:920px){
+  nav.sidenav{display:none;}
+  main.content{padding:24px 18px 80px;}
+  .doc-control{grid-template-columns:repeat(2,1fr);}
+  .signoff{grid-template-columns:1fr;}
+}
+
+@media print{
+  header.app-header,nav.sidenav,.doc-toolbar,footer.app-footer,#ask-section,.no-print{display:none !important;}
+  main.content{padding:0;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASMAAABSCAYAAAAfKbL9AABJ9klEQVR4nO29CZBc13UleN7f8ue+1L6iCoUCUFgJAiQBcKcoSqQoyZIoS7Kktt2W29N2O9wOt3vaHZ6JmYiJjnHbjnC3PR7LY8tyWBKthRIlUzJFijtBYiMIAsRahdr3qszK/e//Tdz3CySx1IJNIqQ8wWIVWZlZP3++d99dzj2Xcc5RQw011PCzhvSzvoAaaqihBkLNGNVQQw3vC9SMUQ011PC+QM0Y1VBDDe8L1IxRDTXU8L5AzRjVUEMN7wvUjFENNdTwvkDNGNVQQw3vCyi4SVCq5rjplOAzHyrTkYm3sJ/1NdVQQw2/YMZoauEkPzb2bahKEr7kwnSykJ0o39D4Yaxt31UzSjXU8HMAdjO0g7x2+pvcUmaRSaTgexJsn2M2l0WlPIWezB3Y1H4PotG6mlGqoYabGDeFMeqfPcjPTP8IrU2dcLkCRXJg2ioWihUsZM8izHRs7/4kOjI9UEMyJClZM0w11HCT4aYwRoQ3zj3J58rHkGxrA3wJilOFVfaxULbwyvGnwPQSbmn/MHZ0/TI2tm+vGaMaarjJcNMYo5IxzYen92M0fwqp+mbA82BUfBTNOew/+T1kjWGEQhKSWgc2td+F9c13o7P+VsTDGcT0VM041VDD+xw3jTGynDwPqSl2YvAZPjDzGmzJRtVRMTx5EAMjB8GZDDXsQQ27sDwZYVlBd6YP3fV3oqvpFjQlu5AINyMd76wZphpqeB/ipjFG78VcYZjP5Pvx+slv48Dpp1F1qwAcSDwCX3KghDyomg7H96GHolBlhpgeRzLahbpkMzLxFNJyHeJaGyJaMxQ1Aof7qNpFlKwBFO1x2IUywpEENnd9FL0Ne2oGrIYabjBuSmN0HtnCJD989im8cuJrGMuegOkCkqSD8TIY08ElGXrYh6aosGGA+RwMCmSmQVU5FJUeC/i+C0lmoFvheRwWN+F6dHcU3Nr+IP7NvX+CRLipZpBqqOEXnWe0FOqSrexDt/07bFy7m+9/6ykcHnwa87lRlF2AowKdpWA4FqqqAeaGoMkOmOLAd1QU5Aog2QiHZKghH65rQWE6mSowS4HtleH5CSzk5uE5PhD+Wb/b9ycKrs2TilYz1DW8vzwjx81zajBRpZ9+wtioLvD5whROjL6Ot4Z/iMG5t1Cxi/BtRRgYm1vgIRuypcBXJEieI7wiRXUBpoKpMpgMcDI8jgPXi4JLDB/e9QV88YE/vS7vx3ZyXFMz4rVcb4Ercvqm3cQF1+FJRb1pr7+GX4AwzfIWuOfb8HwHjl+Bxx0Ef0EC/S2JKVBlHaqkQ2UaGAPU67wps/lJPlM6i8nCII6c+hFOjD8PaBEwT8GGxjuxUB3FbG4InmeC+xI8nwEKg+sZUKFChgYLHM31LfiND/4ptnd/4Jqvr1Ad5FVvDpypgB1FMpZAVLt5W1oKRpWPTxRguT4szYGu6tjR0XzTvp8afo7CtIJ1jucrA1gwJlF0+mFZeZieAccxRTeuJ3FIPARZcqHIEsJqPdJKD/RQB5LxFp7We6Er18coxcI6UtHt6KjbgrOjbyKcTuL2NZ/EwPiPwVI2PnfL/wrTtDBZOItsZQKma8GgvjduQUYYYT2BukQSvc13Yl3jzmu6FtvLcU3OsNOzT2G09DQkMnY8gh0dXyJjhJsVc8US/vyFfRjKFkCHT0dDGv/Xp+7n3Zlabq2Gn5ExGss/x8fz+5Ezp1A2RmG7BXBZgcwVwJXBZRncsyHJgAcOn7uQyDqxKUx7x2DLHsLzaaTCW9Ca2svXRLYiHmm/JqMUCmWYY0/xobG3MTD1Ejqb1uLhrb+JNzOd+N7Rv8KrnoSP7frfsOeWT7GKneeuy8HIg+M+GFMhyzKi14mbRIaIvtuooOQYkH0bsmwKj/FmhswUFAsuzJwLDx5KIQbFuXmLITXcRMbIdPKcS1Ru4ghrGTYxd4CfLH4Pk+Wz8JwcVK7DgwxXCgMegyox+MyhUlXAAfIk+L4PJknw4EOCjDIY4DO4RgVm9SAmKm/gnN6DruTDvCN+CzLR1ncMAud5ztjqDYRhMxwbewFFbx47Eh9HKpHGbdpnUSqU8PyZv0L0VBqfSf4JF0ZHww0HYxo4FPi+BIlpAFdxM4PRZ8cg8moU6TPGIFHMXUMNN9oY6WpgCPLGMH9r9jt8MPsiXGMWDpOh+DHYig9XdqHZHArnMCQOxiSwsgHuk1cESD7AdIZKBNB9GTEWQpVyS5w4Qjq4rWHKOolC4SxGEzuwqelR3pO+S/zdKzFEhPnqON6e/DHCkQjWt9+JsNbEJH+Bf2DL5zFbnsWJ8f0Yzh7DhuaNXJEbbvgucjwfrscgcS48MP8mplQEoM+XPhf6icNnHLxmi2q4kcbIdrNcU4KO+JHCAX5s8nFMlIbggyHMIwA3YMiu8IDIy6nMVxAbdpEa85HotxErcvhUuWIUAjG4kod8awhmdxhmpwynDeCpOhRUIGotQFFCMDwFVuE4is4YCtUxvrHufkT0K0uOvjn0I8yXRrG+8270Nm4X/89TGOoz3ewTt/8Of/zVQewf+C7WpP93xCK44SBj7HHyIlz4HoNHFvomBplSKkgEBRD6qlmiGm60Z+QHDxmce4m/OPFVmOYMmOvD1DxwXxbuTsU00XAGaHg1j8xRA/U5D1GZUkY2FO5DcSWRR6LT02MepKEqpFdLKIJhsj2K7E4b87dG4XUnwGwfpgIofhFOieNA9buw3AL6Gj7KU5G2Va34yYUBfnzwx0jEmnDfpl9BJhZUrSJK4F19191ODeZoDF1SsBxefFP4hUgpKN1t4tuJPHwqNSeGz0V5x5FIWEHZseC4Ptp0Cbeuqcfnb+9AR7L2/dTws4W0gnVOFCoDWDAmUXT6YVl5mJ4BxzFFN64ncUg8BFlyocgSwmo90koP9FAHkvEWntZ7oSvXxyjFwjpS0e3oqNuCs6NvIpxO4vY1n8TA+I/BUjY+d8v/CtO0MFk4i2xlAqZrwaC+N25BRhhhPYG6RBK9zXdiXePOa7oW28txTc6w07NPYbT0NCQydjyCHR1fImOEmxVzxRL+/IV9GMoWQIdPR0Ma/9en7ufdmVpurYaf85BW+wJvT36LzZfHYFXKgKfCcm2wcAqSGoZUqEK1i5DVGCTFhCVXETaBiOHDdBmyvIzTEztx98a/wZoUJXhrqOFnBOWTn/zkkTPZAv5tvoJTHscPJ+dxYCSPN0aLGCk4qEsr6EiHkdRlmA5H0eGYtTn6ay62DUpo/ZaB48kIWpMR3Neu463VaXTGVGxJK2iOSOA88KRezZbxvYFxtEXCaAjrOJ0v40edE6h4wOaGCJKq9Cnnw+z//eyzP7VfEUY8pilYm4wgygB5wgD7ig4Y1IYTF3AqXNwYVNlZ+lBpx6mcQVdVdIaAcGgOTs8IdFVBNKzhX4ZH8W8mCriv3sBoTMcXn5vG40cLuJvJqLdVzM/PYdQwEfF9pMIhKI6D5tky0oaNU6qEkzEZzbaN25UyStwBUxSMDo/gj/78D/H8kUM4NDCB8oiF7voE0lqI5sPCcQBb1qGrIfjRJGaqNsY9GfGwjgTz0Nk3g0/Wp5FMxHFOU9Fq2rifq7iN25gxTQxaFsA5ZM4RUmXcv3MDQpqCsm2Db0zjGSbjLmZDkxUcTiVwLBVBSFPFZ0BB5J7WFN66LSX+3iAxxDwPQxYHFB1z3AXTFEDyMWZ7iEZC2Fifhh4KYag/i+5MHOsyMchcgqYw1CkyshUb26MhpMKauDaZceQ4x1jVQVpXsK4hCsPnGDMcRJmEkbKF/lIVDU063ID4tTBOJK+wpMcSXeGsQvJdgLI/Yqi+jjXm7QnObVfF6fkKvv3P/wsvvOb/nDX6Hb26tf/4W38Kb5CmveJb02EIRB5rHZfC0KnH+f18TN+Y1p9d+ZWM6FZmDpTPo9CDbUdBHVX8kK0FMdSxq7cAv/Jw1TDR+t5aphAM6TCoAQVBS7dLIsvzSGRC/8Hue45S5/kEG8B+hDMv+wRQlLo24hR89/gT/9Zc/6+3/oXdufKdY/L7cdSTe5X/D4wSfxrFsvfrKn3ecpHYCkAr/Rn9K/56KWJdMFDF41V9CN/UZaEbaOgifNGzeoiA0P4NoBhWkfMs9jrZ0MZZOM9RfeaJcz9BdRc0KTz9m86jjdkPk6dXaHTSuI7iDW+xxSl4Nfk0DjF+wpuqiuOw3rWCblIRy2ii4LEEHOa1LZfnv4tvpN23Tv0GX0dHXHc7wg9r3npf4B6bl0AiN7hCPZWuh4dY2WuG9pAbdgtvzXQyKnbYnndhQI0Jn4EM7DTU8FTWCn/AEyk8vNUkR8mPuKPeu2rZjFAAAAAElFTkSuQmCC" alt="Colaberry" onerror="this.style.opacity=0">
+    <div class="titles">
+      <strong>Solution Architect Field Guide</strong>
+      <span>Colaberry Enterprise AI Leadership Accelerator</span>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search-box" type="text" placeholder="Search the guide — try &quot;C4&quot;, &quot;ADR&quot;, &quot;Kafka&quot;, &quot;NFR&quot;..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" id="ask-btn" type="button">Ask the Guide</button>
+    <button class="btn btn-ghost" id="theme-toggle" type="button" title="Toggle dark mode">Theme</button>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidenav" id="sidenav">
+  <div class="navgroup">
+    <div class="label">Start Here</div>
+    <a href="#overview" data-nav>Welcome &amp; How to Use This Guide</a>
+    <a href="#ask-section" data-nav>Ask the Field Guide</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">The Discipline</div>
+    <a href="#why-sa" data-nav>Why Solution Architecture Exists</a>
+    <a href="#the-20-percent" data-nav>The 20% an Architect Must Know</a>
+    <a href="#good-bad" data-nav>Good vs. Bad Architecture</a>
+    <a href="#kpis" data-nav>KPIs &amp; Architecture Metrics</a>
+    <a href="#review-lens" data-nav>The Architect&rsquo;s Review Lens</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">The Example</div>
+    <a href="#the-example" data-nav>Meridian Mutual &mdash; ClaimsPilot AI</a>
+  </div>
+  <div class="navgroup">
+    <div class="label">Documents</div>
+    <a href="#doc-sad" data-nav>1. Solution Architecture Document</a>
+    <a href="#doc-c4" data-nav>2. C4 Diagrams</a>
+    <a href="#doc-adr" data-nav>3. Architecture Decision Records</a>
+    <a href="#doc-nfr" data-nav>4. Non-Functional Requirements Spec</a>
+    <a href="#doc-tsm" data-nav>5. Technology Trade-off Matrix</a>
+    <a href="#doc-seq" data-nav>6. Sequence &amp; Data-Flow Diagrams</a>
+    <a href="#doc-risk" data-nav>7. Architecture Risk Register</a>
+    <a href="#doc-pkg" data-nav>8. Architecture Package Summary</a>
+  </div>
+</nav>
+
+<main class="content">
+<div class="container">
+
+<!-- ============================================================ OVERVIEW ============================================================ -->
+<section class="topic" id="overview" data-search-title="Welcome and how to use this guide">
+  <div class="hero">
+    <span class="tag">Deep Dive &middot; Week 2 &middot; Solution Architect</span>
+    <h1>Solution Architect Field Guide</h1>
+    <p>Built for learners in the Colaberry Enterprise AI Leadership Accelerator who are becoming AI Solution Architects. You will not draft every diagram or decision record yourself &mdash; AI will produce most of the first draft. Your job is to know enough solution architecture to <strong>direct, evaluate, and approve</strong> what the AI produces. This guide teaches that discipline, then applies it end-to-end against one realistic initiative whose requirements are already approved.</p>
+  </div>
+  <div class="callout">
+    <div class="head">How this guide works</div>
+    <p>Use the left navigation or the search box at the top to jump to any topic. Every one of the eight architecture documents below is a genuine, fully-designed deliverable &mdash; not a placeholder &mdash; complete with inline C4 diagrams, sequence diagrams, and Power-BI-style charts rendered as self-contained SVG. Each document can be downloaded individually as branded HTML, printed to PDF, or (where tabular) exported to CSV using the buttons on its toolbar. Type a question into <a href="#ask-section">Ask the Field Guide</a> and it will answer using this guide&rsquo;s own content &mdash; no internet connection required.</p>
+  </div>
+  <div class="card-grid">
+    <div class="persona-card">
+      <h4>Who this is for</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">Architects who must direct AI-generated technical design work, not architects who hand-draw every diagram full-time. The bar is judgment, not authorship.</p>
+    </div>
+    <div class="persona-card">
+      <h4>What&rsquo;s inside</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">A concise discipline primer, then eight complete, interlinked architecture documents for one invented initiative: an AI-assisted claims intake and triage platform for a regional property &amp; casualty insurer.</p>
+    </div>
+    <div class="persona-card">
+      <h4>What &ldquo;done&rdquo; looks like</h4>
+      <p style="margin:0;color:var(--muted);font-size:.9rem;">You can look at any AI-generated architecture artifact and immediately tell whether every quality attribute has a number, every style choice is justified against real load, and every decision documents what it rejected and why.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ WHY SA ============================================================ -->
+<section class="topic" id="why-sa" data-search-title="Why solution architecture exists">
+  <div class="eyebrow">The Discipline</div>
+  <h2>Why Solution Architecture Exists</h2>
+  <p>An AI agent can generate a working system design in minutes: pick some services, draw some boxes, wire them with REST calls. What it cannot yet reliably do is tell you whether that design will survive a 37x traffic spike during a hurricane, whether a regulator can reconstruct why a specific claim was auto-approved three years after the fact, or whether the team has any realistic chance of operating the message broker it just recommended. That gap &mdash; between a design that runs in a demo and a design that survives production, audits, and scale &mdash; is why solution architecture exists, and it is exactly the gap an AI Solution Architect is paid to close.</p>
+  <p>Solution architecture is the discipline of translating approved business requirements into a technical structure that satisfies not just what the system must do, but how well it must do it, under real load, real failure conditions, and real regulatory scrutiny &mdash; before expensive engineering work begins. Skipping it does not remove the risk; it moves the cost of discovering a bad architectural choice from a cheap whiteboard conversation to an expensive production incident or a failed compliance exam.</p>
+  <div class="callout bad">
+    <div class="head">What happens without it</div>
+    <p>An AI agent is asked to &ldquo;build a claims intake system.&rdquo; It ships a monolith that calls a fraud-scoring API synchronously on every request. Nobody defined what happens when 3,000 claims arrive in four hours during a hurricane instead of the usual 80 a day, or what happens when the fraud vendor&rsquo;s API times out. The system falls over during the exact event it exists to help with &mdash; not because the AI wrote bad code, but because no one specified the load it had to survive or the failure modes it had to tolerate.</p>
+  </div>
+  <p>As an AI Solution Architect, you sit between business stakeholders, compliance, operations, and AI-generated technical work. Solution architecture is your shared vocabulary with all three &mdash; the thing that lets you catch a fragile design before it becomes a production incident.</p>
+</section>
+
+<!-- ============================================================ THE 20 PERCENT ============================================================ -->
+<section class="topic" id="the-20-percent" data-search-title="The 20 percent an architect must know quality attributes non-functional requirements architecture styles monolith microservices event-driven C4 model architecture decision records ADR trade-off analysis patterns fitness functions build vs buy">
+  <div class="eyebrow">The Discipline</div>
+  <h2>The 20% an Architect Must Know</h2>
+  <p>You do not need to become a full-time systems engineer. You need the subset of the discipline that lets you evaluate AI-generated technical designs critically. That subset is eight ideas.</p>
+
+  <h3>1. Quality attributes (non-functional requirements)</h3>
+  <p>A <strong>quality attribute</strong> &mdash; also called a non-functional requirement (NFR) &mdash; describes how well a system must behave: availability, latency, throughput, scalability, security, auditability, recoverability, usability, maintainability, cost. AI-generated architectures are almost always feature-heavy and quality-attribute-thin, because a feature is easy to imagine from a prompt and a quality attribute requires someone to have already thought about failure. An architect&rsquo;s first pass on any AI-drafted design should be: <em>where are the numbers, and would two different engineers build two different things from this sentence?</em></p>
+  <div class="callout bad"><div class="head">Adjective, not a target</div><p class="mono" style="margin:0;">&ldquo;The claims platform shall be highly available and fast.&rdquo;</p></div>
+  <div class="callout good"><div class="head">Measurable, testable</div><p class="mono" style="margin:0;">&ldquo;The FNOL intake channel shall maintain 99.95% uptime, 24/7/365, and shall acknowledge a submission in under 2 seconds at the 95th percentile.&rdquo;</p></div>
+
+  <h3>2. Architecture styles &mdash; monolith vs. services vs. event-driven</h3>
+  <p>A <strong>monolith</strong> deploys the whole system as one unit &mdash; simple to reason about and operate, but every part scales and releases together, and one bad deploy can take down everything. A <strong>service-based (or microservices) architecture</strong> splits the system into independently deployable units communicating over the network &mdash; each part scales and releases on its own schedule, at the cost of operational complexity and network failure modes that don&rsquo;t exist in a monolith. An <strong>event-driven architecture</strong> decouples producers and consumers through an event backbone (a message broker or log) instead of direct calls &mdash; ideal when work is naturally asynchronous and volume is spiky, at the cost of harder-to-trace request flows and eventual, not immediate, consistency. Most real systems are a <strong>hybrid</strong>: synchronous APIs where a human is waiting for an answer, asynchronous events where the work can happen in the background. Neither style is &ldquo;best&rdquo; &mdash; each is justified against a specific load profile and failure tolerance, never chosen by default.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Style</th><th>Best fit when&hellip;</th><th>Watch out for&hellip;</th></tr></thead>
+    <tbody>
+      <tr><td>Monolith</td><td>Small team, low/steady load, simplicity matters more than independent scaling</td><td>One slow query can degrade the whole system; releases are all-or-nothing</td></tr>
+      <tr><td>Service-based / microservices</td><td>Different parts of the system have very different load or release cadences</td><td>Operational overhead, distributed-systems failure modes, network latency between calls</td></tr>
+      <tr><td>Event-driven</td><td>Work is naturally asynchronous, volume is bursty, multiple consumers need the same data</td><td>Harder to trace a request end-to-end; requires an event backbone someone must operate</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>3. The C4 model</h3>
+  <p>C4 gives you four nested zoom levels for describing a system, so an AI-generated diagram can be evaluated at the right altitude instead of one confusing tangle of boxes. <strong>Context</strong>: the system as one box, its users, and the external systems it talks to &mdash; a diagram a non-technical stakeholder can read. <strong>Container</strong>: zoom into the system to show its major deployable units (services, apps, data stores) and how they call each other. <strong>Component</strong>: zoom into one container to show its internal building blocks. <strong>Code</strong>: class-level detail &mdash; generally left to the codebase itself, not a document. This guide&rsquo;s <a href="#doc-c4">C4 Diagrams document</a> works through Context, Container, and Component for the worked example.</p>
+
+  <h3>4. Architecture Decision Records (ADRs)</h3>
+  <p>An ADR captures one significant decision: the context that forced it, the decision itself, the options that were <strong>rejected</strong> and why, and the resulting consequences (both positive and negative). Its value is almost entirely in the rejected options &mdash; without them, an ADR is just a decision with no defense, and six months later someone re-litigates the same argument from scratch. An AI-generated architecture with no ADRs, or with ADRs that list no rejected alternatives, has not actually documented a decision &mdash; it has documented a preference.</p>
+
+  <h3>5. Trade-off analysis</h3>
+  <p>Every non-trivial technology choice is a trade-off, not a verdict. A defensible trade-off analysis scores each option against weighted criteria that matter to <em>this</em> system (not generic &ldquo;best practice&rdquo;), and &mdash; critically &mdash; states what the winning option costs, not just what it wins. &ldquo;We chose Kafka because it&rsquo;s powerful&rdquo; is not a trade-off analysis. &ldquo;We chose Kafka because it scored highest on replay and fan-out, at the cost of a new operational skill the team doesn&rsquo;t have yet&rdquo; is. See the <a href="#doc-tsm">Technology Trade-off Matrix</a> for four worked comparisons.</p>
+
+  <h3>6. Key patterns</h3>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Pattern</th><th>What it solves</th></tr></thead>
+    <tbody>
+      <tr><td>API Gateway / BFF (Backend-for-Frontend)</td><td>One stable entry point for client apps, hiding internal service topology and version changes from the caller</td></tr>
+      <tr><td>Circuit breaker</td><td>Stops calling a failing downstream dependency after N failures, so one slow/broken system doesn&rsquo;t cascade into an outage of everything that calls it</td></tr>
+      <tr><td>Bulkhead</td><td>Isolates resource pools (threads, connections) per dependency, so one overloaded integration can&rsquo;t starve the others</td></tr>
+      <tr><td>Saga</td><td>Coordinates a multi-step transaction across services without a single distributed lock, using compensating actions if a later step fails</td></tr>
+      <tr><td>Event sourcing (lite: append-only audit log)</td><td>Records every state-changing event immutably, so the system&rsquo;s history can be replayed or audited &mdash; not full event sourcing, just its most common enterprise use</td></tr>
+      <tr><td>Strangler fig</td><td>Incrementally routes traffic from a legacy system to a new one, one capability at a time, instead of a risky big-bang rewrite</td></tr>
+      <tr><td>CQRS (Command Query Responsibility Segregation)</td><td>Separates the write model from the read model when their scaling or shape needs diverge sharply</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>7. Fitness functions</h3>
+  <p>A fitness function is an automated, repeatable check that a specific architectural characteristic still holds &mdash; run in CI, not verified by memory or a design review six months ago. It turns an architectural intent into something that fails a build instead of quietly rotting. Three fitness functions for this guide&rsquo;s example: (1) a load test that fails if p95 triage latency exceeds 60 seconds; (2) a static-analysis rule that fails the build if a new service calls the legacy Policy Administration System synchronously in the request path (violates ADR-004); (3) a nightly job that fails if any AI-assisted triage decision in the audit log is missing its model version or reason code (violates NFR-08).</p>
+
+  <h3>8. Build vs. buy</h3>
+  <p>Every significant capability forces a build-vs-buy decision, and an AI agent will default to whichever it was more recently trained on, not whichever is actually right for this system. The framework: <strong>time-to-value</strong> (how long until this works), <strong>differentiation</strong> (is this something that makes the business win, or table stakes), <strong>control &amp; compliance</strong> (can we live with data leaving our boundary, can we get the explainability a regulator will demand), and <strong>total cost of ownership</strong> (license/usage fees vs. the fully-loaded cost of building and operating it ourselves). See <a href="#doc-adr">ADR-006</a> for this framework applied to the fraud-scoring engine.</p>
+</section>
+
+<!-- ============================================================ GOOD VS BAD ============================================================ -->
+<section class="topic" id="good-bad" data-search-title="Good versus bad architecture examples measurable justified against load">
+  <div class="eyebrow">The Discipline</div>
+  <h2>Good vs. Bad Architecture</h2>
+  <p>Every AI-drafted architecture statement should pass four checks before an architect approves it: is it <strong>measurable</strong>, is it <strong>justified against real load</strong>, does it <strong>state a rejected alternative</strong>, and does it <strong>state a cost, not just a win</strong>. The table below shows the same statement before and after that review.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th style="width:8%">#</th><th>Bad (as AI often drafts it)</th><th>Why it fails</th><th>Good (after architect review)</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>We use microservices because they scale better.</td><td>No load number, no comparison to the alternative, unfalsifiable.</td><td>We use a hybrid event-driven/service-based style because baseline volume (80 claims/day) must absorb a 37x catastrophe-event surge (3,000/day) within 4 hours &mdash; a monolith&rsquo;s single scaling unit cannot isolate that surge from the human-facing workbench. See ADR-001.</td></tr>
+      <tr><td>2</td><td>The fraud model should be fast and accurate.</td><td>&ldquo;Fast&rdquo; and &ldquo;accurate&rdquo; are not observable or testable.</td><td>Auto-triage decisions for the straight-through path complete in under 60 seconds at p95, with a false-positive auto-approval rate under 0.5%, verified monthly against an SIU audit sample.</td></tr>
+      <tr><td>3</td><td>We chose Kafka because it&rsquo;s the industry standard.</td><td>&ldquo;Industry standard&rdquo; is not a criterion; states no rejected alternative or cost.</td><td>Kafka (Confluent Cloud) scored 4.40/5 against SQS/SNS (3.65) and Azure Service Bus (3.05) on replay, fan-out, and ecosystem fit, at the cost of a new operational skill the team must build and a ~$1,800/month baseline fee. See the Trade-off Matrix.</td></tr>
+      <tr><td>4</td><td>All 16 non-functional requirements are Must-have.</td><td>Priority inflation &mdash; signals no real trade-off occurred.</td><td>10 Must, 6 Should, each independently justified and each carrying a stated verification method &mdash; see the NFR Spec.</td></tr>
+      <tr><td>5</td><td>The system should handle vendor failures gracefully.</td><td>&ldquo;Gracefully&rdquo; is undefined; no fallback behavior specified.</td><td>If the fraud-scoring vendor API is unreachable, the claim routes to standard adjuster assignment rather than straight-through processing, and the outage is logged and alerted to the Platform Engineering Lead within 5 minutes. See the Risk Register.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ KPIs ============================================================ -->
+<section class="topic" id="kpis" data-search-title="KPIs architecture metrics DORA deployment frequency MTTR change failure rate">
+  <div class="eyebrow">The Discipline</div>
+  <h2>KPIs &amp; Architecture Metrics</h2>
+  <p>An architecture without KPIs behind it is an opinion about boxes and arrows. Two families of metric matter here. <strong>Initiative KPIs</strong> measure whether the business problem is actually getting solved &mdash; see the KPI tiles in the <a href="#doc-pkg">Architecture Package Summary</a>. <strong>Architecture health KPIs</strong> measure whether the system itself stays maintainable over time &mdash; the four DORA metrics are the standard set: <strong>deployment frequency</strong> (how often can we safely ship), <strong>lead time for changes</strong> (commit to production), <strong>change failure rate</strong> (% of deploys that cause a production incident), and <strong>mean time to restore</strong> (MTTR, how fast can we recover). When you review an AI-generated architecture, insist on the same three things every time for each quality attribute: a <strong>baseline</strong> (where are we now), a <strong>target</strong> (where must we be, and by when), and a <strong>verification method</strong> (how will anyone know, and how often is it checked).</p>
+</section>
+
+<!-- ============================================================ REVIEW LENS ============================================================ -->
+<section class="topic" id="review-lens" data-search-title="architect review lens red flags checklist reviewing AI generated architecture">
+  <div class="eyebrow">The Discipline</div>
+  <h2>The Architect&rsquo;s Review Lens</h2>
+  <p>When an AI agent hands you an architecture artifact, run this checklist before you approve it. This is the actual lens applied to every document in this guide.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Check</th><th>Question to ask</th><th>Red flag</th></tr></thead>
+    <tbody>
+      <tr><td>Measurability</td><td>Does every quality attribute have a number and a verification method?</td><td>Adjectives without numbers (&ldquo;fast,&rdquo; &ldquo;secure,&rdquo; &ldquo;scalable&rdquo;)</td></tr>
+      <tr><td>Load justification</td><td>Is the architecture style justified against a stated baseline and peak load?</td><td>A style choice with no load numbers anywhere near it</td></tr>
+      <tr><td>Decision defensibility</td><td>Does every significant decision have an ADR with rejected options?</td><td>ADRs that state a decision but list no alternatives considered</td></tr>
+      <tr><td>Honest trade-offs</td><td>Does the winning option in any comparison state what it costs, not just what it wins?</td><td>A trade-off matrix where the recommended option has no listed weaknesses</td></tr>
+      <tr><td>Failure-path coverage</td><td>What does this do when a dependency is down, times out, or returns garbage?</td><td>Sequence diagrams with only the happy path, no exception flow</td></tr>
+      <tr><td>Source-of-truth clarity</td><td>Is it clear which system owns which data, and is there exactly one?</td><td>Two systems that could both claim to be authoritative for the same record</td></tr>
+      <tr><td>Security &amp; compliance presence</td><td>Are PII handling, retention, and auditability addressed, or only features?</td><td>An architecture document silent on data classification or retention</td></tr>
+      <tr><td>Over-engineering check</td><td>Does the complexity match the actual load, or is it sized for hypothetical future scale?</td><td>15 microservices for a system processing 80 transactions a day</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout">
+    <div class="head">Rule of thumb</div>
+    <p>If you can approve an AI-generated architecture decision without being able to state, in one sentence, what alternative it rejected and why, send it back.</p>
+  </div>
+</section>
+
+<!-- ============================================================ THE EXAMPLE ============================================================ -->
+<section class="topic" id="the-example" data-search-title="Meridian Mutual Insurance ClaimsPilot AI initiative overview insurance industry example FNOL">
+  <div class="eyebrow">Worked Example</div>
+  <h2>The Example: Meridian Mutual Insurance</h2>
+  <p>Every document in this guide applies to one invented, concrete initiative so that nothing below is abstract. Its business requirements are treated as already gathered and approved &mdash; this guide starts at the architecture phase.</p>
+  <div class="table-scroll">
+  <table>
+    <tbody>
+      <tr><th style="width:220px">Company</th><td>Meridian Mutual Insurance &mdash; a regional property &amp; casualty insurer headquartered in Raleigh, North Carolina. Approximately 1.1 million policies in force; $640M in annual written premium.</td></tr>
+      <tr><th>Industry</th><td>Insurance (Property &amp; Casualty)</td></tr>
+      <tr><th>Initiative</th><td><strong>ClaimsPilot AI</strong> &mdash; an AI-assisted First Notice of Loss (FNOL) intake, triage, and straight-through processing platform</td></tr>
+      <tr><th>The problem</th><td>FNOL intake today is manual: claimants call or fill out a web form, and claims route to adjusters by simple round-robin regardless of complexity or fraud risk. Average time-to-first-adjuster-contact is 26 hours. Low-complexity claims (glass damage, minor fender-benders) that could be settled the same day instead take an average of 9 days. Fraud referral relies entirely on adjuster instinct, catching only about 40% of claims that eventually prove fraudulent &mdash; and only after payment has often already gone out.</td></tr>
+      <tr><th>The initiative</th><td>Ingest FNOL submissions (web/mobile form, call-center transcript, claimant-submitted photos), extract structured claim data with an AI extraction pipeline, score severity and fraud risk, and auto-route: straight-through settlement for low-complexity, low-risk claims under $2,500 (human-approved by design, see ADR-002), fast-tracked adjuster assignment for standard claims, and immediate Special Investigations Unit (SIU) referral for high fraud-risk claims &mdash; all under a full audit trail suitable for a state Department of Insurance market-conduct exam.</td></tr>
+      <tr><th>Scope</th><td><strong>In scope:</strong> FNOL intake across web, mobile, and call-center channels; document/transcript extraction; severity and fraud-risk triage; straight-through processing up to $2,500; adjuster and SIU routing; claimant/adjuster notifications; payment orchestration for approved straight-through claims; full audit trail.<br><strong>Out of scope (this phase):</strong> auto-approval above $2,500 (Phase 2 candidate); the full claims lifecycle beyond initial routing (litigation, subrogation, appeals); non-P&amp;C lines of business; agent/broker-facing tooling.</td></tr>
+      <tr><th>Executive sponsor</th><td>Renee Castellano, Chief Claims Officer</td></tr>
+      <tr><th>Pilot footprint</th><td>5 regional claims offices, 16-week build-and-pilot window, ahead of a chain-wide rollout decision</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ ASK SECTION ============================================================ -->
+<section class="topic" id="ask-section" data-search-title="ask the field guide offline question answering assistant FAQ">
+  <div class="eyebrow">Ask the Guide</div>
+  <h2>Ask the Field Guide</h2>
+  <p>Type a question in plain language. This assistant matches your question against this guide&rsquo;s own content and FAQ entries &mdash; it does not call any external service, and works fully offline.</p>
+  <div class="ask-panel">
+    <textarea id="ask-input" placeholder="e.g. Why Kafka over SQS? What's the availability target? What happens if the fraud vendor is down?"></textarea>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="btn btn-primary" id="ask-submit" type="button">Ask</button>
+      <button class="btn btn-ghost" id="ask-clear" type="button">Clear</button>
+    </div>
+    <div class="ask-chip-row" id="ask-suggestions"></div>
+    <div id="ask-answer-wrap"></div>
+  </div>
+</section>
+
+<!-- ============================================================ DOCUMENTS INTRO ============================================================ -->
+<section class="topic" id="documents-intro">
+  <div class="eyebrow">Deliverables</div>
+  <h2>The Eight Documents</h2>
+  <p>Each document below is styled as a genuine, standalone deliverable &mdash; cover page, document-control strip, sign-off block, and footer &mdash; and can be downloaded individually as branded HTML, printed to PDF, or (where tabular) exported to CSV.</p>
+</section>
+
+<!-- ===== 1. SAD ===== -->
+<section class="topic" id="doc-sad" data-search-title="Solution Architecture Document SAD architecture style scope integration security deployment">
+  <div class="eyebrow">Document 1 of 8</div>
+  <h2>Solution Architecture Document (SAD)</h2>
+  <div class="doc-wrap" id="export-sad">
+    <div class="doc-toolbar">
+      <span class="idline">SAD-MM-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="sad">Download HTML</button>
+        <button class="btn btn-sm" data-print="sad">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Solution Architecture Document</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; FNOL Intake, Triage &amp; Straight-Through Processing Platform</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>SAD-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Purpose</h2>
+      <p>This document specifies the target solution architecture for ClaimsPilot AI, an AI-assisted First Notice of Loss (FNOL) intake, triage, and straight-through processing platform for Meridian Mutual Insurance. Business requirements for this initiative are already gathered and approved; this document begins at the architecture phase and is the basis for detailed design, AI-agent-assisted implementation, and go-live readiness review.</p>
+
+      <h2>2. Business Context &amp; Problem Statement</h2>
+      <p>FNOL intake today is manual and routed by simple round-robin, independent of claim complexity or fraud risk. Average time-to-first-adjuster-contact is 26 hours; low-complexity claims that could be settled same-day instead take an average of 9 days; fraud referral catches only about 40% of eventually-confirmed fraud, often after payment has gone out. ClaimsPilot AI targets all three problems at once: faster routing, faster settlement for simple claims, and earlier fraud detection &mdash; without compromising the auditability a state Department of Insurance market-conduct exam requires.</p>
+
+      <h2>3. Scope</h2>
+      <p><strong>In scope:</strong> FNOL intake across web, mobile, and call-center channels; document and call-transcript extraction; severity and fraud-risk triage; straight-through processing for claims under $2,500 meeting confidence and risk thresholds; adjuster and SIU case routing and assignment; claimant and adjuster notifications; payment orchestration for approved straight-through claims; a full, immutable audit trail.</p>
+      <p><strong>Out of scope (this phase):</strong> auto-approval above the $2,500 straight-through ceiling (Phase 2 candidate, pending 12-month pilot results); the full claims lifecycle beyond initial routing (litigation, subrogation, appeals handling); non-P&amp;C lines of business; agent/broker-facing tooling.</p>
+
+      <h2>4. Architecture Style &amp; Justification</h2>
+      <p>ClaimsPilot AI adopts a <strong>hybrid event-driven / service-based architecture</strong>: synchronous REST APIs at the two human-facing edges (the claimant FNOL portal and the adjuster/SIU workbench), and an asynchronous event backbone (Kafka via Confluent Cloud) connecting the intake&rarr;extraction&rarr;triage&rarr;routing pipeline. This is justified directly against load: baseline volume is approximately 80 FNOL submissions per day, but a declared catastrophe event (hurricane, hailstorm) can drive volume to roughly 3,000 submissions in a single day &mdash; a 37x surge that must be absorbed within 4 hours of the event being declared, without degrading the adjuster workbench&rsquo;s own responsiveness. A monolith has one scaling unit, so a catastrophe-event surge on the intake path would degrade or take down the human-facing workbench alongside it. An event-driven pipeline lets the ingestion tier scale independently of everything downstream, and lets each pipeline stage absorb backpressure without cascading failure. See <a href="#doc-adr">ADR-001</a> and <a href="#doc-adr">ADR-005</a> for the full decision record, including rejected alternatives.</p>
+
+      <h2>5. System Context</h2>
+      <p>ClaimsPilot AI sits between three types of human actor (claimants, adjusters, SIU investigators) and seven external systems it must integrate with: the Policy Administration System (coverage/eligibility lookup), the Core Claims System of Record (the authoritative claims ledger), the Telephony/Call Center Platform (call transcripts), a Payment Processor (ACH disbursement), a Notification Gateway (email/SMS), the SIU Case Management tool, and the enterprise Data Warehouse (regulatory and analytical reporting). See the <a href="#doc-c4">C4 Context Diagram</a> for the full picture.</p>
+
+      <h2>6. Container View</h2>
+      <p>Inside the ClaimsPilot AI system boundary, the architecture comprises: a claimant-facing FNOL portal and an adjuster/SIU workbench (both single-page apps behind a shared API Gateway/BFF); an Intake Service; a Document &amp; Transcript Extraction Service; a Triage &amp; Fraud Scoring Service; a Case Routing &amp; Assignment Service; a Notification Service; a Payment Orchestration Service; a Policy Lookup Adapter; and three data stores &mdash; a Claims Case Store (in-flight state only, see Section 7), an ML Model Registry &amp; Feature Store, and an append-only Audit &amp; Explainability Log. All pipeline stages communicate through the Kafka event backbone. See the <a href="#doc-c4">C4 Container Diagram</a>.</p>
+
+      <h2>7. Data Architecture</h2>
+      <p>The <strong>Policy Administration System</strong> and <strong>Core Claims System of Record</strong> remain the systems of truth for policy and claims data respectively &mdash; ClaimsPilot AI does not duplicate them. The Claims Case Store (PostgreSQL) holds only <em>in-flight</em> claim state between FNOL receipt and final routing decision; once a routing decision is made, the authoritative record is written back to the Core Claims System of Record via its claims-intake API, and the case store retains a pointer plus the full decision audit trail rather than a second copy of the record. See <a href="#doc-adr">ADR-004</a> for why, including a rejected alternative that failed under load testing.</p>
+      <p>The pipeline communicates via four typed events on the Kafka backbone: <span class="mono">FNOLReceived</span>, <span class="mono">ExtractionCompleted</span>, <span class="mono">TriageDecisionMade</span>, and <span class="mono">CaseResolved</span>. Every event and every downstream decision is written to the append-only Audit &amp; Explainability Log, retained for 7 years per state Department of Insurance record-retention requirements (see NFR-08 in the <a href="#doc-nfr">NFR Spec</a>).</p>
+
+      <h2>8. Integration Architecture</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>External system</th><th>Integration pattern</th><th>Direction</th></tr></thead>
+        <tbody>
+          <tr><td>Policy Administration System</td><td>Synchronous REST, via the Policy Lookup Adapter</td><td>Inbound (coverage/eligibility lookup)</td></tr>
+          <tr><td>Core Claims System of Record</td><td>Synchronous REST write-back with retry + reconciliation job</td><td>Outbound (final decision write)</td></tr>
+          <tr><td>Telephony / Call Center Platform</td><td>Batch/event export of call transcripts</td><td>Inbound</td></tr>
+          <tr><td>Fraud Scoring Vendor</td><td>Synchronous REST, tokenized features only</td><td>Outbound request / inbound response</td></tr>
+          <tr><td>Payment Processor</td><td>Synchronous REST, ACH disbursement initiation</td><td>Outbound</td></tr>
+          <tr><td>Notification Gateway</td><td>Asynchronous event-triggered API call</td><td>Outbound</td></tr>
+          <tr><td>SIU Case Management</td><td>Synchronous REST, case creation</td><td>Outbound</td></tr>
+          <tr><td>Enterprise Data Warehouse</td><td>Asynchronous event stream, de-identified</td><td>Outbound</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>9. Security Architecture</h2>
+      <p>PII fields (Social Security Number, driver&rsquo;s license number) are tokenized at the Intake Service before any downstream service &mdash; including the external fraud-scoring vendor &mdash; ever sees them; detokenization is restricted to the write-back to the Core Claims System of Record, under role-based access control. All data is encrypted at rest with AES-256 and in transit with TLS 1.2 or higher. Access to PO-approval-equivalent actions (straight-through override, SIU case creation) is restricted by role, and every access is logged. Secrets are held in a managed vault, never in code, configuration files, or logs. See <a href="#doc-nfr">NFR-07 and NFR-09</a>.</p>
+
+      <h2>10. Deployment View</h2>
+      <p>Services deploy as containers on managed Kubernetes across two AWS regions &mdash; primary <span class="mono">us-east-1</span>, disaster-recovery <span class="mono">us-west-2</span> &mdash; with per-service auto-scaling groups and blue/green releases to support independent, zero-downtime deploys (see <a href="#doc-nfr">NFR-14</a>). Confluent Cloud runs multi-availability-zone within the primary region. The Claims Case Store replicates synchronously within-region and asynchronously to the DR region, consistent with the recoverability targets in <a href="#doc-nfr">NFR-10</a>.</p>
+
+      <h2>11. Related Documents</h2>
+      <ul>
+        <li><a href="#doc-c4">C4 Diagrams</a> &mdash; Context, Container, and Component views referenced above</li>
+        <li><a href="#doc-adr">Architecture Decision Records</a> &mdash; the six decisions this document assumes</li>
+        <li><a href="#doc-nfr">Non-Functional Requirements Spec</a> &mdash; every quality attribute with a measurable target</li>
+        <li><a href="#doc-tsm">Technology Trade-off Matrix</a> &mdash; the scoring behind the event backbone, extraction, fraud-scoring, and data-store choices</li>
+        <li><a href="#doc-seq">Sequence &amp; Data-Flow Diagrams</a> &mdash; the standard and fraud-escalation flows, and the PII data boundary</li>
+        <li><a href="#doc-risk">Architecture Risk Register</a> &mdash; ten identified risks with mitigations</li>
+        <li><a href="#doc-pkg">Architecture Package Summary</a> &mdash; the one-page sign-off view</li>
+      </ul>
+
+      <h2>12. Assumptions &amp; Constraints</h2>
+      <ul>
+        <li>Business requirements for this initiative are already gathered and approved; no BA-phase artifacts are produced by this document set.</li>
+        <li>The Policy Administration System and Core Claims System of Record are existing, legacy systems that cannot be replaced or materially modified within this initiative&rsquo;s budget or timeline.</li>
+        <li>The pilot is scoped to 5 regional claims offices over a 16-week build-and-pilot window, ahead of a chain-wide rollout decision.</li>
+        <li>All processing and storage must remain within US-based cloud infrastructure regions (data residency, see <a href="#doc-nfr">NFR-06</a>).</li>
+        <li>No changes to the Core Claims System of Record&rsquo;s existing contract or hosting arrangement are authorized under this initiative&rsquo;s budget.</li>
+      </ul>
+
+      <h2>13. Glossary</h2>
+      <div class="table-scroll">
+      <table>
+        <tbody>
+          <tr><th style="width:160px">FNOL</th><td>First Notice of Loss &mdash; the initial claim submission a policyholder makes to report a loss.</td></tr>
+          <tr><th>STP</th><td>Straight-Through Processing &mdash; a claim settled without human adjuster intervention, within defined confidence and dollar thresholds.</td></tr>
+          <tr><th>SIU</th><td>Special Investigations Unit &mdash; the team that investigates suspected insurance fraud.</td></tr>
+          <tr><th>BFF</th><td>Backend-for-Frontend &mdash; an API layer tailored to a specific client application.</td></tr>
+          <tr><th>p95</th><td>95th percentile &mdash; the value below which 95% of measurements fall; the standard way to state a latency target that tolerates some outliers.</td></tr>
+          <tr><th>RPO / RTO</th><td>Recovery Point / Time Objective &mdash; maximum tolerable data loss, and maximum tolerable downtime, after an incident.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Renee Castellano</div><div class="title">Chief Claims Officer, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>SAD-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 2. C4 Diagrams ===== -->
+<section class="topic" id="doc-c4" data-search-title="C4 Diagrams Context Container Component views">
+  <div class="eyebrow">Document 2 of 8</div>
+  <h2>C4 Diagrams &mdash; Context, Container &amp; Component</h2>
+  <div class="doc-wrap" id="export-c4">
+    <div class="doc-toolbar">
+      <span class="idline">C4-MM-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="c4">Download HTML</button>
+        <button class="btn btn-sm" data-print="c4">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>C4 Diagrams</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Context, Container &amp; Component Views</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>C4-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. How to Read These Diagrams</h2>
+      <p>These three diagrams are the same system at three zoom levels &mdash; Context (the system as one box, its users, and external systems), Container (the deployable units inside that box), and Component (the internal building blocks of one container, the Triage &amp; Fraud Scoring Service). Read them top to bottom, not side to side: a reader who cannot follow the Context diagram should not be handed the Component diagram.</p>
+      <div class="diagram-legend">
+        <span><i style="background:var(--surface-2);border-color:var(--muted);"></i>Person</span>
+        <span><i style="background:var(--berry);border-color:var(--berry);"></i>System in scope</span>
+        <span><i style="background:rgba(54,120,149,.14);border-color:var(--berry);"></i>Container / Component</span>
+        <span><i style="background:var(--surface-2);border-color:var(--muted);border-style:dashed;"></i>External system</span>
+        <span><i style="background:rgba(91,166,60,.14);border-color:var(--leaf);"></i>Data store</span>
+      </div>
+
+      <h2>2. Context Diagram</h2>
+      <p>ClaimsPilot AI as a single system, its three human actor types, and the seven external systems it integrates with.</p>
+      <div class="diagram-box"><div id="dg-context"></div></div>
+
+      <h2>3. Container Diagram</h2>
+      <p>The deployable units inside the ClaimsPilot AI boundary: two client applications behind a shared gateway, five internal services, an event backbone, and three data stores.</p>
+      <div class="diagram-box"><div id="dg-container"></div></div>
+
+      <h2>4. Component Diagram &mdash; Triage &amp; Fraud Scoring Service</h2>
+      <p>Zooming into the one container that carries the most architectural risk: the service that combines a vendor fraud-risk score, an in-house severity estimate, and business rules into a single, auditable routing decision.</p>
+      <div class="diagram-box"><div id="dg-component"></div></div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>C4-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 3. ADRs ===== -->
+<section class="topic" id="doc-adr" data-search-title="Architecture Decision Records ADR event-driven Kafka human in the loop straight through processing system of record buy fraud engine">
+  <div class="eyebrow">Document 3 of 8</div>
+  <h2>Architecture Decision Records</h2>
+  <div class="doc-wrap" id="export-adr">
+    <div class="doc-toolbar">
+      <span class="idline">ADR-MM-2026-001..006 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="adr">Download HTML</button>
+        <button class="btn btn-sm" data-print="adr">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Architecture Decision Records</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Six Significant Decisions</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>ADR-MM-2026-001..006</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <p>Every ADR below follows the same shape: Context, Decision, Rejected Options (with why), and Consequences (positive and negative). An ADR with no rejected options is not a decision record &mdash; it is a preference.</p>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-001 &middot; Adopt a hybrid event-driven / service-based architecture over a monolith</h3><span class="adr-status">Accepted</span></div>
+        <div class="adr-id">Related: NFR-01, NFR-03, NFR-06 &middot; Referenced by: SAD &sect;4</div>
+        <h4>Context</h4>
+        <p>The existing Core Claims System of Record is a legacy monolith on a quarterly release cycle. ClaimsPilot AI must absorb a 37x catastrophe-event surge (80/day baseline to 3,000/day peak, within 4 hours) on its intake path without degrading the adjuster/SIU workbench, and must iterate on fraud/severity models far faster than a quarterly cycle allows.</p>
+        <h4>Decision</h4>
+        <p>Introduce ClaimsPilot AI as a new bounded system that writes decisions back to the legacy system of record. Internally, structure it as a small set of independently deployable services connected by an event backbone for the ingestion&rarr;extraction&rarr;triage&rarr;routing pipeline, with synchronous REST APIs only at the two human-facing edges (claimant portal, adjuster workbench).</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Extend the legacy monolith directly.</strong> Rejected &mdash; its quarterly release cycle cannot support the weekly iteration the fraud/severity models require, and a catastrophe-event surge on intake would risk degrading the same system adjusters rely on to work existing claims.</li>
+          <li><strong>Full microservices (15+ services).</strong> Rejected as over-engineering &mdash; the operational overhead of that many independently-operated services is not justified for a system processing 80&ndash;3,000 claims/day.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> independent scaling of the ingestion tier; weekly model iteration becomes possible. <strong>Negative:</strong> two integration points to maintain against the legacy system of record; the team must learn event-driven debugging patterns it hasn&rsquo;t needed before.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-002 &middot; Human-in-the-loop straight-through processing for the pilot phase</h3><span class="adr-status">Accepted</span></div>
+        <div class="adr-id">Related: NFR-10, NFR-11 &middot; Referenced by: Risk Register R9</div>
+        <h4>Context</h4>
+        <p>Fully automated claim settlement without any human review carries regulatory and reputational risk if the triage model is wrong &mdash; a paid claim is far harder to unwind than an unpaid one.</p>
+        <h4>Decision</h4>
+        <p>Auto-approve only claims under $2,500 with triage confidence &ge;0.92 and zero fraud-risk flags. Every auto-approval is logged with full explainability and 10% of them are sampled weekly for adjuster QA review. All other claims route to a human.</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Fully automated approval up to $10,000.</strong> Rejected &mdash; Compliance flagged this as premature for a first release with no production track record for the model.</li>
+          <li><strong>No automation; AI only advises the adjuster.</strong> Rejected &mdash; does not move the needle on the 9-day average settlement time for simple claims, the initiative&rsquo;s primary cycle-time objective.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> financial exposure to model error is bounded to $2,500 per claim; the design is regulator-defensible from day one. <strong>Negative:</strong> initial automation rate is estimated at only 18% of volume, well below the eventual 35% target &mdash; the ramp is visible in the pilot trend chart in the <a href="#doc-tsm">Trade-off Matrix</a>.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-003 &middot; Managed Kafka (Confluent Cloud) as the event backbone</h3><span class="adr-status">Accepted</span></div>
+        <div class="adr-id">Related: NFR-02, NFR-04, NFR-12 &middot; Referenced by: Trade-off Matrix &sect;A</div>
+        <h4>Context</h4>
+        <p>The pipeline needs ordered, replayable events with multiple independent consumers (extraction, triage, audit log, data warehouse) reading the same stream, plus the ability to absorb a catastrophe-event burst without losing events.</p>
+        <h4>Decision</h4>
+        <p>Adopt Confluent Cloud managed Kafka as the backbone. Each pipeline stage publishes and consumes typed events (<span class="mono">FNOLReceived</span>, <span class="mono">ExtractionCompleted</span>, <span class="mono">TriageDecisionMade</span>, <span class="mono">CaseResolved</span>).</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Point-to-point REST calls between services.</strong> Rejected &mdash; creates N-to-N coupling, no replay capability, and no backpressure protection during a surge.</li>
+          <li><strong>AWS SQS/SNS.</strong> Rejected &mdash; no native long-term replay/log semantics for audit reconstruction, and multi-consumer fan-out requires extra plumbing SNS doesn&rsquo;t provide out of the box.</li>
+          <li><strong>Azure Service Bus.</strong> Rejected &mdash; no compelling advantage over Kafka for this use case, and the organization&rsquo;s cloud footprint is AWS-primary. See the full scoring in the <a href="#doc-tsm">Trade-off Matrix</a>.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> replay supports audit reconstruction and reprocessing after a model fix; clean fan-out to the data warehouse. <strong>Negative:</strong> the team must operate/monitor a new component class (mitigated by choosing a managed offering); adds a baseline cost of roughly $1,800/month.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-004 &middot; Legacy systems remain sources of truth; ClaimsPilot AI holds only in-flight case state</h3><span class="adr-status">Accepted</span></div>
+        <div class="adr-id">Related: Data Architecture &sect;7 &middot; Referenced by: Risk Register R6</div>
+        <h4>Context</h4>
+        <p>Building a second copy of policy or claims data risks that copy drifting from the real source of truth over time &mdash; a well-known and expensive failure mode.</p>
+        <h4>Decision</h4>
+        <p>The Claims Case Store (PostgreSQL) holds only claim state that is in-flight, not yet finalized. On a final routing decision, the authoritative record is written back to the Core Claims System of Record via its claims-intake API; the case store retains a pointer and the full audit trail, not a duplicate record.</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Build ClaimsPilot AI as a new system of record.</strong> Rejected &mdash; massive, unjustified scope increase, redundant with an existing compliant system.</li>
+          <li><strong>No local store; call the legacy system synchronously at every pipeline step.</strong> Rejected on evidence &mdash; a load test showed the legacy Policy Administration System&rsquo;s API p95 exceeding 4 seconds under 10x load, which would have made the whole pipeline dependent on a component that cannot sustain the required read/write pattern.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> single source of truth is preserved; blast radius of any ClaimsPilot AI defect is contained. <strong>Negative:</strong> requires a reconciliation job to detect and alert on write-back failures &mdash; an added operational component.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-005 &middot; Synchronous edges, asynchronous pipeline (hybrid interaction style)</h3><span class="adr-status">Accepted</span></div>
+        <div class="adr-id">Related: NFR-02, NFR-03 &middot; Referenced by: SAD &sect;4, Sequence Diagrams</div>
+        <h4>Context</h4>
+        <p>Claimant and adjuster interactions need immediate, predictable responses. The multi-stage AI pipeline (extraction, scoring, routing) has variable, sometimes multi-second-to-minute latency &mdash; especially where LLM inference or human SIU review is involved.</p>
+        <h4>Decision</h4>
+        <p>Claimant- and adjuster-facing APIs are synchronous REST via the API Gateway/BFF, using a &ldquo;submitted, we&rsquo;ll notify you&rdquo; pattern beyond the initial FNOL acknowledgment. The pipeline itself is fully event-driven, decoupling extraction/triage from the human request/response cycle.</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Fully synchronous end-to-end (block until triage completes).</strong> Rejected &mdash; extraction and triage can take up to 60 seconds; blocking a form submission on that is a broken UX and fragile under load.</li>
+          <li><strong>Fully asynchronous, including the claimant&rsquo;s submission acknowledgment (webhook-only).</strong> Rejected &mdash; claimants reasonably expect an immediate confirmation number when they file a claim.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> predictable UX at the human-facing edges; pipeline stages scale and fail independently. <strong>Negative:</strong> requires a notification mechanism to close the loop with the claimant, adding a dependency on the Notification Gateway.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-head"><h3>ADR-006 &middot; Buy a commercial fraud-scoring engine for the pilot rather than build in-house</h3><span class="adr-status">Accepted &mdash; revisit at 12 months</span></div>
+        <div class="adr-id">Related: Build vs. Buy framework &middot; Referenced by: Risk Register R3</div>
+        <h4>Context</h4>
+        <p>Meridian has no in-house data science team with production fraud-model experience. SIU leadership wants faster time-to-value than a 9&ndash;12 month internal build would allow, and fraud-capture improvement is a primary initiative KPI that cannot be deferred to a later phase.</p>
+        <h4>Decision</h4>
+        <p>License a commercial P&amp;C fraud-scoring API (vendor-hosted) for the pilot and first 12 months, fed with tokenized claim, policy, and claimant-history features. Wrap it behind the internal Fraud Risk Model Client component (see the <a href="#doc-c4">Component Diagram</a>) so the vendor can be swapped later without touching the Triage Orchestrator.</p>
+        <h4>Rejected Options</h4>
+        <ul>
+          <li><strong>Build in-house from day one.</strong> Rejected &mdash; a 9&ndash;12 month build with no proven in-house MLOps pipeline would delay the entire initiative past its pilot window.</li>
+          <li><strong>No fraud scoring in v1; defer to Phase 2.</strong> Rejected &mdash; fraud-capture-rate improvement is a primary KPI for this initiative and cannot be deferred.</li>
+        </ul>
+        <h4>Consequences</h4>
+        <p><strong>Positive:</strong> fast time-to-value on a proven vendor model; optionality preserved via the abstraction layer. <strong>Negative:</strong> vendor lock-in risk and a per-scored-claim fee; less direct control and explainability over the underlying model, mitigated by a contract requirement for vendor-provided reason codes (see <a href="#doc-risk">Risk Register R3</a>).</p>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Renee Castellano</div><div class="title">Chief Claims Officer, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>ADR-MM-2026-001..006 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 4. NFR Spec ===== -->
+<section class="topic" id="doc-nfr" data-search-title="Non-Functional Requirements Specification NFR availability latency throughput scalability security compliance cost measurable targets">
+  <div class="eyebrow">Document 4 of 8</div>
+  <h2>Non-Functional Requirements Specification</h2>
+  <div class="doc-wrap" id="export-nfr">
+    <div class="doc-toolbar">
+      <span class="idline">NFR-MM-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="nfr">Download HTML</button>
+        <button class="btn btn-sm" data-print="nfr">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="nfr">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Non-Functional Requirements Specification</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Every Quality Attribute, With a Measurable Target</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>NFR-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Omar Haddad</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Purpose</h2>
+      <p>Sixteen quality attributes govern ClaimsPilot AI. Every row states a measurable target and a verification method &mdash; per the Architect&rsquo;s Review Lens, a quality attribute with no number and no way to check it is not a requirement.</p>
+
+      <h2>2. Requirements</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:7%">ID</th><th style="width:12%">Category</th><th>Requirement &amp; Measurable Target</th><th>Verification Method</th><th style="width:9%">Priority</th></tr></thead>
+        <tbody id="tbl-nfr"></tbody>
+      </table>
+      </div>
+
+      <h2>3. Notes on Prioritization</h2>
+      <p>10 of 16 requirements are Must-have and 6 are Should-have &mdash; a deliberately non-inflated mix. None are marked Could or Won&rsquo;t at this layer: every quality attribute below was judged materially necessary for a regulated financial-services launch; lower-priority architectural niceties (e.g., imperial/metric unit toggles, the kind of Could-have items typical of a functional requirements set) belong in the business requirements document, not here.</p>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Grace Whitcombe</div><div class="title">Chief Compliance &amp; Privacy Officer</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>NFR-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 5. Trade-off Matrix ===== -->
+<section class="topic" id="doc-tsm" data-search-title="Technology Selection Trade-off Matrix Kafka SQS Azure Service Bus weighted scoring build versus buy cost per claim">
+  <div class="eyebrow">Document 5 of 8</div>
+  <h2>Technology Selection &amp; Trade-off Matrix</h2>
+  <div class="doc-wrap" id="export-tsm">
+    <div class="doc-toolbar">
+      <span class="idline">TSM-MM-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="tsm">Download HTML</button>
+        <button class="btn btn-sm" data-print="tsm">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="tsm">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Technology Selection &amp; Trade-off Matrix</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Four Weighted Comparisons, Costs Stated Alongside Wins</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>TSM-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Method</h2>
+      <p>Each category below scores 1&ndash;5 per criterion, weighted, summed to a 5-point total. Weights are set for <em>this</em> system&rsquo;s priorities, not generic best practice, and are stated up front so the scoring can be challenged. Every recommended option states what it costs, not only what it wins.</p>
+
+      <h2>2. Event Backbone</h2>
+      <p>Criteria and weights: Ordered replay (25%), Multi-consumer fan-out (20%), Ops overhead / managed maturity (20%), Ecosystem &amp; connector maturity (15%), Cost at scale (10%), Team familiarity (10%).</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Replay</th><th>Fan-out</th><th>Ops</th><th>Ecosystem</th><th>Cost</th><th>Familiarity</th><th>Weighted Score</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Kafka (Confluent Cloud)</strong> &mdash; recommended</td><td>5</td><td>5</td><td>4</td><td>5</td><td>3</td><td>3</td><td><strong>4.40 / 5</strong></td></tr>
+          <tr><td>AWS SQS/SNS</td><td>2</td><td>4</td><td>5</td><td>3</td><td>5</td><td>4</td><td>3.65 / 5</td></tr>
+          <tr><td>Azure Service Bus</td><td>3</td><td>4</td><td>4</td><td>2</td><td>3</td><td>1</td><td>3.05 / 5</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Event backbone &mdash; weighted trade-off score (of 5)</div>
+        <div id="chart-backbone"></div>
+      </div>
+      <div class="callout">
+        <div class="head">What the winner costs</div>
+        <p>Kafka wins on replay and fan-out &mdash; the two criteria that matter most for audit reconstruction and multi-consumer distribution &mdash; but scores lowest of the three on team familiarity (3/5) and mid-pack on cost (3/5, roughly $1,800/month baseline). See <a href="#doc-adr">ADR-003</a> for the full decision record.</p>
+      </div>
+
+      <h2>3. Document &amp; Transcript Extraction</h2>
+      <p>Criteria and weights: Accuracy on claims-specific forms (30%), Time-to-value (20%), Data control &amp; compliance (20%), Cost per claim (15%), Customization (15%).</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Accuracy</th><th>Time-to-value</th><th>Data control</th><th>Cost</th><th>Customization</th><th>Weighted Score</th></tr></thead>
+        <tbody>
+          <tr><td>In-house OCR + LLM pipeline</td><td>3</td><td>2</td><td>5</td><td>3</td><td>5</td><td>3.50 / 5</td></tr>
+          <tr><td><strong>Managed Cloud Document-AI</strong> &mdash; recommended</td><td>4</td><td>4</td><td>4</td><td>4</td><td>3</td><td><strong>3.85 / 5</strong></td></tr>
+          <tr><td>Third-party InsurTech vendor</td><td>5</td><td>5</td><td>2</td><td>2</td><td>2</td><td>3.50 / 5</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout">
+        <div class="head">What the winner costs</div>
+        <p>Managed Cloud Document-AI wins narrowly over both alternatives, but at a real cost: it is not purpose-built for claims forms the way the InsurTech vendor option is (accuracy 4 vs. 5), and it offers less customization than an in-house pipeline (3 vs. 5). It is chosen for the best <em>balance</em>, not because it dominates every criterion.</p>
+      </div>
+
+      <h2>4. Fraud Scoring</h2>
+      <p>Condensed view &mdash; the full build-vs-buy reasoning is in <a href="#doc-adr">ADR-006</a>.</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Time-to-value</th><th>Control/Explainability</th><th>Cost predictability</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Buy &mdash; commercial vendor API</strong></td><td>High</td><td>Medium (reason codes contractually required)</td><td>Medium (per-claim fee)</td><td><strong>Recommended for pilot; revisit at 12 months</strong></td></tr>
+          <tr><td>Build &mdash; in-house model</td><td>Low (9&ndash;12 month build)</td><td>High</td><td>High (fixed infra cost, but delayed value)</td><td>Rejected for v1 &mdash; no proven in-house MLOps pipeline yet</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>5. Claims Case Data Store</h2>
+      <p>Criteria and weights: Transactional integrity (25%), Query flexibility for triage rules (20%), Team familiarity (20%), Ops/managed maturity (20%), Cost (15%).</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Integrity</th><th>Query flex.</th><th>Familiarity</th><th>Ops</th><th>Cost</th><th>Weighted Score</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Managed PostgreSQL</strong> &mdash; recommended</td><td>5</td><td>5</td><td>5</td><td>5</td><td>4</td><td><strong>4.85 / 5</strong></td></tr>
+          <tr><td>DynamoDB / NoSQL</td><td>3</td><td>2</td><td>2</td><td>5</td><td>4</td><td>3.15 / 5</td></tr>
+          <tr><td>Extend legacy mainframe</td><td>5</td><td>1</td><td>3</td><td>2</td><td>2</td><td>2.75 / 5</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout">
+        <div class="head">What the winner costs</div>
+        <p>PostgreSQL wins decisively, but it is a new store the team must build a reconciliation job around (see <a href="#doc-adr">ADR-004</a>) &mdash; it is not a fully managed data mesh that keeps itself in sync with the system of record automatically.</p>
+      </div>
+
+      <h2>6. Cost Distribution at Steady State</h2>
+      <p>At the target steady-state volume of 30,000 claims/month, projected infrastructure and AI-inference cost is $1.10 per claim (see <a href="#doc-nfr">NFR-16</a>), broken out below.</p>
+      <div class="chart-box">
+        <div class="chart-title">Cost per claim by component ($1.10 total)</div>
+        <div id="chart-cost"></div>
+      </div>
+
+      <h2>7. Straight-Through Processing Ramp</h2>
+      <p>Per <a href="#doc-adr">ADR-002</a>, straight-through automation starts conservatively and ramps toward its 18% pilot target as confidence in the model builds.</p>
+      <div class="chart-box">
+        <div class="chart-title">Straight-through processing rate by pilot week (%, target 18%)</div>
+        <div id="chart-stp"></div>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Nia Brookfield</div><div class="title">Data/ML Vendor Relationship Manager</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>TSM-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 6. Sequence & Data-Flow Diagrams ===== -->
+<section class="topic" id="doc-seq" data-search-title="Sequence diagrams data flow diagram PII boundary straight through settlement fraud escalation SIU">
+  <div class="eyebrow">Document 6 of 8</div>
+  <h2>Sequence &amp; Data-Flow Diagrams</h2>
+  <div class="doc-wrap" id="export-seq">
+    <div class="doc-toolbar">
+      <span class="idline">SDF-MM-2026-001 &middot; v1.0 &middot; Approved</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="seq">Download HTML</button>
+        <button class="btn btn-sm" data-print="seq">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Sequence &amp; Data-Flow Diagrams</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Two Interaction Flows and the PII Data Boundary</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>SDF-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Sequence &mdash; Standard FNOL to Straight-Through Settlement</h2>
+      <p>The happy path for a low-complexity, low-risk claim under the $2,500 straight-through ceiling, per <a href="#doc-adr">ADR-002</a>.</p>
+      <div class="diagram-box"><div id="dg-seq-standard"></div></div>
+
+      <h2>2. Sequence &mdash; Fraud-Flag Escalation to SIU</h2>
+      <p>The path a high fraud-risk claim takes instead &mdash; note it bypasses standard adjuster assignment entirely and never reaches the straight-through path.</p>
+      <div class="diagram-box"><div id="dg-seq-fraud"></div></div>
+      <div class="callout warn">
+        <div class="head">Failure path, stated explicitly</div>
+        <p>If the fraud-scoring vendor API is unreachable, the Triage &amp; Fraud Scoring Service does not fail the claim &mdash; it routes it to standard adjuster assignment rather than straight-through processing (fraud scoring is required for straight-through eligibility, not for routing to exist at all), and logs the vendor outage for alerting. See <a href="#doc-risk">Risk Register R3</a>.</p>
+      </div>
+
+      <h2>3. Data-Flow Diagram &mdash; End-to-End Flow and the PII Boundary</h2>
+      <p>Where PII (Social Security Number, driver&rsquo;s license number) is tokenized, and what crosses the trust boundary to the external fraud-scoring vendor versus what stays internal.</p>
+      <div class="diagram-box"><div id="dg-dataflow"></div></div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Grace Whitcombe</div><div class="title">Chief Compliance &amp; Privacy Officer</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>SDF-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 7. Risk Register ===== -->
+<section class="topic" id="doc-risk" data-search-title="Architecture Risk Register likelihood impact mitigation owner status">
+  <div class="eyebrow">Document 7 of 8</div>
+  <h2>Architecture Risk Register</h2>
+  <div class="doc-wrap" id="export-risk">
+    <div class="doc-toolbar">
+      <span class="idline">RISK-MM-2026-001 &middot; v1.0 &middot; Living Document</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="risk">Download HTML</button>
+        <button class="btn btn-sm" data-print="risk">Save as PDF</button>
+        <button class="btn btn-sm" data-csv="risk">Download CSV</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Architecture Risk Register</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; Ten Identified Risks, Ranked and Mitigated</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>RISK-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Living Document</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Register</h2>
+      <p>Every risk below is architecture-specific &mdash; risks that would exist regardless of implementation quality, not bugs. Status &ldquo;Mitigated by design&rdquo; means the mitigation is already built into the architecture described in this guide; &ldquo;Open&rdquo; means the mitigation requires a follow-up action before or shortly after go-live.</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th style="width:6%">ID</th><th>Risk</th><th style="width:9%">Likelihood</th><th style="width:8%">Impact</th><th>Mitigation</th><th style="width:14%">Owner</th><th style="width:12%">Status</th></tr></thead>
+        <tbody id="tbl-risk"></tbody>
+      </table>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Renee Castellano</div><div class="title">Chief Claims Officer, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>RISK-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+<!-- ===== 8. Architecture Package Summary ===== -->
+<section class="topic" id="doc-pkg" data-search-title="Architecture Package Summary one page sign off KPI tiles recommendation approved conditions">
+  <div class="eyebrow">Document 8 of 8</div>
+  <h2>Architecture Package Summary (One-Page Sign-Off)</h2>
+  <div class="doc-wrap" id="export-pkg">
+    <div class="doc-toolbar">
+      <span class="idline">PKG-MM-2026-001 &middot; v1.0 &middot; Approved for Pilot</span>
+      <div class="btns">
+        <button class="btn btn-sm" data-download="pkg">Download HTML</button>
+        <button class="btn btn-sm" data-print="pkg">Save as PDF</button>
+      </div>
+    </div>
+    <div class="doc-cover">
+      <img class="cover-logo" src="" data-logo>
+      <h1>Architecture Package Summary</h1>
+      <p class="doc-sub">ClaimsPilot AI &mdash; FNOL Intake, Triage &amp; Straight-Through Processing Platform</p>
+      <p class="doc-sub">Meridian Mutual Insurance</p>
+    </div>
+    <div class="doc-control">
+      <div><span>Document ID</span><strong>PKG-MM-2026-001</strong></div>
+      <div><span>Version</span><strong>1.0</strong></div>
+      <div><span>Owner</span><strong>Devon Okafor</strong></div>
+      <div><span>Status</span><strong>Approved for Pilot</strong></div>
+      <div><span>Date</span><strong>2026-08-04</strong></div>
+    </div>
+    <div class="doc-body">
+      <h2>1. Architecture in One Sentence</h2>
+      <p>A hybrid event-driven / service-based architecture &mdash; synchronous APIs at the claimant and adjuster edges, an asynchronous Kafka-backed pipeline for extraction, triage, and routing &mdash; sized to absorb a 37x catastrophe-event surge without duplicating the existing systems of record.</p>
+
+      <h2>2. Key Metrics at a Glance</h2>
+      <div class="kpi-row">
+        <div class="kpi-tile"><div class="lbl">Intake Availability</div><div class="val">99.95%</div></div>
+        <div class="kpi-tile"><div class="lbl">Triage Decision Latency (p95)</div><div class="val">&lt;60s</div></div>
+        <div class="kpi-tile"><div class="lbl">Straight-Through Eligible</div><div class="val">~18%</div></div>
+        <div class="kpi-tile"><div class="lbl">Fraud Capture Target</div><div class="val">40%&rarr;70%</div></div>
+        <div class="kpi-tile"><div class="lbl">Cost / Claim (Steady State)</div><div class="val">$1.10</div></div>
+        <div class="kpi-tile"><div class="lbl">RTO / RPO</div><div class="val">4h / 15m</div></div>
+      </div>
+
+      <h2>3. Key Decisions</h2>
+      <ul>
+        <li><strong>ADR-001:</strong> Hybrid event-driven / service-based architecture over a monolith or full microservices.</li>
+        <li><strong>ADR-002:</strong> Human-in-the-loop straight-through processing under $2,500, not full automation, for the pilot.</li>
+        <li><strong>ADR-003:</strong> Confluent Cloud Kafka as the event backbone (scored 4.40/5 vs. 3.65 SQS/SNS, 3.05 Azure Service Bus).</li>
+        <li><strong>ADR-004:</strong> Legacy systems remain sources of truth; ClaimsPilot AI holds only in-flight case state.</li>
+        <li><strong>ADR-005:</strong> Synchronous human-facing edges, asynchronous pipeline.</li>
+        <li><strong>ADR-006:</strong> Buy the fraud-scoring engine for the pilot; revisit build vs. buy at 12 months.</li>
+      </ul>
+
+      <h2>4. Top Risks</h2>
+      <ul>
+        <li><strong>R1 &mdash; LLM/extraction misreads a claim detail</strong> (Medium likelihood, High impact): mitigated by confidence-threshold gating and the $2,500 straight-through ceiling.</li>
+        <li><strong>R2 &mdash; Kafka operational unfamiliarity during a surge</strong> (Medium, High): open &mdash; game-day load test required before catastrophe-event season.</li>
+        <li><strong>R4 &mdash; PII exposure via LLM prompts or logs</strong> (Medium, High): mitigated by design via field-level tokenization, pending Compliance sign-off.</li>
+      </ul>
+      <p>Full register: <a href="#doc-risk">Architecture Risk Register</a>, 10 risks total.</p>
+
+      <h2>5. Recommendation</h2>
+      <div class="callout good">
+        <div class="head">Approved for Pilot &mdash; with conditions</div>
+        <p>The architecture is approved for the 5-office, 16-week pilot, conditional on: (1) Compliance sign-off on the PII tokenization design before go-live (Risk R4); (2) a completed Kafka game-day load test before go-live (Risk R2); (3) the fraud-scoring vendor contract executing its 90-day price-change notice clause before signature (Risk R3, see Risk Register).</p>
+      </div>
+
+      <div class="signoff">
+        <div><div class="role">Prepared By</div><div class="name">Devon Okafor</div><div class="title">AI Solution Architect</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Reviewed By</div><div class="name">Omar Haddad</div><div class="title">Platform Engineering Lead</div><div class="sigline">Signature / Date</div></div>
+        <div><div class="role">Approved By</div><div class="name">Renee Castellano</div><div class="title">Chief Claims Officer, Executive Sponsor</div><div class="sigline">Signature / Date</div></div>
+      </div>
+    </div>
+    <div class="doc-footer"><span>Meridian Mutual Insurance &mdash; Internal Use</span><span>PKG-MM-2026-001 v1.0</span></div>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+
+<footer class="app-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <span>Colaberry Enterprise AI Leadership Accelerator &mdash; Solution Architect Field Guide</span>
+    <span>Generated by Claude Code &middot; 2026-08-04 &middot; v1.0.0</span>
+  </div>
+</footer>
+
+<script type="application/json" id="deepdive-metadata">
+{
+  "guide_type": "Solution Architect Field Guide",
+  "curriculum_type": "deep_dive",
+  "week": 2,
+  "discipline": "Solution Architect",
+  "student_id": "regina.asafor",
+  "project_id": "SA-FieldGuide-Insurance-Deepdive",
+  "repository": "AI-Project",
+  "generated_by": "Claude Code",
+  "generated_date": "2026-08-04",
+  "version": "1.0.0",
+  "build_number": "1"
+}
+</script>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================ Logo ============================================================ */
+var LOGO_DATA_URI = document.querySelector('.brand img').getAttribute('src');
+document.querySelectorAll('[data-logo]').forEach(function(img){ img.src = LOGO_DATA_URI; });
+
+/* ============================================================ Theme toggle ============================================================ */
+var root = document.documentElement;
+var savedTheme = null;
+try{ savedTheme = localStorage.getItem('safg-theme'); }catch(e){}
+if(savedTheme){ root.setAttribute('data-theme', savedTheme); }
+document.getElementById('theme-toggle').addEventListener('click', function(){
+  var current = root.getAttribute('data-theme');
+  var next = current === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try{ localStorage.setItem('safg-theme', next); }catch(e){}
+  setTimeout(renderAllDiagrams, 30);
+});
+
+/* ============================================================ SVG helpers ============================================================ */
+var NS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs){
+  var el = document.createElementNS(NS, tag);
+  for(var k in attrs){ if(attrs.hasOwnProperty(k)) el.setAttribute(k, attrs[k]); }
+  return el;
+}
+function colorVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#999';
+}
+function svgText(x, y, str, attrs){
+  var t = svgEl('text', Object.assign({x:x, y:y}, attrs));
+  var lines = String(str).split('\n');
+  if(lines.length === 1){ t.textContent = lines[0]; return t; }
+  lines.forEach(function(line, i){
+    var ts = svgEl('tspan', {x:x, dy: i===0 ? '0' : '1.15em'});
+    ts.textContent = line;
+    t.appendChild(ts);
+  });
+  return t;
+}
+
+/* ============================================================ Data: NFR Spec ============================================================ */
+var NFR = [
+  ["NFR-01","Availability","FNOL intake channel shall maintain 99.95% uptime, 24/7/365.","Monthly uptime report from cloud provider SLA dashboard","must"],
+  ["NFR-02","Availability","Adjuster/SIU Workbench shall maintain 99.5% uptime during business hours (7am&ndash;9pm ET), 99% off-hours.","Monthly uptime report","must"],
+  ["NFR-03","Performance","FNOL submission acknowledgment shall complete in under 2 seconds at the 95th percentile.","Synthetic monitoring + APM p95 dashboard","must"],
+  ["NFR-04","Performance","Auto-triage decision for the straight-through path shall complete in under 60 seconds at the 95th percentile.","Event-bus timestamp delta, FNOLReceived to TriageDecisionMade","must"],
+  ["NFR-05","Performance","Standard adjuster-assignment routing shall complete in under 5 minutes at the 95th percentile.","Event-bus timestamp delta","should"],
+  ["NFR-06","Scalability","Ingestion tier shall auto-scale to absorb 10x baseline load within 5 minutes of a declared catastrophe event.","Quarterly load / game-day test","must"],
+  ["NFR-07","Security","SSN and driver&rsquo;s license fields shall be tokenized before leaving the trust boundary; AES-256 at rest, TLS 1.2+ in transit.","Annual penetration test + static-analysis gate","must"],
+  ["NFR-08","Compliance","Every AI-assisted triage decision shall be retrievable with inputs, model version, and reason codes for 7 years.","Quarterly audit-log sampling by Compliance","must"],
+  ["NFR-09","Compliance","All claim data shall be processed and stored within US-based infrastructure regions only.","Cloud provider region configuration review","must"],
+  ["NFR-10","Reliability","Claims intake: RPO 15 min / RTO 4 hours. Event bus: RPO 5 min / RTO 1 hour.","Semi-annual disaster-recovery drill","must"],
+  ["NFR-11","Accuracy","False-positive auto-approval rate (paid a claim that should have been denied/escalated) shall stay under 0.5%.","Monthly SIU/audit sample review","must"],
+  ["NFR-12","Effectiveness","SIU referral capture rate shall improve from a 40% baseline to 70% within 2 quarters of full rollout.","Quarterly SIU outcomes report","should"],
+  ["NFR-13","Usability","Adjuster shall complete a standard triage override in &le;3 clicks from the case view.","UX task-time study during pilot","should"],
+  ["NFR-14","Maintainability","Each service shall be independently deployable with zero-downtime releases; target weekly deploy cadence.","CI/CD deployment-frequency dashboard (DORA metric)","should"],
+  ["NFR-15","Observability","100% of claims shall be traced end-to-end via a single correlation ID across all services.","Trace-coverage report from the tracing backend","must"],
+  ["NFR-16","Cost","Total infra + AI inference cost per claim processed shall stay &le;$1.10 at 30,000 claims/month steady-state volume.","Monthly cost-per-claim finance dashboard","should"]
+];
+var PRI_LABEL = {must:"Must", should:"Should", could:"Could", wont:"Won&rsquo;t"};
+var PRI_CLASS = {must:"pill-must", should:"pill-should", could:"pill-could", wont:"pill-wont"};
+function renderNFR(){
+  var tbody = document.getElementById('tbl-nfr');
+  tbody.innerHTML = NFR.map(function(r){
+    return '<tr><td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td><span class="pill '+PRI_CLASS[r[4]]+'">'+PRI_LABEL[r[4]]+'</span></td></tr>';
+  }).join('');
+}
+renderNFR();
+
+/* ============================================================ Data: Risk Register ============================================================ */
+var RISK = [
+  ["R1","LLM/extraction pipeline misreads a claim amount or coverage detail from a photo or narrative, causing an incorrect triage decision","Medium","High","Confidence-threshold gating (&ge;0.92) plus 10% weekly QA sample plus human-in-the-loop under $2,500 only (ADR-002)","Devon Okafor (Architect)","mitigated"],
+  ["R2","Kafka operational unfamiliarity leads to a mishandled incident during a catastrophe-event surge","Medium","High","Fully managed service (Confluent Cloud) plus on-call runbook plus a game-day load test before go-live","Omar Haddad (Platform Eng. Lead)","open"],
+  ["R3","Vendor lock-in / price increase on the commercial fraud-scoring engine (ADR-006)","Medium","Medium","Abstraction layer (Fraud Risk Model Client) isolates the Triage Orchestrator from vendor specifics; contract includes a 90-day price-change notice clause","Procurement &amp; Devon Okafor","open"],
+  ["R4","PII exposure via LLM prompts or logs (SSN, driver&rsquo;s license) sent to a third-party inference endpoint","Medium","High","Field-level tokenization before any external call; contractual no-training-on-data clause; log-redaction middleware","Grace Whitcombe (Compliance)","mitigated"],
+  ["R5","Catastrophe-event surge (37x baseline) exceeds autoscaling capacity or exhausts vendor rate limits","Medium","High","Load-tested autoscale policy (NFR-06); queue-based backpressure on the event bus; vendor rate-limit tier negotiated in advance","Omar Haddad (Platform Eng. Lead)","open"],
+  ["R6","Policy Administration System legacy API cannot sustain the pipeline&rsquo;s read/write pattern under load","High","High","Local Claims Case Store insulates the pipeline (ADR-004); async write-back with retry plus reconciliation job","Devon Okafor (Architect)","mitigated"],
+  ["R7","Model drift in fraud/severity scoring degrades precision over time without detection","Medium","Medium","Weekly model-performance dashboard; automatic alert if precision drops &gt;5 points from baseline; quarterly model review","Data Science / Vendor","open"],
+  ["R8","Adjuster override actions are not consistently reason-coded, weakening the audit trail","Medium","Medium","Mandatory reason-code field enforced at the UI/API contract level, not just UX convention","Devon Okafor (Architect)","mitigated"],
+  ["R9","Straight-through auto-approval pays a claim that should have been denied (lapsed coverage, exclusion applies)","Low","High","Hard business-rule coverage/eligibility gate against the Policy Administration System, independent of the ML confidence score","Devon Okafor &amp; Compliance","mitigated"],
+  ["R10","Cost per claim exceeds the $1.10 target at steady-state volume due to LLM inference cost growth","Medium","Medium","Monthly cost-per-claim dashboard with a ceiling alert; fallback to a cheaper OCR-only path for simple claim types","Devon Okafor (Architect)","open"]
+];
+var STATUS_LABEL = {mitigated:"Mitigated by Design", open:"Open"};
+var STATUS_CLASS = {mitigated:"pill-status mitigated", open:"pill-status open"};
+function renderRisk(){
+  var tbody = document.getElementById('tbl-risk');
+  tbody.innerHTML = RISK.map(function(r){
+    return '<tr><td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td><span class="pill '+STATUS_CLASS[r[6]]+'">'+STATUS_LABEL[r[6]]+'</span></td></tr>';
+  }).join('');
+}
+renderRisk();
+
+/* ============================================================ Generic box/edge diagram renderer (C4-style) ============================================================ */
+var C4_STYLE_FN = function(){
+  return {
+    person:   {fill: colorVar('--surface-2'), stroke: colorVar('--muted'), text: colorVar('--text')},
+    system:   {fill: colorVar('--berry'), stroke: colorVar('--berry'), text: '#ffffff'},
+    container:{fill: 'rgba(54,120,149,0.14)', stroke: colorVar('--berry'), text: colorVar('--text')},
+    external: {fill: colorVar('--surface-2'), stroke: colorVar('--muted'), text: colorVar('--muted'), dash:'4,3'},
+    datastore:{fill: 'rgba(91,166,60,0.14)', stroke: colorVar('--leaf'), text: colorVar('--text')}
+  };
+};
+function nodeById(nodes, id){
+  for(var i=0;i<nodes.length;i++){ if(nodes[i].id === id) return nodes[i]; }
+  return null;
+}
+function rectAnchor(node, tx, ty){
+  var cx = node.x+node.w/2, cy = node.y+node.h/2;
+  var dx = tx-cx, dy = ty-cy;
+  if(dx===0 && dy===0) return {x:cx, y:cy};
+  var hw = node.w/2, hh = node.h/2;
+  var sx = dx===0 ? Infinity : Math.abs(hw/dx);
+  var sy = dy===0 ? Infinity : Math.abs(hh/dy);
+  var scale = Math.min(sx, sy);
+  return {x: cx+dx*scale, y: cy+dy*scale};
+}
+function boxDiagram(containerId, nodes, edges, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var w = opts.width || 800, h = opts.height || 480;
+  var styles = C4_STYLE_FN();
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:Math.min(h,560), role:'img', 'aria-label':opts.ariaLabel||'Architecture diagram'});
+  var defs = svgEl('defs',{});
+  var marker = svgEl('marker', {id:'arrow-'+containerId, markerWidth:8, markerHeight:8, refX:7, refY:4, orient:'auto'});
+  marker.appendChild(svgEl('path', {d:'M0,0 L8,4 L0,8 Z', fill: colorVar('--muted')}));
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  (opts.zones||[]).forEach(function(z){
+    svg.appendChild(svgEl('rect', {x:z.x, y:z.y, width:z.w, height:z.h, rx:10, fill:'none', stroke:colorVar('--cherry'), 'stroke-width':1.5, 'stroke-dasharray':'6,4'}));
+    var zl = svgText(z.x+10, z.y+16, z.label, {'font-family':'Roboto, sans-serif', 'font-size':'9.5', 'font-weight':'700', fill:colorVar('--cherry')});
+    svg.appendChild(zl);
+  });
+
+  edges.forEach(function(e){
+    var a = nodeById(nodes, e.from), b = nodeById(nodes, e.to);
+    if(!a || !b) return;
+    var acx=a.x+a.w/2, acy=a.y+a.h/2, bcx=b.x+b.w/2, bcy=b.y+b.h/2;
+    var p1 = rectAnchor(a, bcx, bcy), p2 = rectAnchor(b, acx, acy);
+    var line = svgEl('line', {x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, stroke:colorVar('--muted'), 'stroke-width':1.4, 'marker-end':'url(#arrow-'+containerId+')'});
+    if(e.dashed) line.setAttribute('stroke-dasharray','4,3');
+    svg.appendChild(line);
+    if(e.label){
+      var mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+      var bgw = Math.max(24, e.label.length*5.2+8);
+      svg.appendChild(svgEl('rect', {x:mx-bgw/2, y:my-9, width:bgw, height:15, rx:3, fill:colorVar('--surface')}));
+      svg.appendChild(svgText(mx, my+2.5, e.label, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'9', fill:colorVar('--muted')}));
+    }
+  });
+
+  nodes.forEach(function(n){
+    var style = styles[n.type] || styles.container;
+    var rect = svgEl('rect', {x:n.x, y:n.y, width:n.w, height:n.h, rx:8, fill:style.fill, stroke:style.stroke, 'stroke-width':1.5});
+    if(style.dash) rect.setAttribute('stroke-dasharray', style.dash);
+    svg.appendChild(rect);
+    var cx = n.x+n.w/2;
+    var labelY = n.sublabel ? n.y+n.h/2-4 : n.y+n.h/2+4;
+    svg.appendChild(svgText(cx, labelY, n.label, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'10.5', 'font-weight':'700', fill:style.text}));
+    if(n.sublabel){
+      svg.appendChild(svgText(cx, n.y+n.h/2+13, n.sublabel, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'8.5', fill:style.text, opacity:'0.82'}));
+    }
+  });
+
+  el.innerHTML = '';
+  el.appendChild(svg);
+}
+
+/* ============================================================ Sequence diagram renderer ============================================================ */
+function sequenceDiagram(containerId, actors, messages, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var n = actors.length;
+  var w = opts.width || Math.max(600, n*140);
+  var startX = 60, endX = w-60;
+  var laneGap = n>1 ? (endX-startX)/(n-1) : 0;
+  var xs = actors.map(function(a,i){ return startX+i*laneGap; });
+  var headerH = 42, rowH = 32;
+  var h = headerH + messages.length*rowH + 26;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:Math.min(h,480), role:'img', 'aria-label':opts.ariaLabel||'Sequence diagram'});
+  var defs = svgEl('defs',{});
+  var marker = svgEl('marker', {id:'seqarrow-'+containerId, markerWidth:8, markerHeight:8, refX:7, refY:4, orient:'auto'});
+  marker.appendChild(svgEl('path', {d:'M0,0 L8,4 L0,8 Z', fill: colorVar('--text')}));
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  actors.forEach(function(a,i){
+    var x = xs[i];
+    var boxW = Math.min(120, laneGap*0.92 || 120);
+    svg.appendChild(svgEl('rect', {x:x-boxW/2, y:6, width:boxW, height:28, rx:6, fill:colorVar('--berry'), stroke:colorVar('--berry')}));
+    svg.appendChild(svgText(x, 24, a, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'9.5', 'font-weight':'700', fill:'#ffffff'}));
+    svg.appendChild(svgEl('line', {x1:x, y1:34, x2:x, y2:h-8, stroke:colorVar('--border'), 'stroke-width':1, 'stroke-dasharray':'3,3'}));
+  });
+
+  messages.forEach(function(m,i){
+    var y = headerH + i*rowH + 20;
+    var fi = actors.indexOf(m.from), ti = actors.indexOf(m.to);
+    if(fi<0 || ti<0) return;
+    var x1 = xs[fi], x2 = xs[ti];
+    var line = svgEl('line', {x1:x1, y1:y, x2:x2, y2:y, stroke:colorVar('--text'), 'stroke-width':1.4, 'marker-end':'url(#seqarrow-'+containerId+')'});
+    if(m.dashed) line.setAttribute('stroke-dasharray','4,3');
+    svg.appendChild(line);
+    svg.appendChild(svgText((x1+x2)/2, y-5, m.label, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'8.7', fill:colorVar('--muted')}));
+  });
+
+  el.innerHTML = '';
+  el.appendChild(svg);
+}
+
+/* ============================================================ Power-BI-style charts ============================================================ */
+function makeBarChart(containerId, data, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var w = 560, h = 240, padL = 40, padB = 34, padT = 14, padR = 14;
+  var maxVal = opts.maxValue || Math.max.apply(null, data.map(function(d){return d.value;}));
+  var chartW = w - padL - padR, chartH = h - padT - padB;
+  var barW = chartW/data.length*0.5;
+  var gap = chartW/data.length;
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:'260', role:'img', 'aria-label':opts.ariaLabel||'Bar chart'});
+  [0,0.25,0.5,0.75,1].forEach(function(f){
+    var y = h-padB-f*chartH;
+    svg.appendChild(svgEl('line', {x1:padL, y1:y, x2:w-padR, y2:y, stroke:colorVar('--border'), 'stroke-width':0.5, 'stroke-dasharray':'3,3'}));
+    svg.appendChild(svgText(padL-6, y+4, (maxVal*f).toFixed(1), {'text-anchor':'end', 'font-family':'Roboto Mono, monospace', 'font-size':'9', fill:colorVar('--muted')}));
+  });
+  data.forEach(function(d,i){
+    var x = padL + i*gap + (gap-barW)/2;
+    var barH = (d.value/maxVal)*chartH;
+    var y = h-padB-barH;
+    svg.appendChild(svgEl('rect', {x:x, y:y, width:barW, height:barH, rx:4, fill:d.color||colorVar('--berry')}));
+    svg.appendChild(svgText(x+barW/2, y-6, d.value.toFixed(2), {'text-anchor':'middle', 'font-family':'Roboto Mono, monospace', 'font-size':'11', 'font-weight':'700', fill:colorVar('--text')}));
+    svg.appendChild(svgText(x+barW/2, h-padB+16, d.label, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'10', fill:colorVar('--muted')}));
+  });
+  el.innerHTML = ''; el.appendChild(svg);
+}
+
+function makeDonut(containerId, data){
+  var el = document.getElementById(containerId); if(!el) return;
+  var size = 220, cx = size/2, cy = size/2, r = 78, stroke = 34;
+  var total = data.reduce(function(a,d){return a+d.value;},0);
+  var svg = svgEl('svg', {viewBox:'0 0 '+(size+190)+' '+size, width:'100%', height:'260', role:'img', 'aria-label':'Donut chart'});
+  var circumference = 2*Math.PI*r;
+  var offset = 0;
+  data.forEach(function(d){
+    var frac = d.value/total;
+    var dash = frac*circumference;
+    var circle = svgEl('circle', {
+      cx:cx, cy:cy, r:r, fill:'none', stroke:d.color, 'stroke-width':stroke,
+      'stroke-dasharray': dash+' '+(circumference-dash),
+      'stroke-dashoffset': -offset, transform:'rotate(-90 '+cx+' '+cy+')'
+    });
+    svg.appendChild(circle);
+    offset += dash;
+  });
+  svg.appendChild(svgText(cx, cy-4, '$'+total.toFixed(2), {'text-anchor':'middle', 'font-family':'Roboto Mono, monospace', 'font-size':'20', 'font-weight':'700', fill:colorVar('--text')}));
+  svg.appendChild(svgText(cx, cy+16, 'per claim', {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'10', fill:colorVar('--muted')}));
+  var legendX = size+16, legendY = 34;
+  data.forEach(function(d,i){
+    var y = legendY+i*26;
+    svg.appendChild(svgEl('rect', {x:legendX, y:y-11, width:12, height:12, rx:2, fill:d.color}));
+    svg.appendChild(svgText(legendX+18, y-1, d.label+' — $'+d.value.toFixed(2), {'font-family':'Roboto, sans-serif', 'font-size':'11', fill:colorVar('--text')}));
+  });
+  el.innerHTML = ''; el.appendChild(svg);
+}
+
+function makeLineChart(containerId, points, opts){
+  var el = document.getElementById(containerId); if(!el) return;
+  opts = opts || {};
+  var w = 600, h = 240, padL = 34, padB = 30, padT = 16, padR = 20;
+  var chartW = w-padL-padR, chartH = h-padT-padB;
+  var maxY = opts.maxY || Math.max.apply(null, points.map(function(p){return p.y;}))*1.2;
+  function px(i){ return padL + (i/(points.length-1))*chartW; }
+  function py(v){ return h-padB-(v/maxY)*chartH; }
+  var svg = svgEl('svg', {viewBox:'0 0 '+w+' '+h, width:'100%', height:'260', role:'img', 'aria-label':opts.ariaLabel||'Line chart'});
+  [0,0.5,1].forEach(function(f){
+    var y = h-padB-f*chartH;
+    svg.appendChild(svgEl('line', {x1:padL, y1:y, x2:w-padR, y2:y, stroke:colorVar('--border'), 'stroke-width':0.5, 'stroke-dasharray':'3,3'}));
+  });
+  if(opts.target!=null){
+    var ty = py(opts.target);
+    svg.appendChild(svgEl('line', {x1:padL, y1:ty, x2:w-padR, y2:ty, stroke:colorVar('--cherry'), 'stroke-width':1.2, 'stroke-dasharray':'5,3'}));
+    svg.appendChild(svgText(w-padR, ty-6, 'Target '+opts.target+'%', {'text-anchor':'end', 'font-family':'Roboto Mono, monospace', 'font-size':'9.5', fill:colorVar('--cherry')}));
+  }
+  var d = points.map(function(p,i){ return (i===0?'M':'L')+px(i)+' '+py(p.y); }).join(' ');
+  svg.appendChild(svgEl('path', {d:d, fill:'none', stroke:colorVar('--berry'), 'stroke-width':2.5}));
+  points.forEach(function(p,i){
+    svg.appendChild(svgEl('circle', {cx:px(i), cy:py(p.y), r:4, fill:colorVar('--berry'), stroke:colorVar('--surface'), 'stroke-width':2}));
+    svg.appendChild(svgText(px(i), h-padB+15, p.x, {'text-anchor':'middle', 'font-family':'Roboto, sans-serif', 'font-size':'9.5', fill:colorVar('--muted')}));
+  });
+  el.innerHTML = ''; el.appendChild(svg);
+}
+
+/* ============================================================ Diagram data & rendering ============================================================ */
+function renderAllDiagrams(){
+  // ---- C4 Context ----
+  boxDiagram('dg-context', [
+    {id:'claimant', x:40, y:20, w:150, h:70, type:'person', label:'Claimant', sublabel:'Files an FNOL'},
+    {id:'adjuster', x:380, y:20, w:150, h:70, type:'person', label:'Adjuster', sublabel:'Reviews & settles claims'},
+    {id:'siu', x:700, y:20, w:150, h:70, type:'person', label:'SIU Investigator', sublabel:'Investigates fraud flags'},
+    {id:'claimspilot', x:340, y:140, w:220, h:100, type:'system', label:'ClaimsPilot AI', sublabel:'FNOL intake, triage, STP'},
+    {id:'policyadmin', x:30, y:280, w:210, h:80, type:'external', label:'Policy Administration System', sublabel:'Coverage & eligibility'},
+    {id:'telephony', x:270, y:280, w:230, h:80, type:'external', label:'Telephony / Call Center Platform', sublabel:'Call transcripts'},
+    {id:'sor', x:20, y:390, w:160, h:80, type:'external', label:'Core Claims SOR', sublabel:'Authoritative claims ledger'},
+    {id:'payment', x:195, y:390, w:160, h:80, type:'external', label:'Payment Processor', sublabel:'ACH disbursement'},
+    {id:'notif', x:370, y:390, w:160, h:80, type:'external', label:'Notification Gateway', sublabel:'Email / SMS'},
+    {id:'siucm', x:545, y:390, w:160, h:80, type:'external', label:'SIU Case Management', sublabel:'Fraud investigation tool'},
+    {id:'dw', x:720, y:390, w:160, h:80, type:'external', label:'Data Warehouse', sublabel:'Regulatory reporting'}
+  ], [
+    {from:'claimant', to:'claimspilot', label:'Submits FNOL'},
+    {from:'adjuster', to:'claimspilot', label:'Reviews & settles'},
+    {from:'claimspilot', to:'siu', label:'Routes fraud-flagged cases'},
+    {from:'policyadmin', to:'claimspilot', label:'Coverage lookup'},
+    {from:'telephony', to:'claimspilot', label:'Call transcripts'},
+    {from:'claimspilot', to:'sor', label:'Writes final decision'},
+    {from:'claimspilot', to:'payment', label:'Initiates ACH'},
+    {from:'claimspilot', to:'notif', label:'Sends alerts'},
+    {from:'claimspilot', to:'siucm', label:'Creates SIU case'},
+    {from:'claimspilot', to:'dw', label:'Publishes de-identified events'}
+  ], {width:900, height:480, ariaLabel:'C4 Context diagram'});
+
+  // ---- C4 Container ----
+  boxDiagram('dg-container', [
+    {id:'portal', x:30, y:20, w:190, h:64, type:'container', label:'Claimant FNOL Portal', sublabel:'Web + mobile SPA'},
+    {id:'workbench', x:250, y:20, w:200, h:64, type:'container', label:'Adjuster & SIU Workbench', sublabel:'Web SPA'},
+    {id:'gateway', x:140, y:120, w:200, h:56, type:'container', label:'API Gateway / BFF'},
+    {id:'intake', x:30, y:214, w:180, h:64, type:'container', label:'Intake Service', sublabel:'Validate, tokenize, ack'},
+    {id:'policyadapter', x:240, y:214, w:190, h:64, type:'container', label:'Policy Lookup Adapter', sublabel:'Integrates Policy Admin Sys.'},
+    {id:'eventbus', x:30, y:314, w:560, h:50, type:'system', label:'Event Bus (Kafka / Confluent Cloud)'},
+    {id:'extraction', x:20, y:400, w:190, h:68, type:'container', label:'Document & Transcript Extraction', sublabel:'OCR + LLM field extraction'},
+    {id:'triage', x:230, y:400, w:190, h:68, type:'container', label:'Triage & Fraud Scoring', sublabel:'severity + fraud risk + rules'},
+    {id:'routing', x:440, y:400, w:190, h:68, type:'container', label:'Case Routing & Assignment', sublabel:'STP / adjuster / SIU'},
+    {id:'casestore', x:20, y:500, w:150, h:62, type:'datastore', label:'Claims Case Store', sublabel:'PostgreSQL'},
+    {id:'modelreg', x:190, y:500, w:170, h:62, type:'datastore', label:'ML Model Registry', sublabel:'& Feature Store'},
+    {id:'auditlog', x:380, y:500, w:170, h:62, type:'datastore', label:'Audit & Explainability Log', sublabel:'append-only, 7-yr'},
+    {id:'notification', x:650, y:400, w:160, h:68, type:'container', label:'Notification Service'},
+    {id:'payment', x:650, y:500, w:160, h:62, type:'container', label:'Payment Orchestration Service'}
+  ], [
+    {from:'portal', to:'gateway', label:'HTTPS/JSON'},
+    {from:'workbench', to:'gateway', label:'HTTPS/JSON'},
+    {from:'gateway', to:'intake', label:'POST /fnol'},
+    {from:'gateway', to:'routing', label:'GET /cases'},
+    {from:'intake', to:'policyadapter', label:'coverage check'},
+    {from:'intake', to:'eventbus', label:'publish FNOLReceived'},
+    {from:'eventbus', to:'extraction', label:'consume FNOLReceived'},
+    {from:'extraction', to:'casestore', label:'write structured claim'},
+    {from:'extraction', to:'eventbus', label:'publish ExtractionCompleted'},
+    {from:'eventbus', to:'triage', label:'consume ExtractionCompleted'},
+    {from:'triage', to:'modelreg', label:'load model version'},
+    {from:'triage', to:'eventbus', label:'publish TriageDecisionMade'},
+    {from:'eventbus', to:'routing', label:'consume TriageDecisionMade'},
+    {from:'routing', to:'auditlog', label:'write decision'},
+    {from:'routing', to:'notification', label:'trigger alert'},
+    {from:'routing', to:'payment', label:'authorize disbursement'}
+  ], {width:860, height:600, ariaLabel:'C4 Container diagram'});
+
+  // ---- C4 Component (Triage & Fraud Scoring Service) ----
+  boxDiagram('dg-component', [
+    {id:'inbound', x:20, y:180, w:150, h:60, type:'external', label:'ExtractionCompleted', sublabel:'event, from bus'},
+    {id:'featureextractor', x:210, y:40, w:170, h:66, type:'container', label:'Feature Extractor', sublabel:'assembles feature vector'},
+    {id:'severity', x:210, y:150, w:170, h:66, type:'container', label:'Severity Estimator', sublabel:'rules + regression'},
+    {id:'fraudclient', x:210, y:260, w:170, h:66, type:'container', label:'Fraud Risk Model Client', sublabel:'calls vendor API'},
+    {id:'rules', x:420, y:40, w:170, h:66, type:'container', label:'Business Rules Engine', sublabel:'coverage, state, SIU flags'},
+    {id:'orchestrator', x:420, y:150, w:170, h:66, type:'container', label:'Triage Orchestrator', sublabel:'combines &rarr; decision'},
+    {id:'explain', x:420, y:260, w:170, h:66, type:'datastore', label:'Explainability & Audit Logger', sublabel:'records inputs, version'},
+    {id:'outbound', x:630, y:150, w:170, h:66, type:'external', label:'TriageDecisionMade', sublabel:'event, to bus'},
+    {id:'vendorext', x:210, y:350, w:170, h:56, type:'external', label:'Fraud Scoring Vendor API'}
+  ], [
+    {from:'inbound', to:'featureextractor', label:'claim + policy data'},
+    {from:'featureextractor', to:'severity', label:'feature vector'},
+    {from:'featureextractor', to:'fraudclient', label:'feature vector'},
+    {from:'fraudclient', to:'vendorext', label:'tokenized features', dashed:true},
+    {from:'vendorext', to:'fraudclient', label:'risk score + reasons', dashed:true},
+    {from:'severity', to:'orchestrator', label:'expected severity'},
+    {from:'fraudclient', to:'orchestrator', label:'fraud risk score'},
+    {from:'rules', to:'orchestrator', label:'eligibility + red-flags'},
+    {from:'orchestrator', to:'explain', label:'decision + inputs'},
+    {from:'orchestrator', to:'outbound', label:'routing decision + confidence'}
+  ], {width:820, height:440, ariaLabel:'C4 Component diagram'});
+
+  // ---- Sequence: Standard STP ----
+  sequenceDiagram('dg-seq-standard',
+    ['Claimant','FNOL Portal','Intake Service','Event Bus','Extraction & Triage','Routing Service','Payment & Notification'],
+    [
+      {from:'Claimant', to:'FNOL Portal', label:'Submit FNOL (photos + narrative)'},
+      {from:'FNOL Portal', to:'Intake Service', label:'POST /fnol via API Gateway'},
+      {from:'Intake Service', to:'FNOL Portal', label:'202 Accepted + confirmation #', dashed:true},
+      {from:'FNOL Portal', to:'Claimant', label:'Display confirmation number'},
+      {from:'Intake Service', to:'Event Bus', label:'publish FNOLReceived'},
+      {from:'Event Bus', to:'Extraction & Triage', label:'consume FNOLReceived'},
+      {from:'Extraction & Triage', to:'Event Bus', label:'publish TriageDecisionMade (conf 0.96, STP-eligible)'},
+      {from:'Event Bus', to:'Routing Service', label:'consume TriageDecisionMade'},
+      {from:'Routing Service', to:'Payment & Notification', label:'authorize disbursement + notify'},
+      {from:'Payment & Notification', to:'Claimant', label:'Email: claim approved, payment initiated'}
+    ], {ariaLabel:'Sequence diagram: standard straight-through settlement'});
+
+  // ---- Sequence: Fraud escalation ----
+  sequenceDiagram('dg-seq-fraud',
+    ['Claimant','Intake Service','Event Bus','Extraction & Triage','Routing Service','SIU Investigator','Notification Service'],
+    [
+      {from:'Claimant', to:'Intake Service', label:'Submit FNOL'},
+      {from:'Intake Service', to:'Event Bus', label:'publish FNOLReceived'},
+      {from:'Event Bus', to:'Extraction & Triage', label:'consume FNOLReceived'},
+      {from:'Extraction & Triage', to:'Event Bus', label:'publish TriageDecisionMade (fraud 0.88, SIU flag)'},
+      {from:'Event Bus', to:'Routing Service', label:'consume TriageDecisionMade'},
+      {from:'Routing Service', to:'SIU Investigator', label:'create SIU case + assign'},
+      {from:'Routing Service', to:'Notification Service', label:'notify claimant: under review'},
+      {from:'Notification Service', to:'Claimant', label:'Email: claim received, under review'},
+      {from:'SIU Investigator', to:'Routing Service', label:'record investigation outcome', dashed:true},
+      {from:'Routing Service', to:'Event Bus', label:'publish CaseResolved'}
+    ], {ariaLabel:'Sequence diagram: fraud-flag escalation to SIU'});
+
+  // ---- Data-flow diagram ----
+  boxDiagram('dg-dataflow', [
+    {id:'claimant', x:20, y:40, w:130, h:70, type:'person', label:'Claimant Input', sublabel:'Photos / narrative / policy #'},
+    {id:'intake', x:190, y:40, w:130, h:70, type:'container', label:'Intake Service', sublabel:'Validate + normalize'},
+    {id:'tokenizer', x:360, y:40, w:130, h:70, type:'container', label:'Tokenization Gateway', sublabel:'SSN/DL &rarr; token'},
+    {id:'eventbus', x:530, y:40, w:130, h:70, type:'system', label:'Event Bus', sublabel:'Kafka (Confluent Cloud)'},
+    {id:'extraction', x:700, y:40, w:180, h:70, type:'container', label:'Extraction Service', sublabel:'OCR + LLM structured fields'},
+    {id:'triage', x:530, y:170, w:150, h:70, type:'container', label:'Triage & Fraud Scoring', sublabel:'severity + fraud risk'},
+    {id:'fraudvendor', x:720, y:170, w:160, h:70, type:'external', label:'Fraud Scoring Vendor', sublabel:'tokenized features only'},
+    {id:'casestore', x:340, y:170, w:150, h:70, type:'datastore', label:'Claims Case Store', sublabel:'Postgres, in-flight state'},
+    {id:'routing', x:530, y:270, w:150, h:70, type:'container', label:'Routing Service', sublabel:'STP / adjuster / SIU'},
+    {id:'sor', x:340, y:270, w:150, h:70, type:'external', label:'Core Claims SOR'},
+    {id:'dw', x:720, y:270, w:160, h:70, type:'external', label:'Data Warehouse', sublabel:'de-identified analytics'}
+  ], [
+    {from:'claimant', to:'intake', label:'submit'},
+    {from:'intake', to:'tokenizer', label:'raw PII fields'},
+    {from:'tokenizer', to:'eventbus', label:'publish FNOLReceived (tokenized)'},
+    {from:'eventbus', to:'extraction', label:'consume'},
+    {from:'extraction', to:'casestore', label:'write structured claim'},
+    {from:'casestore', to:'triage', label:'read claim + policy features'},
+    {from:'triage', to:'fraudvendor', label:'tokenized feature vector', dashed:true},
+    {from:'fraudvendor', to:'triage', label:'risk score + reason codes', dashed:true},
+    {from:'triage', to:'eventbus', label:'publish TriageDecisionMade'},
+    {from:'eventbus', to:'routing', label:'consume'},
+    {from:'routing', to:'sor', label:'write final decision (RBAC)'},
+    {from:'routing', to:'dw', label:'publish de-identified event'}
+  ], {width:900, height:360, ariaLabel:'Data-flow diagram with PII boundary',
+      zones:[{x:10, y:20, w:495, h:105, label:'PII Boundary — SSN / DL tokenized beyond this line'}]});
+
+  // ---- Charts ----
+  makeBarChart('chart-backbone', [
+    {label:'Kafka\n(Confluent)', value:4.40, color:colorVar('--berry')},
+    {label:'AWS\nSQS/SNS', value:3.65, color:colorVar('--leaf')},
+    {label:'Azure\nService Bus', value:3.05, color:colorVar('--amber')}
+  ], {maxValue:5, ariaLabel:'Event backbone weighted trade-off scores'});
+
+  makeDonut('chart-cost', [
+    {label:'Extraction (OCR+LLM)', value:0.46, color:colorVar('--berry')},
+    {label:'Fraud scoring vendor', value:0.31, color:colorVar('--cherry')},
+    {label:'Event bus & compute', value:0.18, color:colorVar('--leaf')},
+    {label:'Storage & audit log', value:0.09, color:colorVar('--amber')},
+    {label:'Notification & payment', value:0.06, color:colorVar('--muted')}
+  ]);
+
+  makeLineChart('chart-stp', [
+    {x:'W1', y:4}, {x:'W2', y:7}, {x:'W3', y:10}, {x:'W4', y:13},
+    {x:'W5', y:15}, {x:'W6', y:17}, {x:'W7', y:18}, {x:'W8', y:18}
+  ], {target:18, maxY:22, ariaLabel:'Straight-through processing rate ramp by pilot week'});
+}
+renderAllDiagrams();
+
+/* ============================================================ Search ============================================================ */
+var searchIndex = [];
+function buildSearchIndex(){
+  document.querySelectorAll('section.topic[id]').forEach(function(sec){
+    var titleEl = sec.querySelector('h2') || sec.querySelector('h1');
+    var title = titleEl ? titleEl.textContent.trim() : sec.id;
+    var extra = sec.getAttribute('data-search-title') || '';
+    var text = (sec.textContent || '').replace(/\s+/g,' ').trim();
+    searchIndex.push({id:sec.id, title:title, extra:extra, text:text});
+  });
+}
+buildSearchIndex();
+
+function runSearch(query){
+  query = query.trim().toLowerCase();
+  var box = document.getElementById('search-results');
+  if(!query){ box.classList.remove('open'); box.innerHTML=''; return; }
+  var terms = query.split(/\s+/);
+  var results = searchIndex.map(function(item){
+    var hay = (item.title+' '+item.extra+' '+item.text).toLowerCase();
+    var score = 0;
+    terms.forEach(function(t){ if(hay.indexOf(t) !== -1) score++; });
+    var idx = item.text.toLowerCase().indexOf(terms[0]);
+    var snippet = idx >= 0 ? item.text.substring(Math.max(0,idx-40), idx+90) : item.text.substring(0,90);
+    return {item:item, score:score, snippet:snippet};
+  }).filter(function(r){ return r.score>0; }).sort(function(a,b){ return b.score-a.score; }).slice(0,8);
+
+  if(!results.length){ box.innerHTML = '<div class="none">No matches. Try a different term, or ask the Field Guide below.</div>'; box.classList.add('open'); return; }
+  box.innerHTML = results.map(function(r){
+    return '<a href="#'+r.item.id+'" data-jump="'+r.item.id+'"><div class="grp">'+r.item.title+'</div><div class="snip">…'+r.snippet+'…</div></a>';
+  }).join('');
+  box.classList.add('open');
+}
+var searchBox = document.getElementById('search-box');
+searchBox.addEventListener('input', function(){ runSearch(this.value); });
+searchBox.addEventListener('focus', function(){ if(this.value) runSearch(this.value); });
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.search-wrap')){ document.getElementById('search-results').classList.remove('open'); }
+  var jump = e.target.closest('[data-jump]');
+  if(jump){ document.getElementById('search-results').classList.remove('open'); searchBox.value=''; }
+});
+
+/* Active-link highlighting */
+var navLinks = document.querySelectorAll('nav.sidenav a[data-nav]');
+var sections = Array.prototype.slice.call(document.querySelectorAll('section.topic[id]'));
+function updateActiveNav(){
+  var pos = window.scrollY + 120;
+  var current = sections[0] && sections[0].id;
+  sections.forEach(function(s){ if(s.offsetTop <= pos) current = s.id; });
+  navLinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === '#'+current); });
+}
+window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+
+/* ============================================================ Ask the Field Guide (offline FAQ engine) ============================================================ */
+var FAQ = [
+  {q:"What architecture style did you choose and why?", a:"A hybrid event-driven / service-based architecture: synchronous REST at the claimant and adjuster edges, an asynchronous Kafka-backed pipeline for extraction, triage, and routing. It's justified against load — baseline is 80 FNOLs/day but a catastrophe event can drive 3,000/day within 4 hours, and a monolith's single scaling unit couldn't isolate that surge from the adjuster workbench.", sec:"doc-sad", kw:"architecture style hybrid event driven service based why monolith"},
+  {q:"What is a C4 model?", a:"A way to describe a system at four nested zoom levels: Context (system, users, external systems), Container (deployable units inside the system), Component (internal building blocks of one container), and Code (left to the codebase). This guide's C4 document works through Context, Container, and Component.", sec:"doc-c4", kw:"c4 model context container component what is"},
+  {q:"What is an ADR?", a:"An Architecture Decision Record: the context that forced a decision, the decision itself, the rejected alternatives and why, and the consequences (positive and negative). Its value is almost entirely in the rejected options — without them it's a preference, not a decision record.", sec:"doc-adr", kw:"adr architecture decision record what is"},
+  {q:"Why Kafka over SQS or Azure Service Bus?", a:"Kafka (Confluent Cloud) scored 4.40/5 versus 3.65 for AWS SQS/SNS and 3.05 for Azure Service Bus, winning on ordered replay and multi-consumer fan-out — both needed for audit reconstruction and feeding the data warehouse. It costs more team-familiarity ramp-up (lowest of the three) and roughly $1,800/month baseline. See ADR-003 and the Trade-off Matrix.", sec:"doc-tsm", kw:"kafka sqs azure service bus why event backbone"},
+  {q:"What's the availability target?", a:"FNOL intake channel: 99.95% uptime, 24/7/365. Adjuster/SIU Workbench: 99.5% during business hours (7am–9pm ET), 99% off-hours. See NFR-01 and NFR-02.", sec:"doc-nfr", kw:"availability target uptime nfr"},
+  {q:"What's the latency target for triage?", a:"Auto-triage decisions on the straight-through path complete in under 60 seconds at the 95th percentile (NFR-04). FNOL submission acknowledgment is under 2 seconds at p95 (NFR-03).", sec:"doc-nfr", kw:"latency triage target p95 speed"},
+  {q:"What's RTO and RPO for this system?", a:"Claims intake: RPO 15 minutes, RTO 4 hours. Event bus: RPO 5 minutes, RTO 1 hour — tighter, because claims cannot be lost in transit. See NFR-10.", sec:"doc-nfr", kw:"rto rpo recovery disaster recovery"},
+  {q:"What's the biggest risk?", a:"Two risks are rated Medium likelihood / High impact and still open: R2 (Kafka operational unfamiliarity during a catastrophe-event surge) and R5 (a surge exceeding autoscaling capacity or vendor rate limits). Both require a completed load/game-day test before go-live. See the Risk Register.", sec:"doc-risk", kw:"biggest risk top risk open"},
+  {q:"Who approved this architecture package?", a:"Prepared by Devon Okafor (AI Solution Architect), reviewed by Omar Haddad (Platform Engineering Lead), approved by Renee Castellano (Chief Claims Officer, Executive Sponsor) — approved for the pilot, with three conditions. See the Architecture Package Summary sign-off block.", sec:"doc-pkg", kw:"who approved sign off approval"},
+  {q:"Why buy the fraud-scoring engine instead of building it?", a:"Meridian has no in-house production fraud-model experience, and a 9–12 month internal build would delay the whole initiative past its pilot window. The vendor is wrapped behind an internal abstraction layer so it can be swapped later without touching the Triage Orchestrator. See ADR-006.", sec:"doc-adr", kw:"buy build fraud engine vendor why"},
+  {q:"What is a fitness function?", a:"An automated, repeatable check — run in CI, not remembered by a human — that a specific architectural characteristic still holds. Example for this system: a static-analysis rule that fails the build if a new service calls the legacy Policy Administration System synchronously in the request path, violating ADR-004.", sec:"the-20-percent", kw:"fitness function automated check ci"},
+  {q:"What's the difference between monolith and event-driven architecture?", a:"A monolith deploys the whole system as one unit — simple, but every part scales and releases together. Event-driven decouples producers and consumers through a broker, ideal for asynchronous, bursty work, at the cost of harder-to-trace request flows. Most real systems, including this one, are a hybrid of both.", sec:"the-20-percent", kw:"monolith event driven difference microservices"},
+  {q:"What does good vs bad architecture mean in this guide?", a:"Good architecture statements are measurable, justified against real load, cite a rejected alternative, and state a cost alongside every win. \"We use microservices because they scale better\" is bad — no load number, no comparison. See the Good vs. Bad Architecture table for five worked examples.", sec:"good-bad", kw:"good bad architecture meaning examples"},
+  {q:"What's the cost-per-claim target?", a:"$1.10 per claim processed at 30,000 claims/month steady-state volume (NFR-16), broken down as $0.46 extraction, $0.31 fraud-scoring vendor fee, $0.18 event bus & compute, $0.09 storage & audit log, $0.06 notification & payment — see the cost donut chart in the Trade-off Matrix.", sec:"doc-tsm", kw:"cost per claim target dollar"},
+  {q:"What is straight-through processing (STP)?", a:"A claim settled without human adjuster intervention, within defined confidence and dollar thresholds — here, under $2,500 with triage confidence ≥0.92 and zero fraud flags, human-approved by design per ADR-002. Initial pilot target is 18% of volume.", sec:"the-example", kw:"straight through processing stp what is"},
+  {q:"What happens if the fraud-scoring vendor is down?", a:"The claim routes to standard adjuster assignment instead of straight-through processing — fraud scoring is required for straight-through eligibility, not for routing to function at all. The outage is logged and alerted. See the Sequence & Data-Flow Diagrams document.", sec:"doc-seq", kw:"fraud vendor down outage fallback"},
+  {q:"Where is PII tokenized?", a:"At the Intake Service, before any downstream service — including the external fraud-scoring vendor — ever sees raw SSN or driver's license values. Detokenization is restricted to the final write-back to the Core Claims System of Record, under RBAC. See the Data-Flow Diagram's PII boundary.", sec:"doc-seq", kw:"pii tokenize ssn driver license where"},
+  {q:"What's a BFF?", a:"Backend-for-Frontend — an API layer tailored to a specific client application, giving the claimant portal and the adjuster/SIU workbench a stable entry point that hides internal service topology. See the C4 Container Diagram.", sec:"doc-c4", kw:"bff backend for frontend what is"},
+  {q:"What data store holds claims in this architecture?", a:"A PostgreSQL Claims Case Store holds only in-flight claim state, never the system of record — the Core Claims System of Record keeps that role. PostgreSQL scored 4.85/5 in the trade-off matrix against DynamoDB (3.15) and extending the legacy mainframe (2.75). See ADR-004.", sec:"doc-tsm", kw:"data store postgres dynamodb claims case store"},
+  {q:"What's next after this package is approved?", a:"Three conditions before go-live: Compliance sign-off on the PII tokenization design (Risk R4), a completed Kafka game-day load test (Risk R2), and execution of the fraud vendor's 90-day price-change notice clause (Risk R3). See the Architecture Package Summary recommendation.", sec:"doc-pkg", kw:"next steps conditions go live approved"},
+  {q:"What's the fraud-capture-rate target?", a:"Improve SIU referral capture rate from a 40% baseline to 70% within 2 quarters of full rollout. See NFR-12.", sec:"doc-nfr", kw:"fraud capture rate target siu"},
+  {q:"What is the executive sponsor's role?", a:"Renee Castellano, Chief Claims Officer, is the executive sponsor and final approver on the Solution Architecture Document, the ADRs, the Risk Register, and the Architecture Package Summary.", sec:"the-example", kw:"executive sponsor renee castellano role"}
+];
+
+function tokenize(s){ return s.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean); }
+function scoreFaq(queryTokens, faq){
+  var hay = tokenize(faq.q + ' ' + faq.kw + ' ' + faq.a);
+  var score = 0;
+  queryTokens.forEach(function(t){
+    if(t.length < 3) return;
+    hay.forEach(function(h){ if(h === t) score += 3; else if(h.indexOf(t) !== -1 || t.indexOf(h) !== -1) score += 1; });
+  });
+  return score;
+}
+function sectionTitle(id){
+  var sec = document.getElementById(id);
+  var h = sec && (sec.querySelector('h2') || sec.querySelector('h1'));
+  return h ? h.textContent.trim() : id;
+}
+function answerQuestion(raw){
+  var wrap = document.getElementById('ask-answer-wrap');
+  var q = (raw||'').trim();
+  if(!q){ wrap.innerHTML = ''; return; }
+  var qTokens = tokenize(q);
+  var best = null, bestScore = 0;
+  FAQ.forEach(function(f){
+    var s = scoreFaq(qTokens, f);
+    if(s > bestScore){ bestScore = s; best = f; }
+  });
+  if(!best || bestScore === 0){
+    wrap.innerHTML = '<div class="ask-answer" style="border-color:var(--amber);">'+
+      '<div class="q">No confident match</div>'+
+      '<p style="margin:0;">I couldn&rsquo;t match that to a specific section. Try the search box above, or one of the suggested questions below.</p></div>';
+    return;
+  }
+  wrap.innerHTML = '<div class="ask-answer">'+
+    '<div class="q">Matched: '+best.q+'</div>'+
+    '<p style="margin:0;">'+best.a+'</p>'+
+    '<div class="src">Source: <a href="#'+best.sec+'">'+sectionTitle(best.sec)+'</a></div>'+
+  '</div>';
+}
+document.getElementById('ask-submit').addEventListener('click', function(){ answerQuestion(document.getElementById('ask-input').value); });
+document.getElementById('ask-input').addEventListener('keydown', function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); answerQuestion(this.value); } });
+document.getElementById('ask-clear').addEventListener('click', function(){ document.getElementById('ask-input').value=''; document.getElementById('ask-answer-wrap').innerHTML=''; });
+document.getElementById('ask-btn').addEventListener('click', function(){
+  document.getElementById('ask-section').scrollIntoView({behavior:'smooth'});
+  document.getElementById('ask-input').focus();
+});
+var suggEl = document.getElementById('ask-suggestions');
+[0,3,8,14,19].forEach(function(i){
+  var chip = document.createElement('button');
+  chip.type = 'button'; chip.className = 'ask-chip'; chip.textContent = FAQ[i].q;
+  chip.addEventListener('click', function(){ document.getElementById('ask-input').value = FAQ[i].q; answerQuestion(FAQ[i].q); });
+  suggEl.appendChild(chip);
+});
+
+/* ============================================================ Download / Print / CSV ============================================================ */
+var DOC_META = {
+  sad: {title:"Solution Architecture Document", docId:"SAD-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Approved", date:"2026-08-04"},
+  c4: {title:"C4 Diagrams", docId:"C4-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Approved", date:"2026-08-04"},
+  adr: {title:"Architecture Decision Records", docId:"ADR-MM-2026-001..006", version:"1.0", owner:"Devon Okafor", status:"Approved", date:"2026-08-04"},
+  nfr: {title:"Non-Functional Requirements Specification", docId:"NFR-MM-2026-001", version:"1.0", owner:"Omar Haddad", status:"Approved", date:"2026-08-04"},
+  tsm: {title:"Technology Selection & Trade-off Matrix", docId:"TSM-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Approved", date:"2026-08-04"},
+  seq: {title:"Sequence & Data-Flow Diagrams", docId:"SDF-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Approved", date:"2026-08-04"},
+  risk: {title:"Architecture Risk Register", docId:"RISK-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Living Document", date:"2026-08-04"},
+  pkg: {title:"Architecture Package Summary", docId:"PKG-MM-2026-001", version:"1.0", owner:"Devon Okafor", status:"Approved for Pilot", date:"2026-08-04"}
+};
+
+var EXPORT_CSS = document.querySelector('style').textContent;
+
+function buildStandaloneDoc(key){
+  var meta = DOC_META[key];
+  var srcWrap = document.getElementById('export-'+key);
+  var body = srcWrap.querySelector('.doc-body').innerHTML;
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8">'+
+    '<title>'+meta.title+' — Meridian Mutual Insurance</title>'+
+    '<style>'+EXPORT_CSS+'</style></head><body>'+
+    '<div class="doc-wrap" style="max-width:900px;margin:30px auto;">'+
+    '<div class="doc-cover"><img class="cover-logo" src="'+LOGO_DATA_URI+'"><h1>'+meta.title+'</h1>'+
+    '<p class="doc-sub">ClaimsPilot AI — FNOL Intake, Triage &amp; Straight-Through Processing Platform</p>'+
+    '<p class="doc-sub">Meridian Mutual Insurance</p></div>'+
+    '<div class="doc-control">'+
+      '<div><span>Document ID</span><strong>'+meta.docId+'</strong></div>'+
+      '<div><span>Version</span><strong>'+meta.version+'</strong></div>'+
+      '<div><span>Owner</span><strong>'+meta.owner+'</strong></div>'+
+      '<div><span>Status</span><strong>'+meta.status+'</strong></div>'+
+      '<div><span>Date</span><strong>'+meta.date+'</strong></div>'+
+    '</div>'+
+    '<div class="doc-body">'+body+'</div>'+
+    '<div class="doc-footer"><span>Meridian Mutual Insurance — Internal Use</span><span>'+meta.docId+' v'+meta.version+'</span></div>'+
+    '</div></body></html>';
+}
+
+function downloadHTML(filename, htmlStr){
+  var blob = new Blob([htmlStr], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+}
+function printDoc(key){
+  var html = buildStandaloneDoc(key);
+  var w = window.open('', '_blank');
+  if(!w){ alert('Please allow pop-ups to use Save as PDF.'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  var triggered = false;
+  function go(){ if(triggered) return; triggered = true; try{ w.focus(); w.print(); }catch(e){} }
+  w.addEventListener('load', go);
+  setTimeout(go, 600);
+}
+function csvEscape(v){ return '"'+String(v==null?'':v).replace(/<[^>]+>/g,'').replace(/&rsquo;/g,"'").replace(/&mdash;/g,'-').replace(/&ndash;/g,'-').replace(/&rarr;/g,'->').replace(/&amp;/g,'&').replace(/&le;/g,'<=').replace(/&ge;/g,'>=').replace(/"/g,'""')+'"'; }
+function toCSV(headers, rows){
+  var lines = [headers.map(csvEscape).join(',')];
+  rows.forEach(function(r){ lines.push(r.map(csvEscape).join(',')); });
+  return lines.join('\r\n');
+}
+function downloadCSV(filename, headers, rows){
+  var csv = toCSV(headers, rows);
+  var blob = new Blob(["﻿"+csv], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+}
+
+document.querySelectorAll('[data-download]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = btn.getAttribute('data-download');
+    downloadHTML(DOC_META[key].docId+'.html', buildStandaloneDoc(key));
+  });
+});
+document.querySelectorAll('[data-print]').forEach(function(btn){
+  btn.addEventListener('click', function(){ printDoc(btn.getAttribute('data-print')); });
+});
+document.querySelectorAll('[data-csv]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var key = btn.getAttribute('data-csv');
+    if(key === 'nfr'){
+      downloadCSV('NFR-MM-2026-001.csv', ['ID','Category','Requirement & Measurable Target','Verification Method','Priority'],
+        NFR.map(function(r){ return [r[0],r[1],r[2],r[3],PRI_LABEL[r[4]]]; }));
+    } else if(key === 'tsm'){
+      downloadCSV('TSM-MM-2026-001.csv', ['Category','Option','Weighted Score (of 5)','Recommended'],
+        [
+          ['Event Backbone','Kafka (Confluent Cloud)','4.40','Yes'],
+          ['Event Backbone','AWS SQS/SNS','3.65','No'],
+          ['Event Backbone','Azure Service Bus','3.05','No'],
+          ['Document Extraction','In-house OCR + LLM pipeline','3.50','No'],
+          ['Document Extraction','Managed Cloud Document-AI','3.85','Yes'],
+          ['Document Extraction','Third-party InsurTech vendor','3.50','No'],
+          ['Claims Case Data Store','Managed PostgreSQL','4.85','Yes'],
+          ['Claims Case Data Store','DynamoDB / NoSQL','3.15','No'],
+          ['Claims Case Data Store','Extend legacy mainframe','2.75','No']
+        ]);
+    } else if(key === 'risk'){
+      downloadCSV('RISK-MM-2026-001.csv', ['ID','Risk','Likelihood','Impact','Mitigation','Owner','Status'],
+        RISK.map(function(r){ return [r[0],r[1],r[2],r[3],r[4],r[5],STATUS_LABEL[r[6]]]; }));
+    }
+  });
+});
+
+})();
+</script>
+</body>
+</html>
+

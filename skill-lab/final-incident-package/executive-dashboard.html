@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive Revenue Dashboard — Publish Status</title>
+<style>
+  :root { color-scheme: light; }
+  .viz-root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --status-good:      #0ca30c;
+    --status-warning:   #fab219;
+    --status-critical:  #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    padding: 32px 16px 64px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  header.page-header { margin-bottom: 24px; }
+  header.page-header .eyebrow {
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  header.page-header h1 { margin: 0 0 6px; font-size: 26px; }
+  header.page-header .sub { color: var(--text-secondary); font-size: 14px; margin: 0; }
+
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--status-critical);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .banner .badge {
+    flex: 0 0 auto;
+    background: var(--status-critical);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+  .banner .msg { font-size: 15px; color: var(--text-primary); }
+  .banner .msg strong { font-weight: 600; }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 720px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .tile .label {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+  }
+  .tile .value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: proportional-nums;
+    margin: 0 0 8px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .chip.critical { background: color-mix(in srgb, var(--status-critical) 16%, transparent); color: var(--status-critical); }
+  .chip.warning  { background: color-mix(in srgb, var(--status-warning) 22%, transparent); color: #8a5a00; }
+  .chip.good     { background: color-mix(in srgb, var(--status-good) 16%, transparent); color: var(--status-good); }
+  :root[data-theme="dark"] .chip.warning, @media (prefers-color-scheme: dark) { }
+  .chip.warning { }
+
+  section { margin-bottom: 28px; }
+  section h2 {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    border-bottom: 1px solid var(--gridline);
+    padding-bottom: 8px;
+  }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--gridline); vertical-align: top; }
+  th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
+  tr:last-child td { border-bottom: none; }
+  td.evidence { color: var(--text-secondary); }
+
+  .cause-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .cause-list li {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--status-warning);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .cause-list li.rank-1 { border-left-color: var(--status-critical); }
+  .cause-list .rank { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin: 0 0 4px; }
+  .cause-list .title { font-weight: 600; margin: 0 0 4px; }
+  .cause-list .evidence { color: var(--text-secondary); font-size: 13px; margin: 0; }
+
+  .timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gridline);
+    font-size: 13px;
+  }
+  .timeline li:last-child { border-bottom: none; }
+  .timeline .ts { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .timeline .desc { color: var(--text-primary); }
+
+  .unknowns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 720px) { .unknowns { grid-template-columns: 1fr; } }
+  .unknowns .card {
+    background: var(--surface-1);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .unknowns .card .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin: 0 0 6px; }
+  .unknowns .card .v { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+  .action {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--status-critical);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+  .action strong { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--status-critical); }
+
+  footer { color: var(--text-muted); font-size: 12px; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="wrap">
+
+    <header class="page-header">
+      <p class="eyebrow">Executive Revenue Dashboard · Publish Readiness</p>
+      <h1>Orders Dataset — Scheduled Publish Incident</h1>
+      <p class="sub">Source: skill-lab/orders.csv · Pipeline: orders_pipeline · Run: run-20260803-2210</p>
+    </header>
+
+    <div class="banner">
+      <span class="badge">BLOCK</span>
+      <span class="msg">Data quality gate returned <strong>FAIL</strong>. Do not publish this refresh to the executive revenue dashboard.</span>
+    </div>
+
+    <div class="tiles">
+      <div class="tile">
+        <p class="label">Overall Result</p>
+        <p class="value">FAIL</p>
+        <span class="chip critical">4 of 8 checks</span>
+      </div>
+      <div class="tile">
+        <p class="label">Rows Flagged</p>
+        <p class="value">4 / 12</p>
+        <span class="chip warning" style="background:color-mix(in srgb, var(--status-warning) 22%, transparent); color:#8a5a00;">stale · dup · blank · negative</span>
+      </div>
+      <div class="tile">
+        <p class="label">Pipeline Attempts</p>
+        <p class="value">2 / 2 failed</p>
+        <span class="chip critical">retries exhausted</span>
+      </div>
+      <div class="tile">
+        <p class="label">Recommendation</p>
+        <p class="value">BLOCK</p>
+        <span class="chip critical">publish decision</span>
+      </div>
+    </div>
+
+    <section>
+      <h2>Data Quality Checks</h2>
+      <table>
+        <thead>
+          <tr><th>Check</th><th>Evidence</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Schema</td><td class="evidence">All 9 contract columns present and correctly named.</td><td><span class="chip good">PASS</span></td></tr>
+          <tr><td>Freshness</td><td class="evidence">ORD-1010 load_timestamp 2026-07-30 — ~95h old (limit 24h).</td><td><span class="chip critical">FAIL</span></td></tr>
+          <tr><td>Expected volume</td><td class="evidence">12 rows present, minimum is 10.</td><td><span class="chip good">PASS</span></td></tr>
+          <tr><td>Key uniqueness</td><td class="evidence">order_id ORD-1004 appears on two rows.</td><td><span class="chip critical">FAIL</span></td></tr>
+          <tr><td>Duplicates (full-row)</td><td class="evidence">No two rows identical across all fields.</td><td><span class="chip good">PASS</span></td></tr>
+          <tr><td>Required fields</td><td class="evidence">ORD-1005 has a blank region.</td><td><span class="chip critical">FAIL</span></td></tr>
+          <tr><td>Nulls (other fields)</td><td class="evidence">No other blanks found outside the region gap.</td><td><span class="chip good">PASS</span></td></tr>
+          <tr><td>Numeric rules</td><td class="evidence">ORD-1008 revenue = -100.00 (must be &gt; 0).</td><td><span class="chip critical">FAIL</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Ranked Root Causes (Pipeline Triage)</h2>
+      <ul class="cause-list">
+        <li class="rank-1">
+          <p class="rank">Rank 1 · Most likely</p>
+          <p class="title">Source schema drift on region</p>
+          <p class="evidence">raw_orders.region widened from constrained VARCHAR(50) to free-text VARCHAR(255) on 2026-08-02, ~30h before the first failure.</p>
+        </li>
+        <li>
+          <p class="rank">Rank 2</p>
+          <p class="title">Mapping table not updated</p>
+          <p class="evidence">region_code_map last modified 2026-06-14 — predates the source change by ~7 weeks; no entries for 'North America' / 'Europe', no null default.</p>
+        </li>
+        <li>
+          <p class="rank">Rank 3</p>
+          <p class="title">Failure confirmed non-transient</p>
+          <p class="evidence">Retry at 22:15Z reproduced the identical failure signature — rules out timeout, upstream outage, and credential causes.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Pipeline Run Timeline</h2>
+      <ul class="timeline">
+        <li><span class="ts">2026-08-03 22:10 UTC</span><span class="desc">Attempt 1 — schema_validate FAILED (322/1482 rows, 21.7%)</span><span class="chip critical">FAIL</span></li>
+        <li><span class="ts">2026-08-03 22:15 UTC</span><span class="desc">Attempt 2 (retry) — schema_validate FAILED (326/1486 rows, 21.9%)</span><span class="chip critical">FAIL</span></li>
+        <li><span class="ts">2026-08-03 22:15 UTC</span><span class="desc">Retries exhausted (2/2) — on-call notified via data-eng-alerts</span><span class="chip warning" style="background:color-mix(in srgb, var(--status-warning) 22%, transparent); color:#8a5a00;">ALERTED</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Not Yet Known</h2>
+      <div class="unknowns">
+        <div class="card"><p class="k">Owner</p><p class="v">Not confirmed in the reviewed log or metadata.</p></div>
+        <div class="card"><p class="k">Resolution time</p><p class="v">No ETA available in the reviewed sources.</p></div>
+        <div class="card"><p class="k">Financial impact</p><p class="v">Not quantified in the reviewed sources.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recommended Next Business Action</h2>
+      <div class="action">
+        <strong>Escalate now</strong>
+        Escalate to the data-engineering on-call / source-system owner (already paged via data-eng-alerts) to confirm ownership and an ETA before the next scheduled publish window. Do not publish until the region mapping is fixed and the four flagged rows are corrected or excluded.
+      </div>
+    </section>
+
+    <footer>
+      Generated from skill-lab/final-incident-package/data-quality-report.md and skill-lab/final-incident-package/etl-triage-report.md. No pipeline code was changed and no job was rerun to produce this page.
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>
