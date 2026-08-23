@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "Agentic AI System for Data Pipeline Incident Investigation",
+    "descriptor": "A system coordinating specialized agents to analyze data-engineering pipeline incidents, identify root causes, and recommend corrective actions."
+  },
+  "schedule": {
+    "build_start": "2026-08-30",
+    "build_end": "2026-10-01",
+    "demo_day": "2026-10-08",
+    "demo_release_key": "r4"
+  },
+  "requirements": [
+    { "id": "REQ-001", "statement": "The system must analyze error logs for common patterns to determine the root cause of pipeline incidents.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-001"] },
+    { "id": "REQ-002", "statement": "The system must coordinate specialized agents to analyze pipeline dependencies.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-010"] },
+    { "id": "REQ-003", "statement": "The system must analyze SQL queries to identify potential issues.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-003"] },
+    { "id": "REQ-004", "statement": "The system must analyze data-quality issues to identify potential root causes.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-004"] },
+    { "id": "REQ-005", "statement": "The system must recommend corrective actions for human approval.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-001", "STORY-005"] },
+    { "id": "REQ-006", "statement": "The system must flag uncertain root causes and notify the user.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-006"] },
+    { "id": "REQ-007", "statement": "The system must provide simplified summaries for ops teams.", "kind": "FUNC", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-007"] },
+    { "id": "REQ-008", "statement": "The system must connect to data sources for log and SQL analysis.", "kind": "CONSTRAINT", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-001", "STORY-003"] },
+    { "id": "REQ-009", "statement": "The system must reduce incident investigation time from 4 hours to 1 hour.", "kind": "NFR", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-009"] },
+    { "id": "REQ-010", "statement": "The system must ensure recommendations for major changes are reviewed before approval.", "kind": "SAFE", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-005"] },
+    { "id": "REQ-011", "statement": "The system must log all investigation activities for audit purposes.", "kind": "OBS", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-002"] },
+    { "id": "REQ-012", "statement": "The system must have a successful pilot with low error rates before autonomous operation.", "kind": "SAFE", "priority": "must", "cluster": null, "fulfilled_by": ["STORY-009"] },
+    { "id": "REQ-013", "statement": "Every screen the ops team uses must complete its primary action in three clicks or fewer.", "kind": "NFR", "priority": "should", "cluster": null, "fulfilled_by": ["STORY-007"] },
+    { "id": "REQ-014", "statement": "The system must support integration with existing ops tools for notifications.", "kind": "CONSTRAINT", "priority": "should", "cluster": null, "fulfilled_by": ["STORY-006"] },
+    { "id": "REQ-015", "statement": "The system must allow configuration of agent parameters by data engineers.", "kind": "FUNC", "priority": "should", "cluster": null, "fulfilled_by": [] },
+    { "id": "REQ-016", "statement": "The system must handle concurrent investigations without performance degradation.", "kind": "NFR", "priority": "should", "cluster": null, "fulfilled_by": ["STORY-009"] },
+    { "id": "REQ-017", "statement": "The system must provide detailed reports of investigation outcomes.", "kind": "FUNC", "priority": "should", "cluster": null, "fulfilled_by": ["STORY-008"] },
+    { "id": "REQ-018", "statement": "The system must support role-based access control for security.", "kind": "SAFE", "priority": "should", "cluster": null, "fulfilled_by": [] }
+  ],
+  "stories": [
+    { "id": "STORY-001", "title": "Basic Log Analysis and Recommendation", "release": "r0", "owner": "Data Engineer", "narrative": "As a data engineer, I want the system to analyze error logs for common patterns and recommend a corrective action, so that I can identify a likely root cause faster than manual log review.", "due_on": "2026-08-30", "due_baseline_on": "2026-08-30" },
+    { "id": "STORY-002", "title": "Audit Logging for Investigations", "release": "r0", "owner": "Compliance Officer", "narrative": "As a compliance officer, I want every investigation activity logged, so that I have an auditable record of how each incident was analyzed.", "due_on": "2026-09-02", "due_baseline_on": "2026-09-02" },
+    { "id": "STORY-003", "title": "SQL Analysis for Root Cause Identification", "release": "r1", "owner": "Data Engineer", "narrative": "As a data engineer, I want the system to analyze SQL queries involved in a pipeline, so that query-level issues are surfaced as part of root cause analysis.", "due_on": "2026-09-04", "due_baseline_on": "2026-09-04" },
+    { "id": "STORY-004", "title": "Data-Quality Analysis for Root Cause Identification", "release": "r1", "owner": "Data Engineer", "narrative": "As a data engineer, I want the system to analyze data-quality signals, so that data-quality problems are considered as a potential root cause.", "due_on": "2026-09-06", "due_baseline_on": "2026-09-06" },
+    { "id": "STORY-010", "title": "Coordinate Specialized Agents for Dependency Analysis", "release": "r1", "owner": "Backend Team", "narrative": "As a data engineer, I want specialized agents coordinated to analyze pipeline dependencies, so that upstream and downstream dependency issues are included in the investigation.", "due_on": "2026-09-08", "due_baseline_on": "2026-09-08" },
+    { "id": "STORY-005", "title": "Recommendation Engine with Human Approval", "release": "r2", "owner": "Ops Team Member", "narrative": "As an ops team member, I want recommended corrective actions to require human approval before being applied, so that major changes are reviewed rather than applied automatically.", "due_on": "2026-09-11", "due_baseline_on": "2026-09-11" },
+    { "id": "STORY-006", "title": "Notification System for Uncertain Cases", "release": "r2", "owner": "Data Engineer", "narrative": "As a data engineer, I want to be notified when a root cause is uncertain, so that I can review the case manually instead of trusting a low-confidence result.", "due_on": "2026-09-14", "due_baseline_on": "2026-09-14" },
+    { "id": "STORY-007", "title": "User Interface for Ops Teams", "release": "r3", "owner": "UI/UX Team", "narrative": "As an ops team member, I want a simplified summary of each incident in the UI, so that I can understand what happened without reading raw logs.", "due_on": "2026-09-16", "due_baseline_on": "2026-09-16" },
+    { "id": "STORY-008", "title": "Detailed Reporting of Investigation Outcomes", "release": "r3", "owner": "Data Engineer", "narrative": "As a data engineer, I want a detailed report of each investigation's outcome, so that I can review what the system found and why.", "due_on": "2026-09-19", "due_baseline_on": "2026-09-19" },
+    { "id": "STORY-009", "title": "Pilot Testing and Performance Optimization", "release": "r4", "owner": "Project Manager", "narrative": "As a project manager, I want a successful pilot with low error rates measured before the system operates autonomously, so that I can be confident it is safe to rely on.", "due_on": "2026-10-01", "due_baseline_on": "2026-10-01" }
+  ],
+  "releases": [
+    { "key": "r0", "name": "Initial Skeleton", "starts_on": "2026-08-30", "ends_on": "2026-09-02", "story_ids": ["STORY-001", "STORY-002"], "is_demo_target": false },
+    { "key": "r1", "name": "Enhanced Analysis", "starts_on": "2026-09-04", "ends_on": "2026-09-08", "story_ids": ["STORY-003", "STORY-004", "STORY-010"], "is_demo_target": false },
+    { "key": "r2", "name": "Recommendation and Notification", "starts_on": "2026-09-11", "ends_on": "2026-09-14", "story_ids": ["STORY-005", "STORY-006"], "is_demo_target": false },
+    { "key": "r3", "name": "User Interface and Reporting", "starts_on": "2026-09-16", "ends_on": "2026-09-19", "story_ids": ["STORY-007", "STORY-008"], "is_demo_target": false },
+    { "key": "r4", "name": "Pilot Testing and Optimization", "starts_on": "2026-10-01", "ends_on": "2026-10-01", "story_ids": ["STORY-009"], "is_demo_target": true }
+  ],
+  "agents": [],
+  "derived": {
+    "measures": [
+      { "id": "REQ-009", "statement": "The system must reduce incident investigation time from 4 hours to 1 hour." }
+    ],
+    "roles": [
+      { "role": "data engineer", "story_ids": ["STORY-001", "STORY-003", "STORY-004", "STORY-006", "STORY-008", "STORY-010"] },
+      { "role": "compliance officer", "story_ids": ["STORY-002"] },
+      { "role": "ops team member", "story_ids": ["STORY-005", "STORY-007"] },
+      { "role": "project manager", "story_ids": ["STORY-009"] },
+      { "role": "system administrator", "story_ids": [] }
+    ],
+    "guardrails": [
+      { "id": "REQ-010", "statement": "The system must ensure recommendations for major changes are reviewed before approval." },
+      { "id": "REQ-012", "statement": "The system must have a successful pilot with low error rates before autonomous operation." },
+      { "id": "REQ-018", "statement": "The system must support role-based access control for security." }
+    ],
+    "systems": ["SQL"],
+    "owners": [
+      { "owner": "Data Engineer", "story_ids": ["STORY-001", "STORY-003", "STORY-004", "STORY-006", "STORY-008"] },
+      { "owner": "Compliance Officer", "story_ids": ["STORY-002"] },
+      { "owner": "Ops Team Member", "story_ids": ["STORY-005"] },
+      { "owner": "UI/UX Team", "story_ids": ["STORY-007"] },
+      { "owner": "Project Manager", "story_ids": ["STORY-009"] },
+      { "owner": "Backend Team", "story_ids": ["STORY-010"] }
+    ]
+  }
+}

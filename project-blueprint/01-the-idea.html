@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Idea — Family Tree App Blueprint</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-section="idea">
+<div id="scroll-progress"></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html"><span class="dot"></span>Family Tree App</a>
+    <a class="home-link" href="index.html">&larr; Command Center</a>
+    <div class="nav-search">
+      <input type="text" id="site-search" placeholder="Search the blueprint..." autocomplete="off">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">&#9788;</button>
+    <button class="icon-btn" id="print-btn" title="Print this page" aria-label="Print this page">&#128438;</button>
+  </div>
+</header>
+<nav class="breadcrumbs" id="breadcrumbs"></nav>
+
+<main class="page">
+  <div class="with-sidebar">
+    <div>
+      <div class="page-header">
+        <div class="kicker">Section 1 of 7</div>
+        <h1>The Idea</h1>
+        <p class="lead">The one-paragraph brief this entire design is built from — nothing here that wasn't asked for, nothing implied that isn't included.</p>
+      </div>
+
+      <div class="card" data-search-text="build an app that can be used to create a family tree with 10 generations deep at a minimum">
+        <p class="idea-quote" style="margin:0;padding:0.9rem 1.1rem;border-left:3px solid var(--accent);background:var(--bg);border-radius:0 10px 10px 0;font-size:1.05rem;">
+          &ldquo;Build an app that can be used to create a family tree with 10 generations deep at a minimum.&rdquo;
+        </p>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">Why this sentence drives everything</h2>
+        <p>Two phrases in it decide every component that follows: <strong>&ldquo;app&hellip;used to create&rdquo;</strong> means a human builds the tree by hand, across more than one sitting. And <strong>&ldquo;10 generations deep at a minimum&rdquo;</strong> is the requirement that outranks everything else — a family tree tool that looks fine at 3 generations and breaks at 10 hasn&rsquo;t done its job. See <a href="02-components.html">Components</a> for the two pieces built specifically to guarantee that number holds.</p>
+        <p class="muted">Nothing in the paragraph mentions other people, other devices, imported records, or AI — so none of those appear in the design. A padded diagram would be a worse answer than a small one.</p>
+      </div>
+
+      <div class="card diagram-block" data-figure data-figure-title="The idea as a pipeline">
+        <div class="diagram-toolbar">
+          <button class="icon-btn expand-btn" title="Expand full screen" aria-label="Expand full screen">&#10530;</button>
+        </div>
+        <div class="illustration" data-illustration="idea-pipeline"></div>
+        <p class="interpretation">One paragraph becomes a small closed loop of four components, which together produce one thing: a tree that stays usable ten-plus generations deep.</p>
+      </div>
+
+      <div class="kv-list">
+        <div class="kv-item">
+          <div class="kv-label">Minimum depth required</div>
+          <div class="kv-value">10 generations</div>
+        </div>
+        <div class="kv-item">
+          <div class="kv-label">People mentioned building it</div>
+          <div class="kv-value">1 (single user)</div>
+        </div>
+        <div class="kv-item">
+          <div class="kv-label">External services named</div>
+          <div class="kv-value">0</div>
+        </div>
+      </div>
+
+      <div class="page-footer-nav" id="footer-nav"></div>
+    </div>
+
+    <aside class="ask-panel card" id="ask-panel"></aside>
+  </div>
+</main>
+
+<footer class="site-foot">Family Tree App knowledge base &mdash; generated blueprint, browsable offline. Full detail also lives in <a href="architecture.md">architecture.md</a>.</footer>
+<button class="icon-btn" id="back-to-top" title="Back to top" aria-label="Back to top">&uarr;</button>
+
+<div class="modal-backdrop" id="diagram-modal">
+  <div class="modal-box">
+    <div class="modal-bar">
+      <span class="modal-title" style="margin-right:auto;font-weight:700;font-size:0.9rem;"></span>
+      <button class="icon-btn zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+      <button class="icon-btn zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+      <button class="icon-btn zoom-reset" title="Reset zoom" aria-label="Reset zoom">&#8635;</button>
+      <button class="icon-btn modal-close" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-viewport"><div class="modal-zoom-inner"></div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="assets/blueprint.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

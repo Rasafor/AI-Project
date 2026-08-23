@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Family Tree App Blueprint</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-section="components">
+<div id="scroll-progress"></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html"><span class="dot"></span>Family Tree App</a>
+    <a class="home-link" href="index.html">&larr; Command Center</a>
+    <div class="nav-search">
+      <input type="text" id="site-search" placeholder="Search the blueprint..." autocomplete="off">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">&#9788;</button>
+    <button class="icon-btn" id="print-btn" title="Print this page" aria-label="Print this page">&#128438;</button>
+  </div>
+</header>
+<nav class="breadcrumbs" id="breadcrumbs"></nav>
+
+<main class="page">
+  <div class="with-sidebar">
+    <div>
+      <div class="page-header">
+        <div class="kicker">Section 2 of 7</div>
+        <h1>Components</h1>
+        <p class="lead">Four real, idea-specific pieces — each one traceable back to specific words in the brief. No login system, no server, no external data source, and no AI layer, because the idea didn't ask for shared access, imported records, or anything generated/ranked by meaning.</p>
+      </div>
+
+      <div class="card diagram-block" data-figure data-figure-title="Components grouped by layer">
+        <div class="diagram-toolbar">
+          <button class="icon-btn expand-btn" title="Expand full screen" aria-label="Expand full screen">&#10530;</button>
+        </div>
+        <div class="illustration" data-illustration="layer-diagram"></div>
+        <p class="interpretation">Three layers, four boxes: one for the person to touch, two that guarantee the ten-generation requirement (marked ★), one to remember what was built.</p>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">The four components</h2>
+        <table>
+          <thead>
+            <tr><th style="width:22%">Component</th><th style="width:40%">What it does for this project</th><th>Why it exists — the words that required it</th></tr>
+          </thead>
+          <tbody id="components-table"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">The two-part depth guarantee</h2>
+        <p>&ldquo;10 generations deep at a minimum&rdquo; is satisfied by <strong>two</strong> components working together, not one: the <strong>Genealogy Engine</strong> guarantees the depth can structurally <em>exist</em> (an open-ended relationship graph, not a form with 10 pre-printed slots), and the <strong>Tree Rendering Engine</strong> guarantees that depth can actually be <em>seen and navigated</em> once it does. If either is missing, the requirement isn't met — one without the other is either an unusable spreadsheet or a pretty renderer with nothing real to draw.</p>
+      </div>
+
+      <div class="page-footer-nav" id="footer-nav"></div>
+    </div>
+
+    <aside class="ask-panel card" id="ask-panel"></aside>
+  </div>
+</main>
+
+<footer class="site-foot">Family Tree App knowledge base &mdash; generated blueprint, browsable offline. Full detail also lives in <a href="architecture.md">architecture.md</a>.</footer>
+<button class="icon-btn" id="back-to-top" title="Back to top" aria-label="Back to top">&uarr;</button>
+
+<div class="modal-backdrop" id="diagram-modal">
+  <div class="modal-box">
+    <div class="modal-bar">
+      <span class="modal-title" style="margin-right:auto;font-weight:700;font-size:0.9rem;"></span>
+      <button class="icon-btn zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+      <button class="icon-btn zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+      <button class="icon-btn zoom-reset" title="Reset zoom" aria-label="Reset zoom">&#8635;</button>
+      <button class="icon-btn modal-close" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-viewport"><div class="modal-zoom-inner"></div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="assets/blueprint.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

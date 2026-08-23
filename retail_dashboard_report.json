@@ -1,0 +1,111 @@
+{
+  "report_title": "June 2026 Retail Sales Performance Dashboard",
+  "generated_at": "Covering the full month of June 2026",
+  "headline_summary": "June brought in $267,700 in total revenue across 6,060 units sold. Wireless Earbuds alone accounted for $126,000 — nearly half of all revenue — making the business heavily dependent on one product. The West and East regions carried most of the sales, while the North region lagged well behind at just $35,750.",
+  "key_metrics": [
+    {
+      "name": "Total Revenue",
+      "value": "$267,700",
+      "trend": "flat"
+    },
+    {
+      "name": "Total Units Sold",
+      "value": "6,060",
+      "trend": "flat"
+    },
+    {
+      "name": "Average Revenue Per Unit",
+      "value": "$44.17",
+      "trend": "flat"
+    },
+    {
+      "name": "Revenue From Top Product",
+      "value": "$126,000 (47% of total)",
+      "trend": "up"
+    },
+    {
+      "name": "Products Sold",
+      "value": "6",
+      "trend": "flat"
+    },
+    {
+      "name": "Best Region (Revenue)",
+      "value": "West \" \"$96,600",
+      "trend": "up"
+    },
+    {
+      "name": "Weakest Region (Revenue)",
+      "value": "North \" \"$35,750",
+      "trend": "down"
+    }
+  ],
+  "top_products": [
+    {
+      "product_name": "Wireless Earbuds",
+      "units_sold": 2100,
+      "revenue_usd": 126000.0
+    },
+    {
+      "product_name": "Running Shoes",
+      "units_sold": 465,
+      "revenue_usd": 41850.0
+    },
+    {
+      "product_name": "Stainless Water Bottle",
+      "units_sold": 1700,
+      "revenue_usd": 34000.0
+    },
+    {
+      "product_name": "Yoga Mat",
+      "units_sold": 1040,
+      "revenue_usd": 31200.0
+    },
+    {
+      "product_name": "Bluetooth Speaker",
+      "units_sold": 300,
+      "revenue_usd": 21000.0
+    },
+    {
+      "product_name": "Desk Lamp",
+      "units_sold": 455,
+      "revenue_usd": 13650.0
+    }
+  ],
+  "regional_performance": [
+    {
+      "region": "West",
+      "revenue_usd": 96600.0,
+      "standout_note": "Your strongest region, but 77% of its revenue comes from Wireless Earbuds alone."
+    },
+    {
+      "region": "East",
+      "revenue_usd": 85550.0,
+      "standout_note": "Solid second place and the only region selling nearly 1,000 water bottles."
+    },
+    {
+      "region": "South",
+      "revenue_usd": 49800.0,
+      "standout_note": "Best region for Yoga Mats (610 units) and has the most balanced product mix."
+    },
+    {
+      "region": "North",
+      "revenue_usd": 35750.0,
+      "standout_note": "Weakest region overall, though Running Shoes there earned $24,750 \" \"more than any other single item outside earbuds."
+    }
+  ],
+  "recommendations": [
+    "Protect the Wireless Earbuds business \" \"make sure stock levels, supplier terms, and shipping for this one product are rock solid, since half your revenue depends on it.",
+    "Push Running Shoes harder. At roughly $90 per sale they earn 4.5x more per unit than water bottles. Even a small increase in shoe sales moves revenue a lot.",
+    "Test Wireless Earbuds in the South and North regions. They currently sell in West and East only, and those two regions are your top performers largely because of it.",
+    "Investigate why North is underperforming \" \"it only carries three products (Desk Lamp, Running Shoes, Bluetooth Speaker) versus four or five elsewhere. Adding your proven sellers there is the fastest growth opportunity.",
+    "Reconsider the Desk Lamp. At $13,650 it is your smallest earner and sells poorly in the North (145 units). Either bundle it with other Home & Kitchen items or free up the shelf space.",
+    "Bundle low-value, high-volume items like the Stainless Water Bottle with Yoga Mats or Running Shoes to lift the average sale size."
+  ],
+  "risk_flags": [
+    "Heavy single-product concentration: Wireless Earbuds are 47% of revenue. A supply delay, price war, or quality issue with this one item would seriously damage the month.",
+    "Category concentration: Electronics account for $147,000 (55% of revenue) across just two products.",
+    "Regional imbalance: West and East together generate 68% of revenue. The business is thin in North and South.",
+    "Bluetooth Speaker is barely selling in the North (95 units) \" \"the lowest volume in the entire dataset \" \"which may signal wasted inventory or poor local demand.",
+    "This report covers a single month with no prior period to compare against, so no trend directions can be confirmed. Treat all trend indicators as provisional until a second month of data is available."
+  ]
+}

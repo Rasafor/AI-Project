@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Tree App — Blueprint Command Center</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<div id="scroll-progress"></div>
+<header class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html"><span class="dot"></span>Family Tree App</a>
+    <div class="nav-search">
+      <input type="text" id="site-search" placeholder="Search the blueprint..." autocomplete="off">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">&#9788;</button>
+    <button class="icon-btn" id="print-btn" title="Print this page" aria-label="Print this page">&#128438;</button>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Family Tree App — Blueprint</h1>
+  <p>System architecture and build plan for an app that creates a family tree at least ten generations deep. Seven sections, browsable in any order — start wherever you like.</p>
+  <p class="idea-quote">&ldquo;Build an app that can be used to create a family tree with 10 generations deep at a minimum.&rdquo;</p>
+</div>
+
+<div class="tile-grid" id="tile-grid"></div>
+
+<main class="page" style="padding-top:0">
+  <div class="card" style="max-width:820px;margin:0 auto 2rem;">
+    <h2 style="margin-top:0">Ask the Blueprint</h2>
+    <div id="ask-panel"></div>
+  </div>
+</main>
+
+<footer class="site-foot">Family Tree App knowledge base &mdash; generated blueprint, browsable offline. Full detail also lives in <a href="architecture.md">architecture.md</a>.</footer>
+<button class="icon-btn" id="back-to-top" title="Back to top" aria-label="Back to top">&uarr;</button>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="assets/blueprint.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>
