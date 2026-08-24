@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Engineer Field Guide — Colaberry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style id="site-style">
+:root{
+  --cherry:#FB2832; --berry:#367895; --leaf:#5BA63C; --amber:#E8920C;
+  --text:#1A1A1A; --muted:#6B6B6B; --border:#E4E4E3;
+  --surface:#FFFFFF; --surface-alt:#F8F8F7; --bg:#FFFFFF;
+  --font-body:'Roboto',system-ui,Arial,sans-serif;
+  --font-mono:'Roboto Mono',ui-monospace,Consolas,monospace;
+  --shadow:0 1px 3px rgba(26,26,26,.08),0 1px 2px rgba(26,26,26,.06);
+  --radius:10px;
+}
+:root[data-theme="dark"]{
+  --cherry:#FF5960; --berry:#5EA9C4; --leaf:#8AC759; --amber:#E8920C;
+  --text:#F2F2F2; --muted:#A8A8A8; --border:#2A2A2A;
+  --surface:#171717; --surface-alt:#1D1D1D; --bg:#0F0F0F;
+  --shadow:0 1px 3px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.55;font-size:15.5px;}
+h1,h2,h3,h4{font-family:var(--font-body);color:var(--berry);font-weight:700;line-height:1.25;}
+a{color:var(--berry);}
+code,pre,.mono{font-family:var(--font-mono);}
+p{margin:.6em 0;}
+::selection{background:var(--cherry);color:#fff;}
+
+/* ---------- App shell ---------- */
+.app-shell{display:flex;flex-direction:column;min-height:100vh;}
+header.topbar{
+  position:sticky;top:0;z-index:50;background:var(--surface);
+  border-bottom:1px solid var(--border);box-shadow:var(--shadow);
+}
+.topbar-inner{max-width:1440px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;min-width:220px;}
+.brand img{height:38px;display:block;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text b{color:var(--berry);font-size:15px;}
+.brand-text span{color:var(--muted);font-size:11.5px;font-family:var(--font-mono);}
+.searchwrap{flex:1;min-width:240px;position:relative;}
+.searchwrap input{
+  width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--border);border-radius:999px;
+  background:var(--surface-alt);color:var(--text);font-size:14px;font-family:var(--font-body);
+}
+.searchwrap input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+.searchwrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--muted);}
+.searchmeta{font-size:11.5px;color:var(--muted);margin-top:4px;padding-left:6px;font-family:var(--font-mono);}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px;font-family:var(--font-body);
+  font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap;
+}
+.btn:hover{border-color:var(--berry);}
+.btn-primary{background:var(--cherry);border-color:var(--cherry);color:#fff;}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-ghost{border-color:transparent;background:transparent;}
+.btn-sm{padding:6px 10px;font-size:12px;}
+
+/* ---------- Layout ---------- */
+.layout{display:flex;max-width:1440px;margin:0 auto;width:100%;flex:1;align-items:flex-start;}
+nav.sidenav{
+  width:280px;flex-shrink:0;position:sticky;top:65px;max-height:calc(100vh - 65px);overflow-y:auto;
+  padding:22px 14px 60px 20px;border-right:1px solid var(--border);
+}
+nav.sidenav .navgroup{margin-bottom:18px;}
+nav.sidenav .navlabel{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px 8px;font-weight:700;
+}
+nav.sidenav a{
+  display:block;padding:6px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:13.5px;
+  border-left:2px solid transparent;
+}
+nav.sidenav a:hover{background:var(--surface-alt);}
+nav.sidenav a.active{color:var(--berry);border-left-color:var(--cherry);background:var(--surface-alt);font-weight:600;}
+nav.sidenav a.nav-dim{opacity:.3;}
+nav.sidenav a.doclink{font-family:var(--font-mono);font-size:12.3px;}
+
+main.content{flex:1;min-width:0;padding:28px 34px 100px;}
+main.content section.topic-section{margin-bottom:56px;scroll-margin-top:78px;}
+main.content section.topic-section.search-hidden{display:none;}
+.topic-section h2.section-title{
+  font-size:26px;border-bottom:3px solid var(--cherry);padding-bottom:10px;margin-bottom:6px;
+}
+.topic-section .section-kicker{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.subtopic{margin:30px 0;scroll-margin-top:78px;}
+.subtopic h3{font-size:19px;border-left:4px solid var(--berry);padding-left:10px;}
+.subtopic h4{font-size:15px;color:var(--text);margin-top:1.2em;}
+
+/* ---------- Components ---------- */
+.callout{border-radius:var(--radius);padding:14px 16px;margin:16px 0;border:1.5px solid var(--border);background:var(--surface-alt);}
+.callout b.callout-tag{display:block;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.callout-info{border-color:var(--berry);}
+.callout-info b{color:var(--berry);}
+.callout-success{border-color:var(--leaf);}
+.callout-success b{color:var(--leaf);}
+.callout-warning{border-color:var(--amber);}
+.callout-warning b{color:var(--amber);}
+.callout-danger{border-color:var(--cherry);}
+.callout-danger b{color:var(--cherry);}
+
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.6px;}
+table caption{text-align:left;font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--font-mono);}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;}
+thead th{background:var(--berry);color:#fff;font-weight:700;font-size:12.6px;}
+tbody tr:nth-child(even){background:var(--surface-alt);}
+table.compact td,table.compact th{padding:5px 8px;font-size:12.8px;}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-family:var(--font-mono);font-weight:700;}
+.badge-success{background:rgba(91,166,60,.15);color:var(--leaf);border:1px solid var(--leaf);}
+.badge-warning{background:rgba(232,146,12,.15);color:var(--amber);border:1px solid var(--amber);}
+.badge-danger{background:rgba(251,40,50,.15);color:var(--cherry);border:1px solid var(--cherry);}
+.badge-info{background:rgba(54,120,149,.15);color:var(--berry);border:1px solid var(--berry);}
+
+pre.codeblock{
+  background:#14181b;color:#e6e6e6;border-radius:var(--radius);padding:14px 16px;overflow-x:auto;
+  font-size:12.6px;line-height:1.55;border:1px solid #2a2f33;
+}
+:root[data-theme="dark"] pre.codeblock{background:#0a0c0d;}
+pre.codeblock code{font-family:var(--font-mono);}
+.code-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+@media (max-width:920px){.code-pair{grid-template-columns:1fr;}}
+.code-card{border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.code-card .code-ribbon{padding:7px 14px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.code-card.bad .code-ribbon{background:var(--cherry);color:#fff;}
+.code-card.good .code-ribbon{background:var(--leaf);color:#fff;}
+.code-card pre{margin:0;border:none;border-radius:0;}
+.code-card ul.notes{margin:0;padding:10px 16px;font-size:12.6px;background:var(--surface-alt);list-style:disc;}
+.code-card ul.notes li{margin:4px 0;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0;}
+@media (max-width:920px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi-tile{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);box-shadow:var(--shadow);}
+.kpi-tile .kpi-label{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.kpi-tile .kpi-value{font-size:30px;font-weight:900;color:var(--berry);margin:4px 0;}
+.kpi-tile .kpi-delta{font-size:12px;font-weight:700;font-family:var(--font-mono);}
+.kpi-delta.up-good{color:var(--leaf);}
+.kpi-delta.down-good{color:var(--leaf);}
+.kpi-delta.warn{color:var(--amber);}
+
+.chart-row{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin:18px 0;align-items:start;}
+@media (max-width:920px){.chart-row{grid-template-columns:1fr;}}
+.chart-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);box-shadow:var(--shadow);}
+.chart-card h4{margin:0 0 10px;font-size:13.5px;color:var(--text);}
+.chart-card svg{width:100%;height:auto;display:block;}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-family:var(--font-mono);}
+.legend-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+
+.diagram-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;background:var(--surface-alt);margin:16px 0;}
+.diagram-card svg{width:100%;height:auto;display:block;}
+.diagram-cap{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:8px;text-align:center;}
+
+/* ---------- Document package ---------- */
+.doc-toolbar{display:flex;gap:8px;margin:10px 0 18px;flex-wrap:wrap;}
+.doc-body{border:1.5px solid var(--border);border-radius:var(--radius);padding:0;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;}
+.doc-cover{
+  background:linear-gradient(135deg,var(--berry) 0%,#274f60 100%);color:#fff;padding:40px 40px 34px;text-align:left;
+}
+.doc-cover img.doc-logo{height:38px;margin-bottom:22px;display:block;filter:brightness(0) invert(1);}
+.doc-cover-kicker{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;}
+.doc-cover-title{font-size:30px;color:#fff;margin:8px 0 4px;font-weight:900;}
+.doc-cover-sub{font-size:15px;opacity:.94;max-width:640px;}
+.doc-cover-org{font-family:var(--font-mono);font-size:12px;opacity:.75;margin-top:14px;border-top:1px solid rgba(255,255,255,.25);padding-top:10px;}
+table.doc-meta{margin:0;font-size:12.8px;}
+table.doc-meta th{background:var(--surface-alt);color:var(--muted);font-family:var(--font-mono);font-weight:700;width:14%;text-transform:uppercase;font-size:10.5px;letter-spacing:.05em;}
+table.doc-meta td{width:36%;font-weight:500;}
+.doc-content{padding:6px 40px 10px;}
+.doc-content h3.doc-h{font-size:18px;margin-top:28px;border-left:4px solid var(--cherry);padding-left:10px;}
+.doc-content h4.doc-h4{font-size:14.5px;margin-top:18px;color:var(--berry);}
+table.signoff{margin:26px 40px 0;width:calc(100% - 80px);}
+table.signoff th{background:var(--text);color:#fff;font-size:11.5px;}
+.doc-footer{
+  margin-top:22px;padding:16px 40px;border-top:1px solid var(--border);background:var(--surface-alt);
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+}
+
+/* ---------- Ask assistant ---------- */
+.ask-widget{border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);padding:20px;}
+.ask-input-row{display:flex;gap:8px;}
+.ask-input-row input{
+  flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-body);
+  font-size:14px;background:var(--surface-alt);color:var(--text);
+}
+.ask-input-row input:focus{outline:2px solid var(--berry);}
+.ask-suggestions{margin:10px 0 0;display:flex;gap:7px;flex-wrap:wrap;}
+.ask-chip{
+  font-size:11.8px;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface-alt);
+  cursor:pointer;font-family:var(--font-mono);color:var(--berry);
+}
+.ask-chip:hover{border-color:var(--berry);}
+.ask-answer{
+  margin-top:16px;padding:16px;border-radius:var(--radius);background:var(--surface-alt);border:1.5px solid var(--berry);
+  animation:fade .25s ease;
+}
+.ask-answer .ask-q{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.ask-answer .ask-a{font-size:14.5px;}
+.ask-answer .ask-jump{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:700;}
+.ask-answer.miss{border-color:var(--amber);}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+#askFloatBtn{
+  position:fixed;bottom:24px;right:24px;z-index:60;border-radius:999px;padding:13px 20px;
+  background:var(--cherry);color:#fff;border:none;box-shadow:0 4px 14px rgba(0,0,0,.25);font-family:var(--font-body);
+  font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:7px;
+}
+#askFloatPanel{
+  position:fixed;bottom:78px;right:24px;z-index:61;width:380px;max-width:calc(100vw - 32px);max-height:70vh;
+  overflow-y:auto;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 10px 32px rgba(0,0,0,.28);padding:16px;display:none;
+}
+#askFloatPanel.open{display:block;}
+#askFloatPanel .ask-close{float:right;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;background:none;border:none;}
+
+footer.sitefoot{
+  border-top:1px solid var(--border);padding:22px 34px;font-size:12px;color:var(--muted);font-family:var(--font-mono);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--surface-alt);
+}
+
+/* ---------- Print ---------- */
+#print-root{display:none;}
+@media print{
+  body > *:not(#print-root){display:none !important;}
+  #print-root{display:block !important;}
+  #askFloatBtn,#askFloatPanel{display:none !important;}
+  .doc-toolbar{display:none !important;}
+  a{color:inherit;text-decoration:none;}
+  .doc-body{box-shadow:none;border:none;}
+}
+@media (max-width:960px){
+  nav.sidenav{display:none;}
+  .code-pair,.chart-row{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img id="brand-logo" alt="Colaberry" src="data:image/png;base64,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">
+      <div class="brand-text"><b>Field Guide</b><span>SOFTWARE ENGINEER · AI SOLUTION ARCHITECT TRACK</span></div>
+    </div>
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchBox" type="text" placeholder="Search the guide — e.g. &quot;idempotency&quot;, &quot;branch naming&quot;, &quot;testing pyramid&quot;..." autocomplete="off">
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="themeToggle" title="Toggle dark mode">Dark mode</button>
+      <a class="btn btn-primary btn-sm" href="#ask">Ask the Guide</a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidenav" id="sideNav">
+  <div class="navgroup">
+    <div class="navlabel">Start Here</div>
+    <a href="#overview">Overview &amp; the Example</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">The Discipline — The 20%</div>
+    <a href="#why-engineering">Why Engineering Exists</a>
+    <a href="#td-docs">Technical Design Documents</a>
+    <a href="#modularity">Modularity &amp; Separation of Concerns</a>
+    <a href="#contracts">Interfaces &amp; Contracts</a>
+    <a href="#clean-code">Clean Code &amp; Naming</a>
+    <a href="#version-control">Version Control &amp; Review</a>
+    <a href="#testing-pyramid">The Testing Pyramid</a>
+    <a href="#tech-debt">Technical Debt</a>
+    <a href="#dry-solid">DRY &amp; SOLID</a>
+    <a href="#error-handling">Error Handling</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">Judgment</div>
+    <a href="#good-bad-code">Good vs. Bad Code</a>
+    <a href="#kpis">Engineering KPIs</a>
+    <a href="#review-lens">The Architect's Review Lens</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">The Seven Documents</div>
+    <a class="doclink" href="#doc-tdd">1 · Technical Design Document</a>
+    <a class="doclink" href="#doc-modules">2 · Module &amp; API Design</a>
+    <a class="doclink" href="#doc-standards">3 · Coding Standards</a>
+    <a class="doclink" href="#doc-checklist">4 · Code Review Checklist</a>
+    <a class="doclink" href="#doc-testplan">5 · Unit &amp; Integration Test Plan</a>
+    <a class="doclink" href="#doc-branching">6 · Branching &amp; PR Workflow</a>
+    <a class="doclink" href="#doc-dod">7 · Definition of Done</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">Assistant</div>
+    <a href="#ask">Ask the Guide</a>
+  </div>
+</nav>
+
+<main class="content" id="mainContent">
+
+<!-- ================= OVERVIEW ================= -->
+<section class="topic-section" id="overview">
+  <div class="section-kicker">Start Here</div>
+  <h2 class="section-title">Overview &amp; the Working Example</h2>
+  <p>This guide teaches the roughly <b>20% of software engineering</b> an <b>AI Solution Architect</b> needs — not to write production code by hand, but to <b>direct, evaluate, and approve</b> code an AI system writes on your behalf. You will not be graded on syntax. You will be graded on judgment: can you read a design, spot a missing failure path, reject a pull request for the right reason, and sign a Definition of Done with your name on it and mean it.</p>
+  <p>Everything below is grounded in a single running example so the ideas stay concrete instead of abstract.</p>
+  <div class="callout callout-info">
+    <b class="callout-tag">Working Example</b>
+    <p><b>Industry:</b> Restaurant operations, multi-location.<br>
+    <b>Company:</b> <b>Verde Table Co.</b> — a 42-location fast-casual chain.<br>
+    <b>Feature:</b> the <b>Order Orchestration Service (OOS)</b> — when a customer places an order at a POS terminal, kiosk, or the mobile app, OOS routes each item to the correct kitchen station, keeps a live ticket on the Kitchen Display System (KDS), and notifies front-of-house the moment food is ready.<br>
+    <b>Why it exists:</b> Verde Table's kitchens currently run on paper tickets hand-sorted by a expediter. During peak lunch service, mis-routed tickets and forgotten allergy holds are the #1 driver of remade orders and refund requests.</p>
+  </div>
+  <p>Every document in this guide — the design, the module contracts, the coding standards, the review checklist, the test plan, the branching rules, the Definition of Done — is written for <b>this feature</b>. That's deliberate: a design document is only as useful as it is specific.</p>
+</section>
+
+<!-- ================= WHY ENGINEERING EXISTS ================= -->
+<section class="topic-section" id="why-engineering">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Why Software Engineering Exists</h2>
+  <p>A single working script is easy. A system that keeps working after the fifth engineer touches it, the traffic doubles, and a kitchen printer starts dropping connections at 12:15pm on a Saturday — that requires discipline. Software engineering is the set of practices that make code <b>predictable under change</b>: change of requirements, change of team, change of load, change of failure conditions.</p>
+  <p>An AI model can generate correct-looking code for the happy path in seconds. It has no innate stake in what happens when the kitchen printer at Location 17 goes offline mid-shift, or when the same order gets submitted twice because a customer double-tapped "Place Order" on a bad wifi connection. That is exactly the gap an AI Solution Architect exists to close: <b>you supply the engineering discipline the model does not have by default</b>, by directing it toward a design, and by refusing to approve output that skips the parts that are actually hard.</p>
+  <div class="callout callout-warning">
+    <b class="callout-tag">The Core Risk You're Managing</b>
+    <p>AI-generated code is fluent, which makes it persuasive. Fluency is not correctness. Your job is to separate "this reads like it works" from "this is provably going to work when the network drops a packet during Saturday lunch rush."</p>
+  </div>
+</section>
+
+<!-- ================= TD DOCS ================= -->
+<section class="topic-section" id="td-docs">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Technical Design Documents</h2>
+  <p>A Technical Design Document (TDD) is where thinking happens <i>before</i> code exists, when changing your mind costs a paragraph instead of a rewrite. It forces four questions onto paper: what problem is this solving, what approach did we choose and why, how does data flow through the system, and what could go wrong.</p>
+  <p>As an architect directing AI-generated code, the TDD is your primary lever. You do not write the implementation — you write (or approve) the design the AI implements against. A vague design produces plausible-but-wrong code every time, because the model will confidently fill gaps with its own assumptions.</p>
+  <table class="compact">
+    <thead><tr><th>TDD Section</th><th>Question It Answers</th><th>Why an Architect Cares</th></tr></thead>
+    <tbody>
+      <tr><td>Context</td><td>What's broken today, for whom?</td><td>Prevents solving the wrong problem elegantly.</td></tr>
+      <tr><td>Chosen Approach</td><td>What are we building, and what did we reject?</td><td>Makes trade-offs visible and defensible.</td></tr>
+      <tr><td>Module Breakdown</td><td>What are the pieces and who owns each one?</td><td>Sets the contract boundaries AI code must respect.</td></tr>
+      <tr><td>Data Model</td><td>What persists, and what are its invariants?</td><td>Schema mistakes are the most expensive to unwind later.</td></tr>
+      <tr><td>Main Sequence</td><td>What actually happens, step by step?</td><td>Reveals timing assumptions and race conditions early.</td></tr>
+      <tr><td>Risks &amp; Trade-offs</td><td>What could fail, and what did we accept?</td><td>Turns hidden risk into a documented, owned decision.</td></tr>
+    </tbody>
+  </table>
+  <p>See <a href="#doc-tdd">Document 1 — Technical Design Document</a> for the complete OOS design, including a component diagram, a sequence diagram, and an entity-relationship diagram.</p>
+</section>
+
+<!-- ================= MODULARITY ================= -->
+<section class="topic-section" id="modularity">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Modularity &amp; Separation of Concerns</h2>
+  <p>A module should do one thing and be nameable in a sentence without the word "and." <code>RoutingRuleEngine</code> decides which station an item goes to. It does not also send notifications, write to the database, or format a receipt. When a module's name needs "and" to describe it, it needs to be two modules.</p>
+  <p>In the OOS design, six modules exist because six distinct responsibilities exist: accepting orders, deciding routing, creating tickets, pushing to kitchen displays, notifying humans, and watching station health. None of them know how to do another's job — they only know each other's <a href="#contracts">contracts</a>.</p>
+  <div class="callout callout-success">
+    <b class="callout-tag">Why It Matters for AI-Directed Work</b>
+    <p>When you ask an AI system to "add allergy-hold routing," a well-separated design means the change is contained to <code>RoutingRuleEngine</code> — you can review a 40-line diff instead of auditing the whole service. Poor separation means every feature request touches everything, and every review becomes a full-system re-read.</p>
+  </div>
+  <h4>Size discipline</h4>
+  <p>Files stay reviewable when they stay small. This project's house limits: files target ~300 lines (hard ceiling 500), functions target ~50 lines (hard ceiling 100). A file that crosses the ceiling is a signal, not a crime — the next change to it must split it before adding new logic.</p>
+</section>
+
+<!-- ================= CONTRACTS ================= -->
+<section class="topic-section" id="contracts">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Interfaces &amp; Contracts</h2>
+  <p>A contract is a promise stated in a form the compiler and the reviewer can both check: given these typed inputs, you get this typed output, or one of these named errors — nothing else, nothing silent. Contracts are what let two modules (or two engineers, or an architect and an AI system) collaborate without reading each other's implementation.</p>
+  <pre class="codeblock"><code>// The contract IS the review surface. An architect can approve this
+// without reading routeItems' internals — the types are the promise.
+export function routeItems(
+  order: Order,
+  rules: RoutingRule[]
+): StationAssignment[];   // throws ValidationError | NoStationAvailableError | RuleConflictError</code></pre>
+  <p>Three rules make a contract trustworthy:</p>
+  <ol>
+    <li><b>Inputs are typed and validated at the boundary</b> — malformed input never reaches business logic.</li>
+    <li><b>Outputs are typed</b> — no function returns "whatever object happened to be built."</li>
+    <li><b>Errors are named, not generic</b> — <code>NoStationAvailableError</code> tells the caller exactly what to handle; a bare <code>Error</code> tells them nothing.</li>
+  </ol>
+  <p>Full signatures for every OOS module are in <a href="#doc-modules">Document 2 — Module &amp; API Design</a>.</p>
+</section>
+
+<!-- ================= CLEAN CODE ================= -->
+<section class="topic-section" id="clean-code">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Clean Code &amp; Naming</h2>
+  <p>Code is read far more often than it is written, and AI-generated code is read by you exactly once, under time pressure, deciding whether to approve it. Names carry that entire burden. <code>routeItems</code> tells a reader what happens without opening the function. <code>process</code> or <code>handle</code> tells them nothing — you're forced to read the body to find out, every single time.</p>
+  <div class="callout callout-info">
+    <b class="callout-tag">The Reviewer's Naming Test</b>
+    <p>If you can predict what a function does from its name alone, and you're wrong when you read the body — that's not a naming nit, that's a defect. A misleading name is a bug that hasn't been caught yet.</p>
+  </div>
+  <p>Full naming conventions (casing, file names, error-class suffixes, schema names) are in <a href="#doc-standards">Document 3 — Coding Standards &amp; Naming Conventions</a>.</p>
+</section>
+
+<!-- ================= VERSION CONTROL ================= -->
+<section class="topic-section" id="version-control">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Version Control: Branching &amp; Code Review</h2>
+  <p>Version control turns "the code" into "the code, and a complete argument for why every change to it was correct at the time." Branching keeps unfinished work from destabilizing what's shipping. Code review is the human (or architect) checkpoint before an AI-authored change becomes the team's shared reality.</p>
+  <p>This project uses <b>trunk-based development</b>: short-lived branches, small pull requests, fast review, squash-merge to <code>main</code>. Long-lived branches are where AI-generated code goes stale against a moving design — the longer a branch lives, the more its assumptions drift from the current contract.</p>
+  <p>Full branch naming, PR size limits, and merge rules are in <a href="#doc-branching">Document 6 — Branching &amp; Pull-Request Workflow</a>.</p>
+</section>
+
+<!-- ================= TESTING PYRAMID ================= -->
+<section class="topic-section" id="testing-pyramid">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">The Testing Pyramid</h2>
+  <p>Not all tests are equal in cost. A unit test runs in milliseconds and pinpoints exactly what broke. An end-to-end test runs in seconds-to-minutes, touches real infrastructure, and tells you <i>something</i> broke somewhere in a whole user journey. The pyramid says: write mostly the cheap, precise kind.</p>
+  <div class="chart-row">
+    <div class="chart-card">
+      <h4>Target vs. Actual Test Mix — Codebase-Wide</h4>
+      <svg viewBox="0 0 500 210" role="img" aria-label="Bar chart comparing target and actual test pyramid mix">
+        <line x1="40" y1="190" x2="480" y2="190" stroke="var(--border)" stroke-width="1.5"/>
+        <rect x="70" y="50" width="36" height="140" rx="2" fill="var(--berry)"/>
+        <rect x="110" y="54" width="36" height="136" rx="2" fill="var(--leaf)"/>
+        <rect x="230" y="150" width="36" height="40" rx="2" fill="var(--berry)"/>
+        <rect x="270" y="144" width="36" height="46" rx="2" fill="var(--leaf)"/>
+        <rect x="390" y="170" width="36" height="20" rx="2" fill="var(--berry)"/>
+        <rect x="430" y="172" width="36" height="18" rx="2" fill="var(--leaf)"/>
+        <text x="88" y="45" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--berry)">70%</text>
+        <text x="128" y="49" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--leaf)">68%</text>
+        <text x="248" y="145" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--berry)">20%</text>
+        <text x="288" y="139" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--leaf)">23%</text>
+        <text x="408" y="165" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--berry)">10%</text>
+        <text x="448" y="167" text-anchor="middle" font-family="Roboto Mono" font-size="11" fill="var(--leaf)">9%</text>
+        <text x="108" y="205" text-anchor="middle" font-family="Roboto" font-size="12" fill="var(--text)">Unit</text>
+        <text x="268" y="205" text-anchor="middle" font-family="Roboto" font-size="12" fill="var(--text)">Integration</text>
+        <text x="428" y="205" text-anchor="middle" font-family="Roboto" font-size="12" fill="var(--text)">End-to-End</text>
+      </svg>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:var(--berry)"></span>Target</span>
+        <span><span class="legend-dot" style="background:var(--leaf)"></span>Actual (current sprint)</span>
+      </div>
+    </div>
+    <div>
+      <table class="compact">
+        <thead><tr><th>Tier</th><th>Share</th><th>Lives Here</th></tr></thead>
+        <tbody>
+          <tr><td>Unit</td><td><span class="badge badge-info">~70%</span></td><td>Pure logic: <code>RoutingRuleEngine</code>, validators, formatters</td></tr>
+          <tr><td>Integration</td><td><span class="badge badge-info">~20%</span></td><td>Service-to-service: gateway → DB, dispatcher → KDS</td></tr>
+          <tr><td>End-to-End</td><td><span class="badge badge-info">~10%</span></td><td>Full order flow, real browser/API against staging</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13px;">A suite with more E2E tests than unit tests is a process violation — it's slow, flaky, and expensive to maintain. Push assertions down the pyramid whenever the same behavior can be proven cheaper.</p>
+    </div>
+  </div>
+  <p>Every feature ships with four case types: <b>happy path</b>, <b>failure path</b>, <b>boundary cases</b>, and <b>idempotency</b>. See <a href="#doc-testplan">Document 5 — Unit &amp; Integration Test Plan</a> for all 21 OOS test cases mapped to these tiers.</p>
+</section>
+
+<!-- ================= TECH DEBT ================= -->
+<section class="topic-section" id="tech-debt">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Technical Debt</h2>
+  <p>Technical debt is a shortcut taken deliberately, with interest that accrues until it's repaid. It is not automatically bad — shipping the OOS pilot to 3 pilot locations with a hardcoded routing table instead of a full rules editor UI is reasonable debt, <i>if it's written down and someone owns paying it back</i>. Undocumented debt is not a shortcut; it's a landmine for the next person, human or AI, who touches that code assuming it's finished.</p>
+  <div class="callout callout-warning">
+    <b class="callout-tag">The AI-Specific Version of This Risk</b>
+    <p>An AI system asked to "just make the tests pass" will sometimes take the cheapest path: loosen an assertion, mock away a hard case, catch and swallow an exception. Each of those is technical debt wearing a green checkmark. Treat a suspiciously easy fix as a prompt to read the diff more closely, not less.</p>
+  </div>
+</section>
+
+<!-- ================= DRY & SOLID ================= -->
+<section class="topic-section" id="dry-solid">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">DRY &amp; SOLID (Lightly)</h2>
+  <div class="subtopic">
+    <h3>DRY — Don't Repeat Yourself</h3>
+    <p>Three is the threshold; two is sometimes a coincidence. If the same non-trivial logic (5+ lines) shows up in three places — say, the same order-validation check duplicated in the POS gateway, the kiosk gateway, and the mobile gateway — lift it into one shared function. Duplicated logic means duplicated bugs: fix it in one place, forget the other two.</p>
+  </div>
+  <div class="subtopic">
+    <h3>SOLID, in one line each</h3>
+    <table class="compact">
+      <tbody>
+        <tr><th style="width:8%">S</th><td><b>Single Responsibility</b> — a module has one reason to change. <code>TicketDispatcher</code> changes when ticket-creation rules change, not when notification copy changes.</td></tr>
+        <tr><th>O</th><td><b>Open/Closed</b> — add behavior by extension, not by editing working code. Adding a new station type should mean adding a rule, not rewriting <code>RoutingRuleEngine</code>.</td></tr>
+        <tr><th>L</th><td><b>Liskov Substitution</b> — a subtype must be usable anywhere its parent type is expected, without surprises. A <code>BackupStation</code> must behave like a <code>Station</code> in every way callers rely on.</td></tr>
+        <tr><th>I</th><td><b>Interface Segregation</b> — don't force a module to depend on methods it never calls. <code>NotificationService</code> shouldn't be handed the full <code>Order</code> object when it only ever needs the ticket ID and customer contact.</td></tr>
+        <tr><th>D</th><td><b>Dependency Inversion</b> — depend on an abstraction (<code>NotificationChannel</code>), not a concrete vendor (Twilio SMS), so the vendor can change without rewriting callers.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= ERROR HANDLING ================= -->
+<section class="topic-section" id="error-handling">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Error Handling</h2>
+  <p>Design the failure path before the happy path. Every external boundary in OOS — the POS webhook, the KDS WebSocket, the notification provider — must answer four questions in writing: what happens if this fails, does it retry and how, what's the recovery path once retries are exhausted, and which failure modes are explicitly out of scope.</p>
+  <div class="callout callout-danger">
+    <b class="callout-tag">Forbidden — Reject on Sight</b>
+    <p><code>try { ... } catch (e) {}</code> — a silent swallow. This is the single most common AI-generated defect: the model makes an error "go away" instead of handling it, because an empty catch block makes tests pass without solving anything. An empty catch block in a reviewed diff is an automatic <span class="badge badge-danger">Blocker</span>, no exceptions.</p>
+  </div>
+  <p>See the <b>Good vs. Bad Code</b> comparison below, and the full error-handling rules in <a href="#doc-standards">Document 3</a> and the review gate in <a href="#doc-checklist">Document 4</a>.</p>
+</section>
+
+<!-- ================= GOOD VS BAD CODE ================= -->
+<section class="topic-section" id="good-bad-code">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">Good vs. Bad Code</h2>
+  <p>Same requirement — route an order's items to kitchen stations — implemented two ways. This is the exact kind of diff an architect approves or rejects.</p>
+  <div class="code-pair">
+    <div class="code-card bad">
+      <div class="code-ribbon">Reject — typical first-draft AI output</div>
+      <pre class="codeblock"><code>function route(order, rules) {
+  try {
+    let result = [];
+    for (let i=0;i<order.items.length;i++) {
+      let item = order.items[i];
+      let station = "grill"; // default
+      for (let r of rules) {
+        if (r.itemType == item.type) station = r.station;
+      }
+      result.push({item: item, station: station});
+    }
+    return result;
+  } catch (e) {}
+}</code></pre>
+      <ul class="notes">
+        <li>Empty <code>catch(e){}</code> — failures vanish silently.</li>
+        <li>No types on <code>order</code>, <code>rules</code>, or the return value.</li>
+        <li>Magic string default <code>"grill"</code> hides a routing decision no one signed off on.</li>
+        <li><code>==</code> instead of <code>===</code> — a correctness landmine.</li>
+        <li>Allergy holds are never checked — a silent safety gap.</li>
+        <li>No handling for zero items, or for zero matching rules.</li>
+        <li>Name <code>route</code> doesn't say what it routes or what it needs.</li>
+      </ul>
+    </div>
+    <div class="code-card good">
+      <div class="code-ribbon">Approve — meets the OOS contract</div>
+      <pre class="codeblock"><code>export function routeItems(
+  order: Order,
+  rules: RoutingRule[]
+): StationAssignment[] {
+  if (order.items.length === 0) {
+    throw new ValidationError(
+      'ORDER_EMPTY',
+      `Order ${order.id} has no items to route`
+    );
+  }
+
+  return order.items.map((item) => {
+    const rule = rules.find(
+      (r) => r.itemType === item.type
+          && r.locationId === order.locationId
+    );
+    if (!rule) {
+      throw new NoStationAvailableError(item.type, order.locationId);
+    }
+    return {
+      itemId: item.id,
+      stationId: rule.stationId,
+      allergyHold: item.hasAllergyFlag,
+    };
+  });
+}</code></pre>
+      <ul class="notes">
+        <li>Explicit types on input, output, and every thrown error.</li>
+        <li>No default fallback station — an unroutable item fails loudly instead of going to the wrong place.</li>
+        <li>Allergy flag is carried through explicitly, not dropped.</li>
+        <li>Pure function — no hidden I/O, easy to unit test (see TP-U01–TP-U04).</li>
+        <li>Boundary case (empty order) handled with a named error.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KPIs ================= -->
+<section class="topic-section" id="kpis">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">Engineering KPIs</h2>
+  <p>These are the numbers an architect watches to know whether the AI-augmented development process is actually working — not vanity metrics, but signals of whether quality is being verified, not just claimed.</p>
+  <div class="kpi-grid">
+    <div class="kpi-tile"><div class="kpi-label">Test Coverage</div><div class="kpi-value">84%</div><div class="kpi-delta up-good">▲ 11pts / quarter</div></div>
+    <div class="kpi-tile"><div class="kpi-label">PR Cycle Time (avg)</div><div class="kpi-value">6.2h</div><div class="kpi-delta down-good">▼ 3.6h / quarter</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Defect Escape Rate</div><div class="kpi-value">1.8%</div><div class="kpi-delta down-good">▼ 2.3pts / quarter</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Deployment Frequency</div><div class="kpi-value">3.4<span style="font-size:15px;">/day</span></div><div class="kpi-delta up-good">▲ from 1.1/day</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card">
+      <h4>PR Cycle Time — Last 6 Sprints (hours)</h4>
+      <svg viewBox="0 0 500 190" role="img" aria-label="Line chart of PR cycle time trending down over six sprints">
+        <line x1="40" y1="160" x2="480" y2="160" stroke="var(--border)" stroke-width="1.5"/>
+        <polyline fill="none" stroke="var(--berry)" stroke-width="3" points="60,42.4 140,56.8 220,65.2 300,74.8 380,80.8 460,85.6"/>
+        <g fill="var(--berry)">
+          <circle cx="60" cy="42.4" r="4"/><circle cx="140" cy="56.8" r="4"/><circle cx="220" cy="65.2" r="4"/>
+          <circle cx="300" cy="74.8" r="4"/><circle cx="380" cy="80.8" r="4"/><circle cx="460" cy="85.6" r="4"/>
+        </g>
+        <g font-family="Roboto Mono" font-size="10.5" fill="var(--text)" text-anchor="middle">
+          <text x="60" y="32">9.8</text><text x="140" y="47">8.6</text><text x="220" y="55">7.9</text>
+          <text x="300" y="65">7.1</text><text x="380" y="71">6.6</text><text x="460" y="76">6.2</text>
+        </g>
+        <g font-family="Roboto" font-size="11" fill="var(--muted)" text-anchor="middle">
+          <text x="60" y="178">S1</text><text x="140" y="178">S2</text><text x="220" y="178">S3</text>
+          <text x="300" y="178">S4</text><text x="380" y="178">S5</text><text x="460" y="178">S6</text>
+        </g>
+      </svg>
+    </div>
+    <div class="chart-card">
+      <h4>Defect Distribution by Category</h4>
+      <svg viewBox="0 0 260 190" role="img" aria-label="Donut chart of defect distribution by category">
+        <g transform="translate(95,90)">
+          <circle r="70" fill="none" stroke="var(--border)" stroke-width="28"/>
+          <circle r="70" fill="none" stroke="var(--cherry)" stroke-width="28" stroke-dasharray="167.1 272.7" stroke-dashoffset="0" transform="rotate(-90)"/>
+          <circle r="70" fill="none" stroke="var(--berry)" stroke-width="28" stroke-dasharray="118.75 320.9" stroke-dashoffset="-167.1" transform="rotate(-90)"/>
+          <circle r="70" fill="none" stroke="var(--amber)" stroke-width="28" stroke-dasharray="92.36 347.5" stroke-dashoffset="-285.85" transform="rotate(-90)"/>
+          <circle r="70" fill="none" stroke="var(--leaf)" stroke-width="28" stroke-dasharray="61.57 378.3" stroke-dashoffset="-378.2" transform="rotate(-90)"/>
+          <text x="0" y="-4" text-anchor="middle" font-family="Roboto" font-size="22" font-weight="900" fill="var(--text)">38%</text>
+          <text x="0" y="14" text-anchor="middle" font-family="Roboto Mono" font-size="10" fill="var(--muted)">top: logic</text>
+        </g>
+      </svg>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:var(--cherry)"></span>Logic 38%</span>
+        <span><span class="legend-dot" style="background:var(--berry)"></span>Validation 27%</span>
+        <span><span class="legend-dot" style="background:var(--amber)"></span>Integration 21%</span>
+        <span><span class="legend-dot" style="background:var(--leaf)"></span>UI 14%</span>
+      </div>
+    </div>
+  </div>
+  <div class="chart-card">
+      <h4>Defect Count — Last 6 Sprints</h4>
+      <svg viewBox="0 0 500 170" role="img" aria-label="Bar chart of defect count trending down over six sprints">
+        <line x1="40" y1="150" x2="480" y2="150" stroke="var(--border)" stroke-width="1.5"/>
+        <g fill="var(--cherry)">
+          <rect x="50" y="48" width="34" height="102" rx="2"/>
+          <rect x="130" y="72" width="34" height="78" rx="2"/>
+          <rect x="210" y="88" width="34" height="62" rx="2"/>
+          <rect x="290" y="104" width="34" height="46" rx="2"/>
+          <rect x="370" y="112" width="34" height="38" rx="2"/>
+          <rect x="450" y="128" width="34" height="22" rx="2"/>
+        </g>
+        <g font-family="Roboto Mono" font-size="11" fill="var(--text)" text-anchor="middle">
+          <text x="67" y="42">14</text><text x="147" y="66">11</text><text x="227" y="82">9</text>
+          <text x="307" y="98">7</text><text x="387" y="106">6</text><text x="467" y="122">4</text>
+        </g>
+      </svg>
+  </div>
+</section>
+
+<!-- ================= REVIEW LENS ================= -->
+<section class="topic-section" id="review-lens">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">The Architect's Review Lens</h2>
+  <p>When AI-generated code lands in front of you, run it through these seven questions before it runs through anything else. This is the compressed version of <a href="#doc-checklist">Document 4</a> — the lens you hold up first.</p>
+  <table>
+    <thead><tr><th>#</th><th>Question</th><th>What a "No" Means</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Does this match the TDD's chosen approach, not a plausible alternative the model preferred?</td><td>Scope drift — send back to the design, not the code.</td></tr>
+      <tr><td>2</td><td>Are all inputs, outputs, and errors explicitly typed?</td><td>Contract violation — <span class="badge badge-danger">Blocker</span>.</td></tr>
+      <tr><td>3</td><td>Is there a test for the failure path, not just the happy path?</td><td>Incomplete by definition — not shippable.</td></tr>
+      <tr><td>4</td><td>Is every catch block doing something — logging, recovering, or rethrowing?</td><td>Silent swallow — <span class="badge badge-danger">Blocker</span>.</td></tr>
+      <tr><td>5</td><td>Can this operation run twice with the same input safely?</td><td>Idempotency gap — production defect, not a nit.</td></tr>
+      <tr><td>6</td><td>Would a new engineer understand this module in one sitting?</td><td>Readability failure — request simplification.</td></tr>
+      <tr><td>7</td><td>Does anything here cross a governance boundary (new dependency, schema change, security posture)?</td><td>Escalate — do not approve at the implementation level.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= DOCUMENTS INTRO ================= -->
+<section class="topic-section" id="documents">
+  <div class="section-kicker">Deliverables</div>
+  <h2 class="section-title">The Seven Documents — Order Orchestration Service</h2>
+  <p>Below are the seven governing documents for the OOS feature, each a complete, standalone deliverable with its own cover, document-control strip, and sign-off block. Each is individually downloadable as a fully-styled HTML file, printable to PDF from the browser's print dialog, and — where the content is tabular — exportable as a spreadsheet-ready CSV.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 1: TDD -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-tdd">
+  <div class="section-kicker">Document 1 of 7</div>
+  <h2 class="section-title">Technical Design Document</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('tdd')">Download HTML</button>
+    <button class="btn" onclick="printDoc('tdd')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-tdd">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Technical Design Document</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — Real-Time Kitchen Ticket Routing &amp; Status Sync</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform · 42 Locations</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-TDD-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">1. Context</h3>
+      <p>Verde Table Co. runs 42 fast-casual locations. Kitchens currently receive orders as printed paper tickets, hand-sorted by an expediter into station piles (grill, fry, cold, beverage). During peak service (11:30am–1:30pm, 6:00pm–8:00pm), the expediter routinely mis-sorts tickets under load, and allergy modifiers printed in small type are missed. Operations reports that 62% of comped/remade orders in Q2 2026 traced back to a routing or allergy-hold error at the paper-ticket stage, not a cooking error.</p>
+      <p>The business goal: eliminate manual ticket sorting for the initial pilot cohort of 3 locations, with the design built to scale to all 42 without a rewrite.</p>
+
+      <h3 class="doc-h">2. Chosen Approach</h3>
+      <p>An event-driven <b>Order Orchestration Service (OOS)</b>, deployed as a standalone Node.js/TypeScript service, subscribes to order-creation events from all three ordering channels (POS, kiosk, mobile app), applies a per-location routing rule set, creates one ticket per kitchen station touched by the order, and pushes tickets to that station's Kitchen Display System (KDS) client over a persistent WebSocket connection. When kitchen staff mark a ticket ready, OOS notifies front-of-house and, where a phone number is on file, the customer directly.</p>
+      <table class="compact">
+        <thead><tr><th>Option Considered</th><th>Verdict</th><th>Reasoning</th></tr></thead>
+        <tbody>
+          <tr><td>Keep paper tickets, add a printer-timestamp audit trail only</td><td>Rejected</td><td>Doesn't address the root cause — human mis-sorting under load.</td></tr>
+          <tr><td>Third-party KDS SaaS (rip-and-replace POS integration)</td><td>Rejected for pilot</td><td>12+ week integration timeline against 42 heterogeneous POS configs; too slow to validate the hypothesis.</td></tr>
+          <tr><td><b>In-house Order Orchestration Service (chosen)</b></td><td>Approved</td><td>Reuses existing POS webhook events already emitted for receipt printing; ships to 3 pilot locations in one sprint.</td></tr>
+          <tr><td>Polling-based KDS refresh instead of WebSocket push</td><td>Rejected</td><td>Adds 2–5s of routing latency during peak load exactly when speed matters most.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">3. Module Breakdown</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 920 620" role="img" aria-label="Component diagram of the Order Orchestration Service">
+          <defs>
+            <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--berry)"/>
+            </marker>
+            <marker id="arrowdash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+          <g font-family="Roboto" font-size="12.5" fill="var(--text)">
+            <rect x="40" y="20" width="170" height="56" rx="8" fill="var(--surface-alt)" stroke="var(--border)"/>
+            <text x="125" y="45" text-anchor="middle">POS Terminal</text><text x="125" y="61" text-anchor="middle" font-size="10.5" fill="var(--muted)">order channel</text>
+            <rect x="230" y="20" width="170" height="56" rx="8" fill="var(--surface-alt)" stroke="var(--border)"/>
+            <text x="315" y="45" text-anchor="middle">Kiosk</text><text x="315" y="61" text-anchor="middle" font-size="10.5" fill="var(--muted)">order channel</text>
+            <rect x="420" y="20" width="170" height="56" rx="8" fill="var(--surface-alt)" stroke="var(--border)"/>
+            <text x="505" y="45" text-anchor="middle">Mobile App</text><text x="505" y="61" text-anchor="middle" font-size="10.5" fill="var(--muted)">order channel</text>
+
+            <rect x="240" y="130" width="250" height="60" rx="8" fill="var(--berry)"/>
+            <text x="365" y="155" text-anchor="middle" fill="#fff" font-weight="700">Order Ingest Gateway</text>
+            <text x="365" y="173" text-anchor="middle" fill="#fff" font-size="10.5" opacity=".85">validates + dedupes by idempotency key</text>
+
+            <rect x="240" y="230" width="250" height="60" rx="8" fill="var(--berry)"/>
+            <text x="365" y="255" text-anchor="middle" fill="#fff" font-weight="700">Routing Rule Engine</text>
+            <text x="365" y="273" text-anchor="middle" fill="#fff" font-size="10.5" opacity=".85">pure function: item → station</text>
+            <rect x="560" y="230" width="220" height="60" rx="8" fill="var(--surface-alt)" stroke="var(--border)" stroke-dasharray="4 3"/>
+            <text x="670" y="255" text-anchor="middle" font-size="11.5">Routing Rules Table</text>
+            <text x="670" y="271" text-anchor="middle" font-size="10.5" fill="var(--muted)">(Postgres)</text>
+
+            <rect x="240" y="330" width="250" height="60" rx="8" fill="var(--berry)"/>
+            <text x="365" y="355" text-anchor="middle" fill="#fff" font-weight="700">Ticket Dispatcher</text>
+            <text x="365" y="373" text-anchor="middle" fill="#fff" font-size="10.5" opacity=".85">creates tickets, enforces dispatch key</text>
+            <rect x="560" y="330" width="220" height="60" rx="8" fill="var(--surface-alt)" stroke="var(--border)" stroke-dasharray="4 3"/>
+            <text x="670" y="355" text-anchor="middle" font-size="11.5">Orders &amp; Tickets DB</text>
+            <text x="670" y="371" text-anchor="middle" font-size="10.5" fill="var(--muted)">(Postgres)</text>
+
+            <rect x="100" y="430" width="230" height="60" rx="8" fill="var(--berry)"/>
+            <text x="215" y="455" text-anchor="middle" fill="#fff" font-weight="700">KDS Sync Gateway</text>
+            <text x="215" y="473" text-anchor="middle" fill="#fff" font-size="10.5" opacity=".85">WebSocket push per station</text>
+
+            <rect x="400" y="430" width="230" height="60" rx="8" fill="var(--leaf)"/>
+            <text x="515" y="455" text-anchor="middle" fill="#fff" font-weight="700">Notification Service</text>
+            <text x="515" y="473" text-anchor="middle" fill="#fff" font-size="10.5" opacity=".85">FOH display + customer SMS</text>
+
+            <rect x="100" y="530" width="230" height="60" rx="8" fill="var(--surface-alt)" stroke="var(--border)"/>
+            <text x="215" y="555" text-anchor="middle">Kitchen Display Clients</text>
+            <text x="215" y="571" text-anchor="middle" font-size="10.5" fill="var(--muted)">per station, in-kitchen tablets</text>
+
+            <rect x="400" y="530" width="230" height="60" rx="8" fill="var(--surface-alt)" stroke="var(--border)"/>
+            <text x="515" y="555" text-anchor="middle">FOH Display / Customer SMS</text>
+            <text x="515" y="571" text-anchor="middle" font-size="10.5" fill="var(--muted)">order-ready notice</text>
+
+            <rect x="660" y="430" width="220" height="160" rx="8" fill="var(--surface-alt)" stroke="var(--amber)" stroke-dasharray="4 3"/>
+            <text x="770" y="453" text-anchor="middle" font-weight="700" fill="var(--amber)">Station Health Monitor</text>
+            <text x="770" y="472" text-anchor="middle" font-size="10.5" fill="var(--muted)">heartbeats every 10s</text>
+            <text x="770" y="490" text-anchor="middle" font-size="10.5" fill="var(--muted)">3 missed → OFFLINE</text>
+            <text x="770" y="508" text-anchor="middle" font-size="10.5" fill="var(--muted)">triggers backup routing</text>
+
+            <path d="M125,76 L360,130" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M315,76 L365,130" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M505,76 L370,130" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M365,190 L365,230" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M490,260 L560,260" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrowdash)" stroke-dasharray="3 3"/>
+            <path d="M365,290 L365,330" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M490,360 L560,360" stroke="var(--muted)" stroke-width="1.4" fill="none" marker-end="url(#arrowdash)" stroke-dasharray="3 3"/>
+            <path d="M320,375 L230,430" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M410,375 L500,430" stroke="var(--leaf)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M215,490 L215,530" stroke="var(--berry)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M515,490 L515,530" stroke="var(--leaf)" stroke-width="1.6" fill="none" marker-end="url(#arrow1)"/>
+            <path d="M660,480 L330,470" stroke="var(--amber)" stroke-width="1.4" fill="none" stroke-dasharray="3 3" marker-end="url(#arrowdash)"/>
+          </g>
+        </svg>
+        <div class="diagram-cap">Component diagram — six single-responsibility modules; dashed lines are async/monitoring paths.</div>
+      </div>
+      <table class="compact">
+        <thead><tr><th>Module</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td>Order Ingest Gateway</td><td>Validates inbound order payloads; deduplicates by idempotency key.</td></tr>
+          <tr><td>Routing Rule Engine</td><td>Pure function mapping order items to stations using per-location rules.</td></tr>
+          <tr><td>Ticket Dispatcher</td><td>Persists tickets, enforces the dispatch idempotency key, owns ticket state transitions.</td></tr>
+          <tr><td>KDS Sync Gateway</td><td>Maintains WebSocket connections to kitchen displays; pushes and re-delivers tickets.</td></tr>
+          <tr><td>Notification Service</td><td>Notifies front-of-house and customers when a ticket reaches READY.</td></tr>
+          <tr><td>Station Health Monitor</td><td>Tracks station heartbeats; flags OFFLINE and triggers backup-station rerouting.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">4. Data Model</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 900 420" role="img" aria-label="Entity relationship diagram for the Order Orchestration Service">
+          <g font-family="Roboto Mono" font-size="11" fill="var(--text)">
+            <rect x="20" y="20" width="220" height="118" rx="6" fill="var(--surface)" stroke="var(--berry)" stroke-width="1.6"/>
+            <rect x="20" y="20" width="220" height="26" rx="6" fill="var(--berry)"/>
+            <text x="130" y="38" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">ORDER</text>
+            <text x="30" y="62">order_id PK</text><text x="30" y="78">location_id</text>
+            <text x="30" y="94">customer_ref</text><text x="30" y="110">status</text><text x="30" y="126">idempotency_key</text>
+
+            <rect x="280" y="20" width="230" height="102" rx="6" fill="var(--surface)" stroke="var(--berry)" stroke-width="1.6"/>
+            <rect x="280" y="20" width="230" height="26" rx="6" fill="var(--berry)"/>
+            <text x="395" y="38" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">ORDER_ITEM</text>
+            <text x="290" y="62">order_item_id PK</text><text x="290" y="78">order_id FK</text>
+            <text x="290" y="94">item_type</text><text x="290" y="110">allergy_flag</text>
+
+            <rect x="20" y="180" width="220" height="102" rx="6" fill="var(--surface)" stroke="var(--berry)" stroke-width="1.6"/>
+            <rect x="20" y="180" width="220" height="26" rx="6" fill="var(--berry)"/>
+            <text x="130" y="198" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">STATION</text>
+            <text x="30" y="222">station_id PK</text><text x="30" y="238">location_id</text>
+            <text x="30" y="254">name / is_backup</text><text x="30" y="270">health_status</text>
+
+            <rect x="280" y="180" width="230" height="86" rx="6" fill="var(--surface)" stroke="var(--berry)" stroke-width="1.6"/>
+            <rect x="280" y="180" width="230" height="26" rx="6" fill="var(--berry)"/>
+            <text x="395" y="198" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">ROUTING_RULE</text>
+            <text x="290" y="222">rule_id PK</text><text x="290" y="238">item_type / station_id</text>
+            <text x="290" y="254">priority</text>
+
+            <rect x="560" y="100" width="230" height="102" rx="6" fill="var(--surface)" stroke="var(--cherry)" stroke-width="1.6"/>
+            <rect x="560" y="100" width="230" height="26" rx="6" fill="var(--cherry)"/>
+            <text x="675" y="118" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">TICKET</text>
+            <text x="570" y="142">ticket_id PK</text><text x="570" y="158">order_id FK / station_id FK</text>
+            <text x="570" y="174">status / dispatch_key</text>
+
+            <rect x="560" y="260" width="260" height="86" rx="6" fill="var(--surface)" stroke="var(--cherry)" stroke-width="1.6"/>
+            <rect x="560" y="260" width="260" height="26" rx="6" fill="var(--cherry)"/>
+            <text x="690" y="278" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="12.5">TICKET_STATUS_EVENT</text>
+            <text x="570" y="302">event_id PK</text><text x="570" y="318">ticket_id FK / status / occurred_at</text>
+
+            <g stroke="var(--muted)" stroke-width="1.4" fill="none">
+              <path d="M240,60 L280,60"/><path d="M395,122 L395,180"/>
+              <path d="M240,220 L280,220"/><path d="M130,138 L130,180"/>
+              <path d="M510,151 L560,151" marker-end=""/><path d="M240,110 L560,151"/>
+              <path d="M240,230 L560,151"/><path d="M675,202 L675,260" marker-end=""/>
+            </g>
+            <g font-family="Roboto" font-size="10.5" fill="var(--muted)">
+              <text x="248" y="55">1 · *</text><text x="248" y="215">1 · *</text><text x="360" y="115">*  · 1</text><text x="660" y="240">1 · *</text>
+            </g>
+          </g>
+        </svg>
+        <div class="diagram-cap">Entity-relationship diagram — ORDER and STATION each fan out to TICKET; TICKET fans out to its status history.</div>
+      </div>
+
+      <h3 class="doc-h">5. Main Flow — Sequence</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 920 470" role="img" aria-label="Sequence diagram of the main order routing flow">
+          <defs>
+            <marker id="arrowseq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--text)"/></marker>
+          </defs>
+          <g font-family="Roboto" font-size="11" fill="var(--text)">
+            <!-- lifelines -->
+            <g stroke="var(--border)" stroke-width="1.2" stroke-dasharray="3 3">
+              <line x1="50" y1="50" x2="50" y2="450"/><line x1="185" y1="50" x2="185" y2="450"/>
+              <line x1="330" y1="50" x2="330" y2="450"/><line x1="475" y1="50" x2="475" y2="450"/>
+              <line x1="620" y1="50" x2="620" y2="450"/><line x1="760" y1="50" x2="760" y2="450"/>
+              <line x1="870" y1="50" x2="870" y2="450"/>
+            </g>
+            <g font-weight="700" text-anchor="middle">
+              <rect x="15" y="20" width="70" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="50" y="39">Customer</text>
+              <rect x="150" y="20" width="70" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="185" y="39">POS</text>
+              <rect x="270" y="20" width="120" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="330" y="39" font-size="10">Ingest Gateway</text>
+              <rect x="415" y="20" width="120" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="475" y="39" font-size="10">Routing Engine</text>
+              <rect x="560" y="20" width="120" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="620" y="39" font-size="10">Dispatcher</text>
+              <rect x="710" y="20" width="100" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="760" y="39" font-size="10">KDS Gateway</text>
+              <rect x="825" y="20" width="90" height="28" rx="5" fill="var(--surface-alt)" stroke="var(--border)"/><text x="870" y="39" font-size="10">Notify Svc</text>
+            </g>
+            <g stroke="var(--text)" stroke-width="1.3" fill="none">
+              <path d="M50,70 L185,70" marker-end="url(#arrowseq)"/>
+              <path d="M185,100 L330,100" marker-end="url(#arrowseq)"/>
+              <path d="M330,130 L475,130" marker-end="url(#arrowseq)"/>
+              <path d="M475,160 L330,160" marker-end="url(#arrowseq)" stroke-dasharray="4 3"/>
+              <path d="M330,190 L620,190" marker-end="url(#arrowseq)"/>
+              <path d="M620,220 L760,220" marker-end="url(#arrowseq)"/>
+              <path d="M760,250 L620,250" marker-end="url(#arrowseq)" stroke-dasharray="4 3"/>
+              <path d="M620,280 L185,280" marker-end="url(#arrowseq)" stroke-dasharray="4 3"/>
+              <path d="M760,330 L620,330" marker-end="url(#arrowseq)"/>
+              <path d="M620,360 L870,360" marker-end="url(#arrowseq)"/>
+              <path d="M870,390 L50,390" marker-end="url(#arrowseq)"/>
+            </g>
+            <g font-size="10.5" fill="var(--text)">
+              <text x="55" y="65">1. Places order (items, modifiers)</text>
+              <text x="190" y="95">2. POST /orders (Idempotency-Key)</text>
+              <text x="335" y="125">3. routeItems(order, rules)</text>
+              <text x="335" y="155">4. StationAssignment[] (return)</text>
+              <text x="335" y="185">5. createTickets(assignments)</text>
+              <text x="625" y="215">6. pushTicket(ticket, stationId)</text>
+              <text x="625" y="245">7. ack — status QUEUED</text>
+              <text x="190" y="275">8. 202 Accepted {orderId}</text>
+              <text x="625" y="325">9. status → READY (kitchen marks done)</text>
+              <text x="625" y="355">10. notifyReady(ticket)</text>
+              <text x="60" y="385">11. SMS / push — "Order ready for pickup"</text>
+            </g>
+          </g>
+        </svg>
+        <div class="diagram-cap">Sequence diagram — main order-to-ready flow. Steps 4 and 7 are async acknowledgements.</div>
+      </div>
+
+      <h3 class="doc-h">6. Risks &amp; Trade-offs</h3>
+      <table>
+        <thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation / Trade-off Accepted</th></tr></thead>
+        <tbody>
+          <tr><td>Kitchen station goes offline mid-shift (WiFi drop, tablet crash)</td><td>Medium</td><td>Station Health Monitor flags OFFLINE after 3 missed heartbeats (30s); Routing Rule Engine reroutes new tickets to the location's backup station. Already-queued tickets replay on reconnect.</td></tr>
+          <tr><td>Customer double-submits the same order (bad network, double-tap)</td><td>Medium</td><td>Order Ingest Gateway requires an <code>Idempotency-Key</code> header; duplicate keys return the cached result instead of creating a second order.</td></tr>
+          <tr><td>WebSocket infrastructure adds operational complexity vs. simple polling</td><td>Accepted</td><td>Traded for materially lower routing latency during peak service, which is the metric the pilot is measured on.</td></tr>
+          <tr><td>Routing rules pilot uses a flat table, not a full rules-editor UI</td><td>Accepted debt</td><td>Documented in Definition of Done (Document 7); rules-editor UI is scoped as a follow-on, not silently skipped.</td></tr>
+          <tr><td>Notification provider (SMS) rate limits or returns 5xx during a surge</td><td>Low-Medium</td><td>Capped exponential-backoff retry (3 attempts); failure after exhaustion logs to a dead-letter queue for manual customer follow-up — front-of-house display never depends on SMS succeeding.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-TDD-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 2: Module & API Design -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-modules">
+  <div class="section-kicker">Document 2 of 7</div>
+  <h2 class="section-title">Module &amp; Component Design — API Signatures</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('modules')">Download HTML</button>
+    <button class="btn" onclick="printDoc('modules')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-modules">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Module &amp; Component Design</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — Typed Interfaces &amp; Contracts per Module</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-MOD-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>Each module below has exactly one responsibility. Its interface is its contract: an AI system implementing against this document should never need to guess an input shape, an output shape, or which errors are possible.</p>
+
+      <h3 class="doc-h">1. Order Ingest Gateway</h3>
+      <p><b>Responsibility:</b> validate and deduplicate inbound order payloads from any channel before they reach business logic.</p>
+      <pre class="codeblock"><code>interface OrderPayload {
+  locationId: string;
+  channel: 'POS' | 'KIOSK' | 'MOBILE';
+  idempotencyKey: string;
+  items: Array&lt;{ type: string; modifiers: string[]; hasAllergyFlag: boolean }&gt;;
+  customerContact?: string;
+}
+interface IngestResult { orderId: string; deduplicated: boolean; }
+
+function ingestOrder(payload: OrderPayload): Promise&lt;IngestResult&gt;;
+// throws ValidationError        — payload fails schema (missing field, empty items)
+// throws IdempotencyConflictError — same key, different payload body</code></pre>
+
+      <h3 class="doc-h">2. Routing Rule Engine</h3>
+      <p><b>Responsibility:</b> pure function mapping order items to kitchen stations using the active rule set. No I/O.</p>
+      <pre class="codeblock"><code>interface RoutingRule { ruleId: string; locationId: string; itemType: string; stationId: string; priority: number; }
+interface StationAssignment { itemId: string; stationId: string; allergyHold: boolean; }
+
+function routeItems(order: Order, rules: RoutingRule[]): StationAssignment[];
+// throws ValidationError         — order.items.length === 0
+// throws NoStationAvailableError — no rule matches item type + location
+// throws RuleConflictError       — two active rules match with equal priority</code></pre>
+
+      <h3 class="doc-h">3. Ticket Dispatcher</h3>
+      <p><b>Responsibility:</b> persist tickets from station assignments; own ticket state transitions; enforce dispatch-level idempotency.</p>
+      <pre class="codeblock"><code>interface Ticket { ticketId: string; orderId: string; stationId: string; status: 'QUEUED'|'IN_PROGRESS'|'READY'|'DELIVERED'; dispatchKey: string; }
+
+function createTickets(assignments: StationAssignment[], dispatchKey: string): Promise&lt;Ticket[]&gt;;
+// throws IdempotencyConflictError — dispatchKey already has tickets (returns existing set instead)
+// throws PersistenceError        — DB write failed after retry budget exhausted
+
+function markReady(ticketId: string): Promise&lt;Ticket&gt;;
+// throws TicketNotFoundError
+// throws InvalidStateTransitionError — e.g. DELIVERED → READY</code></pre>
+
+      <h3 class="doc-h">4. KDS Sync Gateway</h3>
+      <p><b>Responsibility:</b> maintain WebSocket connections to kitchen display clients; push tickets; redeliver on reconnect.</p>
+      <pre class="codeblock"><code>function pushTicket(ticket: Ticket, stationId: string): Promise&lt;void&gt;;
+// throws StationUnreachableError — no active connection; caller queues for redelivery
+// throws AckTimeoutError         — no client ack within 5s (default timeout)</code></pre>
+
+      <h3 class="doc-h">5. Notification Service</h3>
+      <p><b>Responsibility:</b> notify front-of-house and, if contact info exists, the customer when a ticket reaches READY.</p>
+      <pre class="codeblock"><code>function notifyReady(ticket: Ticket, customerContact?: string): Promise&lt;void&gt;;
+// throws NotificationDeliveryError — provider failure after 3 capped retries (logs to dead-letter, does not throw further)</code></pre>
+
+      <h3 class="doc-h">6. Station Health Monitor</h3>
+      <p><b>Responsibility:</b> track per-station heartbeats; mark stations OFFLINE; signal the Routing Rule Engine to prefer backup stations.</p>
+      <pre class="codeblock"><code>interface HealthStatus { stationId: string; state: 'ONLINE'|'DEGRADED'|'OFFLINE'; lastHeartbeatAt: string; }
+
+function checkHealth(stationId: string): Promise&lt;HealthStatus&gt;;
+// never throws — absence of heartbeat data returns state: 'OFFLINE'</code></pre>
+
+      <h3 class="doc-h">7. Error Class Reference</h3>
+      <table class="compact">
+        <thead><tr><th>Error Class</th><th>Raised By</th><th>HTTP Mapping</th></tr></thead>
+        <tbody>
+          <tr><td>ValidationError</td><td>Ingest Gateway, Routing Engine</td><td>400</td></tr>
+          <tr><td>IdempotencyConflictError</td><td>Ingest Gateway, Ticket Dispatcher</td><td>409 (or 200 with cached result, per endpoint)</td></tr>
+          <tr><td>NoStationAvailableError</td><td>Routing Rule Engine</td><td>422</td></tr>
+          <tr><td>RuleConflictError</td><td>Routing Rule Engine</td><td>500 (config defect — pages on-call)</td></tr>
+          <tr><td>StationUnreachableError</td><td>KDS Sync Gateway</td><td>n/a — internal retry/queue signal</td></tr>
+          <tr><td>NotificationDeliveryError</td><td>Notification Service</td><td>n/a — internal, dead-lettered</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-MOD-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 3: Coding Standards -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-standards">
+  <div class="section-kicker">Document 3 of 7</div>
+  <h2 class="section-title">Coding Standards &amp; Naming Conventions</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('standards')">Download HTML</button>
+    <button class="btn" onclick="printDoc('standards')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-standards">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Coding Standards &amp; Naming Conventions</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — The House Style AI and Humans Must Follow</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-STD-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">1. Naming</h3>
+      <table class="compact">
+        <thead><tr><th>Element</th><th>Convention</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Variables / functions</td><td>camelCase, verb-first for functions</td><td><code>routeItems</code>, <code>ticketStatus</code></td></tr>
+          <tr><td>Classes / types / interfaces</td><td>PascalCase</td><td><code>TicketDispatcher</code>, <code>StationAssignment</code></td></tr>
+          <tr><td>Constants</td><td>UPPER_SNAKE_CASE</td><td><code>MAX_RETRY_ATTEMPTS</code></td></tr>
+          <tr><td>Files (modules)</td><td>kebab-case, suffix by role</td><td><code>routing-rule-engine.ts</code>, <code>ticket-dispatcher.service.ts</code></td></tr>
+          <tr><td>Error classes</td><td>PascalCase, suffixed <code>Error</code></td><td><code>NoStationAvailableError</code></td></tr>
+          <tr><td>Zod schemas</td><td>PascalCase, suffixed <code>Schema</code></td><td><code>OrderPayloadSchema</code></td></tr>
+          <tr><td>Test files</td><td>mirror source name + <code>.test.ts</code></td><td><code>routing-rule-engine.test.ts</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">2. Types</h3>
+      <ul>
+        <li>TypeScript strict mode is on for the whole service. <code>tsc --noEmit</code> must pass before merge.</li>
+        <li><code>any</code> requires a one-line comment explaining why no narrower type exists. Bare <code>any</code> is a review Blocker.</li>
+        <li>Every exported function has an explicit return type — never inferred silently across a module boundary.</li>
+      </ul>
+
+      <h3 class="doc-h">3. Validation</h3>
+      <ul>
+        <li>Every HTTP route validates its body, query, and route params with a Zod schema before touching business logic.</li>
+        <li>Malformed input is rejected with 400 and a machine-readable error code (e.g. <code>ORDER_EMPTY</code>) — never a bare 500.</li>
+      </ul>
+
+      <h3 class="doc-h">4. Comments</h3>
+      <p>Default to no comments. Names should make the "what" obvious. Write a comment only when it explains a non-obvious <b>why</b> — a hidden constraint, a workaround for a specific upstream bug, a subtlety that would surprise the next reader. Never restate what the code already says.</p>
+
+      <h3 class="doc-h">5. Error Handling</h3>
+      <ul>
+        <li>No empty <code>catch</code> blocks, ever. Every catch either recovers, logs and rethrows with a stable <code>error_class</code>, or routes to a dead-letter path.</li>
+        <li>Catch specific error classes, not bare <code>Error</code> or <code>Exception</code>, wherever the failure mode is known.</li>
+        <li>Every outbound call (DB, WebSocket, notification provider) has an explicit timeout — never unbounded.</li>
+      </ul>
+
+      <h3 class="doc-h">6. File &amp; Function Size</h3>
+      <p>Soft target 300 lines / file, 50 lines / function. Hard ceiling 500 / 100. Crossing the ceiling means the next change must split the unit before adding new logic.</p>
+
+      <h3 class="doc-h">7. Logging</h3>
+      <p>Structured JSON only, to stdout. Every log line includes <code>timestamp</code>, <code>level</code>, <code>service</code>, <code>event</code>, <code>correlation_id</code>, <code>outcome</code>, and — on failure — <code>error_class</code>. No unstructured <code>console.log</code> strings in a production code path.</p>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-STD-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 4: Code Review Checklist -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-checklist">
+  <div class="section-kicker">Document 4 of 7</div>
+  <h2 class="section-title">Code Review Checklist</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('checklist')">Download HTML</button>
+    <button class="btn" onclick="printDoc('checklist')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('checklist')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-checklist">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Code Review Checklist</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — The Gate Every Pull Request Passes</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-CRC-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>A PR with any open <span class="badge badge-danger">Blocker</span> item does not merge, regardless of author (human or AI-assisted). <span class="badge badge-warning">Major</span> items require a written justification if waived. <span class="badge badge-info">Minor</span> items may be deferred to a follow-up with a linked ticket.</p>
+      <table id="checklistTable">
+        <thead><tr><th>ID</th><th>Category</th><th>Check Item</th><th>Severity</th><th>Pass Criteria</th></tr></thead>
+        <tbody>
+          <tr><td>CRC-01</td><td>Correctness</td><td>Happy-path behavior matches the TDD sequence for the target flow</td><td><span class="badge badge-danger">Blocker</span></td><td>Manual trace or test confirms output matches spec</td></tr>
+          <tr><td>CRC-02</td><td>Contracts &amp; Types</td><td>All exported functions have explicit input/output types; no unexplained <code>any</code></td><td><span class="badge badge-danger">Blocker</span></td><td><code>tsc --noEmit</code> passes; <code>any</code> usages reviewed</td></tr>
+          <tr><td>CRC-03</td><td>Contracts &amp; Types</td><td>Inbound HTTP/webhook payloads validated with a Zod schema before use</td><td><span class="badge badge-danger">Blocker</span></td><td>Schema present and enforced at route boundary</td></tr>
+          <tr><td>CRC-04</td><td>Error Handling</td><td>No empty catch blocks; every catch logs a stable <code>error_class</code> and either recovers or rethrows</td><td><span class="badge badge-danger">Blocker</span></td><td>Code inspection</td></tr>
+          <tr><td>CRC-05</td><td>Error Handling</td><td>Every external call has an explicit timeout and a capped retry policy</td><td><span class="badge badge-danger">Blocker</span></td><td>Code inspection + config review</td></tr>
+          <tr><td>CRC-06</td><td>Idempotency</td><td>Side-effecting operations are keyed so a retry cannot duplicate the effect</td><td><span class="badge badge-danger">Blocker</span></td><td>Idempotency key present + test proves it</td></tr>
+          <tr><td>CRC-07</td><td>Tests</td><td>New business logic ships with at least one unit test covering the happy path</td><td><span class="badge badge-danger">Blocker</span></td><td>Test file present, CI green</td></tr>
+          <tr><td>CRC-08</td><td>Tests</td><td>At least one failure-path and one boundary-case test exists for new logic</td><td><span class="badge badge-warning">Major</span></td><td>Test file present, CI green</td></tr>
+          <tr><td>CRC-09</td><td>Security</td><td>No secrets, tokens, or credentials in source, logs, or error messages</td><td><span class="badge badge-danger">Blocker</span></td><td>Code + log inspection</td></tr>
+          <tr><td>CRC-10</td><td>Security</td><td>Untrusted input never reaches SQL, shell, or regex construction unparameterized</td><td><span class="badge badge-danger">Blocker</span></td><td>Code inspection</td></tr>
+          <tr><td>CRC-11</td><td>Readability</td><td>Names reveal intent; no single-letter identifiers outside short loop indices</td><td><span class="badge badge-warning">Major</span></td><td>Reviewer read-through</td></tr>
+          <tr><td>CRC-12</td><td>Readability</td><td>No dead code, commented-out blocks, or TODOs without a linked ticket</td><td><span class="badge badge-info">Minor</span></td><td>Code inspection</td></tr>
+          <tr><td>CRC-13</td><td>Modularity</td><td>Module still has one responsibility; file under ~500 lines or split proposed</td><td><span class="badge badge-warning">Major</span></td><td>Line count + reviewer judgment</td></tr>
+          <tr><td>CRC-14</td><td>Observability</td><td>Structured log emitted at entry/exit with <code>correlation_id</code> and <code>outcome</code></td><td><span class="badge badge-warning">Major</span></td><td>Log inspection in a dev run</td></tr>
+          <tr><td>CRC-15</td><td>Performance</td><td>No unbounded loops or N+1 queries introduced on the hot path</td><td><span class="badge badge-warning">Major</span></td><td>Reviewer read-through + query plan if DB touched</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-CRC-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 5: Test Plan -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-testplan">
+  <div class="section-kicker">Document 5 of 7</div>
+  <h2 class="section-title">Unit &amp; Integration Test Plan</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('testplan')">Download HTML</button>
+    <button class="btn" onclick="printDoc('testplan')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('testplan')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-testplan">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Unit &amp; Integration Test Plan</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — Cases Mapped to the Testing Pyramid</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-TST-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>21 cases across the pyramid: 14 unit, 4 integration, 3 end-to-end. Every module has at least one Happy, one Failure, and — where a retry or duplicate submission is possible — one Idempotency case.</p>
+      <h4 class="doc-h4">Unit (14)</h4>
+      <table class="compact" id="testplanTableUnit">
+        <thead><tr><th>ID</th><th>Module</th><th>Scenario</th><th>Type</th><th>Expected Result</th></tr></thead>
+        <tbody>
+          <tr><td>TP-U01</td><td>Routing Rule Engine</td><td>Item type matches exactly one active rule for the order's location</td><td>Happy</td><td>Returns a single StationAssignment with the correct stationId</td></tr>
+          <tr><td>TP-U02</td><td>Routing Rule Engine</td><td>No rule matches item type for the location</td><td>Failure</td><td>Throws NoStationAvailableError with item type and locationId</td></tr>
+          <tr><td>TP-U03</td><td>Routing Rule Engine</td><td>Order has zero items</td><td>Boundary</td><td>Throws ValidationError('ORDER_EMPTY')</td></tr>
+          <tr><td>TP-U04</td><td>Routing Rule Engine</td><td>Item carries an allergy flag</td><td>Happy</td><td>Assignment includes allergyHold=true</td></tr>
+          <tr><td>TP-U05</td><td>Order Ingest Gateway</td><td>Well-formed order payload</td><td>Happy</td><td>Returns IngestResult with generated orderId</td></tr>
+          <tr><td>TP-U06</td><td>Order Ingest Gateway</td><td>Payload missing required locationId</td><td>Failure</td><td>Rejects with ValidationError before business logic runs</td></tr>
+          <tr><td>TP-U07</td><td>Order Ingest Gateway</td><td>Payload with 50 items (max supported)</td><td>Boundary</td><td>Accepts and ingests all 50 items</td></tr>
+          <tr><td>TP-U08</td><td>Order Ingest Gateway</td><td>Same idempotency key submitted twice</td><td>Idempotency</td><td>Second call returns the cached IngestResult; no duplicate order row</td></tr>
+          <tr><td>TP-U09</td><td>Ticket Dispatcher</td><td>Valid StationAssignment list</td><td>Happy</td><td>Creates one Ticket per assignment, status=QUEUED</td></tr>
+          <tr><td>TP-U10</td><td>Ticket Dispatcher</td><td>Dispatch called twice with the same dispatch key</td><td>Idempotency</td><td>Second call is a no-op; ticket count unchanged</td></tr>
+          <tr><td>TP-U11</td><td>Notification Service</td><td>Ticket transitions to READY</td><td>Happy</td><td>Sends one notification to the front-of-house channel</td></tr>
+          <tr><td>TP-U12</td><td>Notification Service</td><td>Delivery provider returns 5xx</td><td>Failure</td><td>Throws NotificationDeliveryError; retry scheduled</td></tr>
+          <tr><td>TP-U13</td><td>Station Health Monitor</td><td>Station misses 3 consecutive heartbeats</td><td>Boundary</td><td>Marks station OFFLINE and emits a health event</td></tr>
+          <tr><td>TP-U14</td><td>Routing Rule Engine</td><td>Two active rules conflict for the same item type</td><td>Failure</td><td>Throws RuleConflictError naming both rule IDs</td></tr>
+        </tbody>
+      </table>
+      <h4 class="doc-h4">Integration (4)</h4>
+      <table class="compact" id="testplanTableInt">
+        <thead><tr><th>ID</th><th>Modules</th><th>Scenario</th><th>Type</th><th>Expected Result</th></tr></thead>
+        <tbody>
+          <tr><td>TP-I01</td><td>Ingest Gateway → Routing Engine</td><td>Order posted through the gateway routes using the live rule set from Postgres</td><td>Happy</td><td>Ticket rows match the expected station mapping</td></tr>
+          <tr><td>TP-I02</td><td>Ticket Dispatcher → KDS Gateway</td><td>Ticket creation triggers a WebSocket push to the subscribed KDS client</td><td>Happy</td><td>Mock KDS client receives the ticket payload within 2s</td></tr>
+          <tr><td>TP-I03</td><td>KDS Gateway → Station Health Monitor</td><td>Station WebSocket disconnects mid-shift</td><td>Failure</td><td>Health monitor marks the station degraded; pending tickets queue for redelivery on reconnect</td></tr>
+          <tr><td>TP-I04</td><td>Ticket Dispatcher → Database</td><td>Two dispatch requests race on the same idempotency key</td><td>Idempotency</td><td>Unique constraint prevents a duplicate ticket; second request returns the existing row</td></tr>
+        </tbody>
+      </table>
+      <h4 class="doc-h4">End-to-End (3)</h4>
+      <table class="compact" id="testplanTableE2E">
+        <thead><tr><th>ID</th><th>Flow</th><th>Scenario</th><th>Type</th><th>Expected Result</th></tr></thead>
+        <tbody>
+          <tr><td>TP-E01</td><td>Full order flow</td><td>Customer places a 3-item order via kiosk during normal load</td><td>Happy</td><td>Ticket appears on the correct KDS station within 3s; customer sees confirmation</td></tr>
+          <tr><td>TP-E02</td><td>Full order flow</td><td>Assigned kitchen station is offline when the order is placed</td><td>Failure</td><td>Order reroutes to the backup station per routing rule; front-of-house sees a reroute banner</td></tr>
+          <tr><td>TP-E03</td><td>Full order flow</td><td>Same order retried after a network timeout on the POS</td><td>Idempotency</td><td>Only one ticket set exists in the KDS; no duplicate kitchen prep</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-TST-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 6: Branching & PR Workflow -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-branching">
+  <div class="section-kicker">Document 6 of 7</div>
+  <h2 class="section-title">Branching &amp; Pull-Request Workflow</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('branching')">Download HTML</button>
+    <button class="btn" onclick="printDoc('branching')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-branching">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Branching &amp; Pull-Request Workflow</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — Naming, Size, Review, and Merge Rules</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-BR-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">1. Model — Trunk-Based Development</h3>
+      <p><code>main</code> is always deployable. Feature work happens on short-lived branches (target: merged within 2 days) and lands via squash-merge. No long-running <code>develop</code> branch.</p>
+
+      <h3 class="doc-h">2. Branch Naming</h3>
+      <table class="compact">
+        <thead><tr><th>Prefix</th><th>Use</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><code>feature/</code></td><td>New capability</td><td><code>feature/OOS-108-allergy-hold-routing</code></td></tr>
+          <tr><td><code>fix/</code></td><td>Bug fix</td><td><code>fix/OOS-115-kds-reconnect-loop</code></td></tr>
+          <tr><td><code>chore/</code></td><td>Tooling, deps, non-behavioral cleanup</td><td><code>chore/upgrade-zod-v4</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">3. Branching Diagram</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 900 340" role="img" aria-label="Git branching diagram showing feature and fix branches merging into main">
+          <g font-family="Roboto Mono" font-size="10.5">
+            <line x1="40" y1="170" x2="860" y2="170" stroke="var(--text)" stroke-width="2.5"/>
+            <text x="40" y="155" fill="var(--muted)" font-family="Roboto" font-size="11">main</text>
+            <g fill="var(--text)"><circle cx="60" cy="170" r="5"/><circle cx="260" cy="170" r="5"/><circle cx="430" cy="170" r="5"/><circle cx="580" cy="170" r="5"/><circle cx="700" cy="170" r="5"/><circle cx="840" cy="170" r="5"/></g>
+
+            <path d="M150,170 L150,95 L260,95 L260,170" fill="none" stroke="var(--berry)" stroke-width="2"/>
+            <text x="205" y="85" text-anchor="middle" fill="var(--berry)">feature/OOS-101-station-routing</text>
+            <path d="M320,170 L320,95 L430,95 L430,170" fill="none" stroke="var(--berry)" stroke-width="2"/>
+            <text x="375" y="85" text-anchor="middle" fill="var(--berry)">feature/OOS-108-allergy-hold</text>
+
+            <path d="M500,170 L500,245 L580,245 L580,170" fill="none" stroke="var(--cherry)" stroke-width="2"/>
+            <text x="540" y="262" text-anchor="middle" fill="var(--cherry)">fix/OOS-115-kds-reconnect</text>
+
+            <path d="M640,170 L640,95 L700,95 L700,170" fill="none" stroke="var(--berry)" stroke-width="2"/>
+            <text x="670" y="85" text-anchor="middle" fill="var(--berry)">feature/OOS-122-backup-station</text>
+
+            <g fill="var(--leaf)"><rect x="255" y="195" width="90" height="20" rx="4"/><rect x="775" y="195" width="90" height="20" rx="4"/></g>
+            <text x="300" y="209" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="10">v1.0.0-oos</text>
+            <text x="820" y="209" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="10">v1.1.0-oos</text>
+          </g>
+        </svg>
+        <div class="diagram-cap">Feature branches (berry) squash-merge above the line; fix branches (cherry) below. Release tags mark deployable points.</div>
+      </div>
+
+      <h3 class="doc-h">4. PR Size &amp; Review Rules</h3>
+      <table class="compact">
+        <thead><tr><th>Rule</th><th>Threshold</th></tr></thead>
+        <tbody>
+          <tr><td>Soft PR size cap</td><td>~400 changed lines; larger PRs require a split rationale in the description</td></tr>
+          <tr><td>Required approvals</td><td>1 approval from the module's designated owner, minimum</td></tr>
+          <tr><td>CI gates before merge</td><td><code>tsc --noEmit</code>, unit + integration test suite, lint, secret scan — all green</td></tr>
+          <tr><td>Merge strategy</td><td>Squash-merge only; commit message summarizes the "why"</td></tr>
+          <tr><td>Stale branch policy</td><td>Branches open &gt;5 days are rebased or closed — AI-authored branches drift fastest against a moving contract</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">5. Commit &amp; PR Message Convention</h3>
+      <p>Subject line states the "why," not the "what" (the diff already shows what changed). Body links the ticket and, for AI-assisted changes, notes any logged assumptions.</p>
+      <pre class="codeblock"><code>fix(kds-gateway): redeliver queued tickets on station reconnect
+
+Stations going OFFLINE mid-shift were losing queued tickets on
+reconnect, forcing a manual re-print. Redelivery now replays the
+station's pending queue on ACK of a new connection.
+
+Ref: OOS-115
+Tests: TP-I03</code></pre>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-BR-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- DOC 7: Definition of Done -->
+<!-- ============================================================ -->
+<section class="topic-section" id="doc-dod">
+  <div class="section-kicker">Document 7 of 7</div>
+  <h2 class="section-title">Definition of Done</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('dod')">Download HTML</button>
+    <button class="btn" onclick="printDoc('dod')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('dod')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-dod">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Definition of Done</h1>
+      <div class="doc-cover-sub">Order Orchestration Service — The Objective Bar for Shippable</div>
+      <div class="doc-cover-org">Verde Table Co. · Restaurant Operations Platform</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>OOS-DOD-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>OOS Platform Engineering</td><th>Status</th><td><span class="badge badge-success">Approved for Pilot</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-24</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>A change is "done" only when every row below is true, with a concrete verification artifact — not an intention. No checkbox may be marked complete on the strength of "should work."</p>
+      <table id="dodTable">
+        <thead><tr><th>ID</th><th>Criterion</th><th>Description</th><th>Verification Method</th></tr></thead>
+        <tbody>
+          <tr><td>DOD-01</td><td>Design traceable</td><td>Every implemented requirement traces to a section in the TDD and Module Design doc</td><td>Reviewer cross-check against OOS-TDD-001 / OOS-MOD-001</td></tr>
+          <tr><td>DOD-02</td><td>Types &amp; contracts pass</td><td><code>tsc --noEmit</code> passes with zero errors; no unexplained <code>any</code></td><td>CI type-check job green</td></tr>
+          <tr><td>DOD-03</td><td>Tests exist &amp; pass</td><td>Happy, failure, boundary, and idempotency cases exist per OOS-TST-001 for touched modules</td><td>CI test job green, coverage report attached</td></tr>
+          <tr><td>DOD-04</td><td>Code reviewed</td><td>OOS-CRC-001 completed with zero open Blocker items</td><td>Approved PR with completed checklist attached</td></tr>
+          <tr><td>DOD-05</td><td>No secrets introduced</td><td>Secret scan finds no credentials, tokens, or keys in the diff</td><td>CI secret-scan job green</td></tr>
+          <tr><td>DOD-06</td><td>Idempotent &amp; retry-safe</td><td>Side effects gated by an idempotency key; safe to replay</td><td>Idempotency test passing (TP-U08, TP-U10, TP-I04)</td></tr>
+          <tr><td>DOD-07</td><td>Observable</td><td>Structured logs emitted with <code>correlation_id</code> at entry/exit; <code>error_class</code> set on failure</td><td>Log sample captured from a dev run</td></tr>
+          <tr><td>DOD-08</td><td>Failure path defined</td><td>Retry strategy, circuit-breaker behavior, and recovery path documented for each external boundary touched</td><td>Section present in TDD Risks &amp; Trade-offs</td></tr>
+          <tr><td>DOD-09</td><td>Directive &amp; doc updated</td><td>Any directive or doc affected by this change is updated in the same PR</td><td>Diff includes doc changes or an explicit N/A note</td></tr>
+          <tr><td>DOD-10</td><td>Sign-off recorded</td><td>Prepared / Reviewed / Approved sign-off block completed for shipped documents</td><td>Sign-off block filled on this package</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-success">
+        <b class="callout-tag">Self-Strengthening Requirement</b>
+        <p>Every shipped change should leave the system stronger than it found it: a missing test added, an ambiguous rule clarified, a recurring failure pattern refactored away. Failures are inputs to the next design, not just incidents to close.</p>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>Engineering Lead, OOS Platform</td><td>&nbsp;</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>VP Engineering, Verde Table Co.</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span><span>OOS-DOD-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<!-- ================= ASK ================= -->
+<section class="topic-section" id="ask">
+  <div class="section-kicker">Assistant</div>
+  <h2 class="section-title">Ask the Guide</h2>
+  <p>Type a question in plain language. This assistant matches your question against the guide's own content — entirely offline, no external API — and shows the closest answer with a link to jump to the source section.</p>
+  <div class="ask-widget">
+    <div class="ask-input-row">
+      <input type="text" id="askInputMain" placeholder="e.g. What is the branch naming convention?" autocomplete="off">
+      <button class="btn btn-primary" onclick="askGuide('askInputMain','askAnswerMain')">Ask</button>
+    </div>
+    <div class="ask-suggestions" id="askChipsMain"></div>
+    <div id="askAnswerMain"></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="sitefoot">
+  <span>Colaberry Enterprise AI Leadership Accelerator · Software Engineer Field Guide</span>
+  <span>Generated by Claude Code · 2026-08-24 · v1.0.0</span>
+</footer>
+</div>
+
+<!-- Floating Ask widget -->
+<button id="askFloatBtn" onclick="toggleAskFloat()">Ask the Guide</button>
+<div id="askFloatPanel">
+  <button class="ask-close" onclick="toggleAskFloat()" aria-label="Close">&times;</button>
+  <div style="font-weight:700;color:var(--berry);margin-bottom:8px;">Ask the Guide</div>
+  <div class="ask-input-row">
+    <input type="text" id="askInputFloat" placeholder="Ask a question..." autocomplete="off">
+    <button class="btn btn-primary btn-sm" onclick="askGuide('askInputFloat','askAnswerFloat')">Ask</button>
+  </div>
+  <div class="ask-suggestions" id="askChipsFloat"></div>
+  <div id="askAnswerFloat"></div>
+</div>
+
+<div id="print-root"></div>
+
+<script type="application/json" id="deepdive-metadata">
+{
+  "guide_type": "Software Engineer Field Guide",
+  "curriculum_type": "deep_dive",
+  "week": 4,
+  "discipline": "Software Engineer",
+  "student_id": "colaberry-accelerator-learner",
+  "project_id": "OOS-RESTAURANT-VERDE-TABLE-CO",
+  "repository": "https://github.com/Rasafor/AI-Project",
+  "generated_by": "Claude Code",
+  "generated_date": "2026-08-24",
+  "version": "1.0.0",
+  "build_number": "1"
+}
+</script>
+
+<script>
+(function(){
+  var LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAASMAAABSCAYAAAAfKbL9AABJ9klEQVR4nO29CZBc13UleN7f8ue+1L6iCoUCUFgJAiQBcKcoSqQoyZIoS7Kktt2W29N2O9wOt3vaHZ6JmYiJjnHbjnC3PR7LY8tyWBKthRIlUzJFijtBYiMIAsRahdr3qszK/e//Tdz3CySx1IJNIqQ8wWIVWZlZP3++d99dzj2Xcc5RQw011PCzhvSzvoAaaqihBkLNGNVQQw3vC9SMUQ011PC+QM0Y1VBDDe8L1IxRDTXU8L5AzRjVUEMN7wvUjFENNdTwvkDNGNVQQw3vCyi4SVCq5rjplOAzHyrTkYm3sJ/1NdVQQw2/YMZoauEkPzb2bahKEr7kwnSykJ0o39D4Yaxt31UzSjXU8HMAdjO0g7x2+pvcUmaRSaTgexJsn2M2l0WlPIWezB3Y1H4PotG6mlGqoYabGDeFMeqfPcjPTP8IrU2dcLkCRXJg2ioWihUsZM8izHRs7/4kOjI9UEMyJClZM0w11HCT4aYwRoQ3zj3J58rHkGxrA3wJilOFVfaxULbwyvGnwPQSbmn/MHZ0/TI2tm+vGaMaarjJcNMYo5IxzYen92M0fwqp+mbA82BUfBTNOew/+T1kjWGEQhKSWgc2td+F9c13o7P+VsTDGcT0VM041VDD+xw3jTGynDwPqSl2YvAZPjDzGmzJRtVRMTx5EAMjB8GZDDXsQQ27sDwZYVlBd6YP3fV3oqvpFjQlu5AINyMd76wZphpqeB/ipjFG78VcYZjP5Pvx+slv48Dpp1F1qwAcSDwCX3KghDyomg7H96GHolBlhpgeRzLahbpkMzLxFNJyHeJaGyJaMxQ1Aof7qNpFlKwBFO1x2IUywpEENnd9FL0Ne2oGrIYabjBuSmN0HtnCJD989im8cuJrGMuegOkCkqSD8TIY08ElGXrYh6aosGGA+RwMCmSmQVU5FJUeC/i+C0lmoFvheRwWN+F6dHcU3Nr+IP7NvX+CRLipZpBqqOEXnWe0FOqSrexDt/07bFy7m+9/6ykcHnwa87lRlF2AowKdpWA4FqqqAeaGoMkOmOLAd1QU5Aog2QiHZKghH65rQWE6mSowS4HtleH5CSzk5uE5PhD+Wb/b9ycKrs2TilYz1DW8vzwjx81zajBRpZ9+wtioLvD5whROjL6Ot4Z/iMG5t1Cxi/BtRRgYm1vgIRuypcBXJEieI7wiRXUBpoKpMpgMcDI8jgPXi4JLDB/e9QV88YE/vS7vx3ZyXFMz4rVcb4Ercvqm3cQF1+FJRb1pr7+GX4AwzfIWuOfb8HwHjl+Bxx0Ef0EC/S2JKVBlHaqkQ2UaGAPU67wps/lJPlM6i8nCII6c+hFOjD8PaBEwT8GGxjuxUB3FbG4InmeC+xI8nwEKg+sZUKFChgYLHM31LfiND/4ptnd/4Jqvr1Ad5FVvDpypgB1FMpZAVLt5W1oKRpWPTxRguT4szYGu6tjR0XzTvp8afo7CtIJ1jucrA1gwJlF0+mFZeZieAccxRTeuJ3FIPARZcqHIEsJqPdJKD/RQB5LxFp7We6Er18coxcI6UtHt6KjbgrOjbyKcTuL2NZ/EwPiPwVI2PnfL/wrTtDBZOItsZQKma8GgvjduQUYYYT2BukQSvc13Yl3jzmu6FtvLcU3OsNOzT2G09DQkMnY8gh0dXyJjhJsVc8US/vyFfRjKFkCHT0dDGv/Xp+7n3Zlabq2Gn5ExGss/x8fz+5Ezp1A2RmG7BXBZgcwVwJXBZRncsyHJgAcOn7uQyDqxKUx7x2DLHsLzaaTCW9Ca2svXRLYiHmm/JqMUCmWYY0/xobG3MTD1Ejqb1uLhrb+JNzOd+N7Rv8KrnoSP7frfsOeWT7GKneeuy8HIg+M+GFMhyzKi14mbRIaIvtuooOQYkH0bsmwKj/FmhswUFAsuzJwLDx5KIQbFuXmLITXcRMbIdPKcS1Ru4ghrGTYxd4CfLH4Pk+Wz8JwcVK7DgwxXCgMegyox+MyhUlXAAfIk+L4PJknw4EOCjDIY4DO4RgVm9SAmKm/gnN6DruTDvCN+CzLR1ncMAud5ztjqDYRhMxwbewFFbx47Eh9HKpHGbdpnUSqU8PyZv0L0VBqfSf4JF0ZHww0HYxo4FPi+BIlpAFdxM4PRZ8cg8moU6TPGIFHMXUMNN9oY6WpgCPLGMH9r9jt8MPsiXGMWDpOh+DHYig9XdqHZHArnMCQOxiSwsgHuk1cESD7AdIZKBNB9GTEWQpVyS5w4Qjq4rWHKOolC4SxGEzuwqelR3pO+S/zdKzFEhPnqON6e/DHCkQjWt9+JsNbEJH+Bf2DL5zFbnsWJ8f0Yzh7DhuaNXJEbbvgucjwfrscgcS48MP8mplQEoM+XPhf6icNnHLxmi2q4kcbIdrNcU4KO+JHCAX5s8nFMlIbggyHMIwA3YMiu8IDIy6nMVxAbdpEa85HotxErcvhUuWIUAjG4kod8awhmdxhmpwynDeCpOhRUIGotQFFCMDwFVuE4is4YCtUxvrHufkT0K0uOvjn0I8yXRrG+8270Nm4X/89TGOoz3ewTt/8Of/zVQewf+C7WpP93xCK44SBj7HHyIlz4HoNHFvomBplSKkgEBRD6qlmiGm60Z+QHDxmce4m/OPFVmOYMmOvD1DxwXxbuTsU00XAGaHg1j8xRA/U5D1GZUkY2FO5DcSWRR6LT02MepKEqpFdLKIJhsj2K7E4b87dG4XUnwGwfpgIofhFOieNA9buw3AL6Gj7KU5G2Va34yYUBfnzwx0jEmnDfpl9BJhZUrSJK4F21129gt3R9nv/kzJ8hXx5GLJLGjQbtWZc8Q5+oDwr4Te5GBFd/3jW6ud9LDTeJMdK0JDs5/yp/bfIfUTHHAF+DAgeaF4LPPLATFrY8baLzzQKiThGSHIKuhqAwJljQLhkfBSJXRJ4RufQS7UqZIapIaBitoDxQRPYFB6fuKmHmAQ1SQxweC8OXbTBbw+vT30NBKuNe/AYPRy5fcTPNPFdlF3mjhOeP/i1K7gwe2PEH2NL84GXf15qmDXCPmzg8+iOk4l08Fr6xnB/OpcCbIPsODZzd1HzT95gjLt4UpzDtZo88a/iZYsUd0T93kB8c/TtUKgWQI+QyB7InwylXkHmmgs6XZ9E1bYPrKiJKBLJgDnLIlCNinLYddVVAkoLFSwRESuSKxCd8EZYVIi4ydhF3/pBj7FgcJx/hyN0RRcoKwQo58A0db08eQNxvxo6mj/CIfqnhYChjvlTF02//Fd4YfQp3rPsi9qx7FJHI5XNNzbF29KZ34ZnTX0V33XZs734UNxIe8Zk4Je8lEdJ6N70zsWha2UWeUg013AhB/slCPz8w+jjmKnMiN2B7ITi+gkq2gN6/r2LHEzPom+eIQEPSoX6vsKichVQNEUVHTFIRgYwQCaJBA5OjYGoMLBSBHIpC0ROQQ0m02jG0GFHUIYZ1Q1Xc9tUZND9bQNX3UYUK8W+ziqNT38aocfyy1zpjVPDkG3+JQwPfwaaOh/HAti8hpupLvjctBPS07kTVKOLN0R/gRsMDg+WTSqUE1/fh+z9fbgSx2QMDVUMNN8AzOjL9AwwVT0KSiCFEDy1AmWHo/MoC+o6ZQj/I8nwo8RA0E5A9HzpjkDmDJOwcCxjHigaoOhRZF+EZMVMozSAzCZ7iA1Ff5FM0swidS2ixSwg9nseRko7hX3bgswhUlyPctBY6T11ynWcm3+Q/OvTnODO7Hx3xNfjgpi+gJd6x7DHteRrqkxsRZxEsmCXcaFCTLvfcIG8mEtn4uYMo99dQw/U2RocnnuKn5/YDkgafWfApsVyVse3/G0XvgARNdcF8GSFJA3M5ZIXaPCQooNxQ4L77cgi+rIIvfpHd8XwPTAJk2oyuB00WZBVhwJRwCrCi0LkGKDns/dc8LCWMoU9JuK3hEWxqewzt8a4LVvwb557g/3L4f2KiMAhJCmFj791ozqy/5P24Vo4roYCAKN64wlEf70BYb4Tv2rjhoHK+4FxRfkVkWt4XMN15riv179yXqpfnEizoco1JfXFDMHyOpBa6rha34Bo8qYTfec0Fx+JpdfV/I2tbXGEukmr0iq6r4JV4Uo6z970xyhZG+KHZJ1GwHUiSA+YrsHgO675rYEO/j6TjIsQUMDUsqmkhzwd9RqqnweEKJOZCUnV4WgSuRDkiH4x7cCVXnJ8yD6JDLwI4URncBZSKJ8T2PV2Fr6eQLKmQ3QXs/ImF3q13YdvHPo+wHhLPK1JDrmvj2PDT+N7B/wfZ6hQycR23tN+PXZ2/iqh2qTj/ew1R0S5ww6six/KIJdbBUubwTP/fcU1SEJNiUNUIQlocUbUJcb0RqXCK2XaOc5khdJV9dMQxsn0Zvkw8LNC6viY4HiXsU2yuOsfLVh5VJ4uyNSOag4nFqcthhDTK48WQUFvRmu657HWfN0RlKyvIBhJZS18DrpDuIIzsMr+fLRZ5vlTF1EIec+UiypYNxyXpFgnxUAhNsTgaUyk0xmOoSyVYwazypB657pul4Lk8KSvidRcqJV42POTKBubyecyWiii61FfpI6qqiKoKmuiaknFkdA2NmWsf+jBbznMVFB1wqIqClB674DUr+SLOzC/w0ayDgmEjqkvoSsbR1RJDOhlCWLtQ390zKmBwkGMuzyQu1X6fzM7zoek8RnIVVCwL6ZiONckY2utSSDa++7h81eC+SxELFw5DY/L6N7vnzCr3bCeIiEAjx2SkYu++/0uMUcEu8/7CUczmc+C+A5v5kKGg+Q0V218eR0Sy4KoyojwuqEUS5YgkOSjf02pWXPhyBEyNiMqaxCnEIxUh8pYkkVuwiXcUC0HprgMPEzObgxsO2KwFOVeC5zH4kSQiho3W6jzi33odpTs/i1TdpuDCKzZeH/hH/OTs36LKbOzecD/2tn8SnY27kUpe/kSv+jkekTKsf/4I759/CWOF4yi4WUgpD0VbwY9HvoGwRDtQFfkxWbKQiNShIbYea9O38A3xTWiMr7vqD4jY6Q6l9X3AvQZDZNpZrmt1bLa0gHPzP+TD+WOYNcZR8Yuw/eDeUqsGFRIk7kNWdCTUBLpT3bwrswNrk7uQvEib6Vz2FD80+ThcTwJ4FV2xjbi14+M8oi+3+YJfCZ7RYi6bZtpdjKH5ef786WEcHclhfCKHmWI1WDeOCZcxwcWnIoeqqlBjKezoyGBHZz2/u7cJyZbrTwA7b4gO9Y/w589N4fTwPMZzeVQqNlzLAKMCDF2X5ImfmaKjPhpGT1McWzrT/L4tvVjfdHVG6Qf7j/Nnzw6Lg1zmOrZubMAXbt+Cgu/wpKSyl4/388ffOIW3J7JwKw64x+FTBKJp2LuxE//xg7eiCQVuQkNKC7PHDw/wgycHQKc51yK4t6+VP7BlDcjTKhdK/MDQLL575BzeHp9GpWLCYa6IRNSQhoc2rcFvfWAvb0kHBv/F02PYd2wQnDuwJRl3rM3wR3dsQzJ2/Q6EZ4714+DJMTg64LoOdq1twW/s3Y0ljZFtlvHG7D5ULRue4kHzFLhlG71PzyBG9txnCElhcC6LKR2q8HzI0Mggs8UkH56qQJJl4Q2B04cq+LqBsaJHKxKY48I3bXjxCFTO4KgyVEWDL/tQZyviWnioDmGHwXn7HArfeByV3//P3A3LODz1FP7l2N+DKSo+tOlXcF/vbyKVWL6fba44hbfGvsZPzb2Fkj0pbrgtMcQdSl7J0KQIbLpKz4JMeS1PxUwpi1z5NQzMHsXb0U7c2vkw35TciXj43bBmtSCDS0RHyqZRfuxqUXFMHBz/R/7W7CuYMabh+h6450GTZBE2q7SXuCG8I9PnUB0LU9Y8Js1xvDXTjzWZfdjV+Qm+NX3bO+/Bcks4PX0ALuIwYKDqyti+gjqvYF8Hn7w4ZDTfFh70eeTKc/zQmXl89/V+nJmdhOEBvsugwoUDA54cEjlEDw4qzIBCB1XBxP7SHF7rfxs/PNmER2/dzB/Z3IVk9MpCkOUwND3Pnzp8Ej85OYbZfB6yw2DSPZNd+JpK3U7ku4PRZ8WrUB0HC4UyDpWK2D84iRfeOouP7NzI79u6Du2Zd73t1WA0b+KFY0OIhxV4ho5IhmrOgF2p4B/eGuTffukwshULniyJaENEFdQuVXUQUWMUikHXIux8WebsxDhePtUPlQ54FkJ3OoHkLWE2XS7ybx05g++9/ha8chU2k8ElHyqXhOdrmSUkQxLOGyJCKqbhzZEFVKtzsKFjdGYOt3e3kTG6Lvd9JjfP/+Wt0zh5dgG65iCmhPBAZ9sFj7nEGE0VhjBaOhWEVKL6w9B4aB6tg0VENAmWz0WYxWVKQPtQJJ3sDblIwsWjkwQKERzJ5RfyRsEpSj9zTr2z8CQm2kb8sTyYJsONhqDQoRyWIbWniIkENm/QC0CKxqB7BVReeBYz996Dqa4S9p1+HDaK2NPzady38d8hFb2UDGl6C1xfDKn2zz7DXxr8BgrFGZicwksfzHeF8bQ1BZxJMLkHyXEQFf1jsnAjPcmDylXYrothqx/D5WFMtNyHO5s/yhPRFMKXCQeXArV/uF5gmMlNv9IyuGUt8HFrFs+d+xoGsochkzfJaGOr8P0wXBI9YWT8Q5C5DOa6kCUKr6lRWYbCNFSUORyfmcBocRDzHR/lOxsfhhwik6LAkTR4LgmnSHCZQZ/A8he02NZCLE7GPNEWdN4xGp6d5t84eBbPvDGIsm3AhwvJAyRPg6fpCEsaVJnkZGTYHlUZKVT3IHkeXPIgHYb+kRn8zdiC2HBfuOMW3p7SYYYiSMpXrqFUsB2e1FS2r3+I/+0zxzE4NgmDKpoyNUVbYOQFuRo0SRKUEyoy0AKWfBmGTxceQtgFLMXG2VkTQz8+ikMjefzavX18x5rlCyXvhctckVOVuAmyIDLXkK/k+fePnMSXn+mnR4jcIrVFVSTKgEgAI0UEHZ/ctQ6pi7wUchQUrgmyDCOOP2fIly3+jeeP4TtHBuA7ttDn8mVJrHFSjKDDq7e1BQ/t6rvg2ja3xLG5LYV9g/NQJY6pnIP9Q3Pobe/A9cDrA6MYmc5B00JgvofWugT2bOxZ3hidLh9E1SlC81PQ/CrKto+1R6qogwILLiJMhSprULgHlSwINX5K5BU5EBZF1cUbv4gWJ/5DFkaJ2iK4cNFDJgfvz8JbVweWpFPSE7pCXlsCoYoH26LX5AhFotDH83j5K3+Mww/OQJEjuGvdY3hk+x8gql3ecpMhKloF/sbUC3hl8LsoVadR0RPQXQeKx1FWFCSzLprGq2gYNaBUPcQdjoWEjPmWMGaaJLh1Oqo6GVkbMoWbNvDy5E+Qrc7go12/jnBd3ao/DPIhXE7qALQoV58zqrp5TszxwZkB/GDqy5jJj4O2o+vGYVNVkvuIxzQ0RbrRFu1DfbgJISUEj1uoOEWMl6cxVe1HvjQIbjBwRUW+4uJH536AkmfjgaZHIfk2ysLwalB9c7Gpd1nWx+KnSyc7VQY5HEmFK5k4OT3P/+Zfj+Dw2REw7kL3VFSZinSdjr6Oemxpb8WaVAjhcBh0ovmOj1K1isPDE9g/kUVppgCVvEjHQVX28K0jExjJlfDbD92KXR1JlrdtntKuVFmyiqfeHOdf/slBDOcc6LIhVCWYY0ANp9CQSGJrcwYbO1KI6zIkRYJN3QHZMt6cnsPEtIHq/Dwsn/IzEnwuYf+xYcwUK/gPDxn8rvXrWd6yeCq0fOKZdoLMPJiOEJIBt208ffgcvv78OShuFSbX0ZqMYdvaFmxsrYPlMpxYKOC2NVH0JC8tssiix9ERhRFJ1WBJZXz3zTN44vBJ+EYJthJDQ0Mr9vQ0Y00qDt+zMJYrYOfadehOXbhvGuJ17K7NbfzQ8BR8bsBzXTx7ahof3jLJG9LvNqxfDeaKef7CmRysKumHeTCVKPZu6EJ744WH+SXGaLA0DM9ThVdSUWSkBgz0DJqwdS7ccBUKmE8eES1XEkwL2NX0X1xSwYlufb5VSXRxB/1L9BNtQtqMuhu4xpbMRGuJNpKH15WGHNNgK4DFONSWKOTRAsA1lPV6hKqj6Hh7ErGPfxZb93wUjakexC/jEb0XB6aexXND30TZqsLXdYS9PHwvDGlOx32vjWPbGxVoFoPkcMRcuhUMFkzIXgkLCQlza6I4dmcU59ZrsDUdElX9bB8n5o/D9b+CTyi/ydNaPULhlYdG+pz60YJOd8+nlP7qrBEZohNTB/kTc3+H6fkxyCEd3PHgKnmkw43Y3rAd25IPIB1thaKGkbqISZ43p3jZLOBcvh9HZl/GaPUMWLUC3wH2DTwD1ZFQr6wF83QYjMI9RXxOK3V4BB8xubOqEKhLOSbm5qr4+tG3sa9/CDKz4TIdzckoHtu2Bvds7EJrfRrNyctXcHb3tfPHFqbxyokZ/OvxMUwU6XOZRsYu4fhAGX8NDX/4EHhfx9or3hjH+ofxly+fxdxcGQnJJ7VhOEoMvZ3NeKSvEbvW1yOVrENz/MJk8kK1yh+zbczNL+DFkXm88PYYRqbnA+qKauLMxDT+57MKNJnz9Z2tJF6z7HXQYRxUkyNCX31oMoejZwZRsqsIqSruXNuAL9y9BZ3N9YiGQkhqGpsvFbiiqkgtJvNNL8t1eXETkwfMFLiaB9/3cGYwj1crIzC4ATUUwt3r1uIzd2/AhqYU6mIJ8ZxcqcQz8eAzuFit87Z17ehrncCx0SFIqoNz49N4bTCPj++k93b1GJsu4PhoTnh9EnPQkkph98auSx53gTGaLAzyOTMP5ibhSiVYkoqmUQdRw4GqkDGKgElM5IJUlQwRtXww+BRfU85C0kTbA5kmMjrkDQSlbGJXBqEapWiIMxSSSWeahNZksKoNNpyF39ciKk26zODUa1ALEqQ5ByHJgiPr6DRk9IS3o73tnhUX5OHJ5/lL/d/HPM8jSm6qYcD1VXS/mcV9T8+hed6CyqLi70nwQX6ZrTBQkZW8B0pyNJ4y0D1o4NitOl67L465ZhWqrUPSFRzJHUPs7Pfw0c1fQAjJFT8QSuMT8ZHcf/p5tTyjwWw//8G5xzFeGRGnn+vQvQ5jfWY7Hun6Anrq+97N/Vj5S141pbewlN6C9tRGbGvYw18fexYvTD+FvJmF5lXwzPgT2NHwQfguh4kyJJ4WxmUxG7Qkznfrg9p9qPnZcfH/vnYCp4fmEPY5LFXHns5O/MqDW3Dn2jUrfl4NsSRriCWxtWMD7ts4zf/y+RdxdCAJ27YghUI4PjCMvw+F8PsfyfC29OorPW9NzPEvvzCK/MQMVFWBaziQo8147NZm/Mrdm9Fa37jka6UjEYZIRGyebeu68dH17fxr+47j2VMDKNuaCGcGhkfwN894+KNPxpBqii97LZSP4nJEHOTcL+PUBP038egYbuttwx98ZBc6Lrqe+viFB907hohAURytK84Q8l0cG81C5hVEfY7bd2zBf3x4BzpSSVYx310X5w0R4WLZ4K6GDLtrXRM/MjokIgHHqeKFE/O4t8/kqYh+Vd5Rvmryff2zqFRm4Yg8M8Penga01116ry7wxResIsr+LBRfhecpkE0HiamqIDK6MoO8qBlBukbcp5ySsDLim/gVGSR23sEPTv/gBD3/PugspVCBNiV1aDFIHheJZN9wwaaK4uRQPB+cElHxmBBnk3kIGr2qw2EdG1/xBozlTvMnB79OpUTIvg7H5dAcFXc+lcVjX59B9yyDRkRKyUWYyvVqBL6WgKZkoEaawcKNiITrocXr0eRncM9+jse+OoPOIQ9GWIJrU7JWxaHpA9g//ezqPhXK8RDPinvwqMS/iq79bGWaPz38z5jKDUNmIXBbAndc3LHmHnyx7/cvMESEUGj5TZqO1rNHNn6OfaLnV9ES6YRLyVvLxsHJ52BzUuRU4bgWTLdKesTLXhv9WlDEyLTKPmbKVRwfngZRLnwphHt3dOI/fXLXqgzRxdjU1cz++JMP4qHb1sCXJLjEA+MMr5wcxpNvnkbeKKzKlE8tTPKvvfIm+qenxdokRUo1EcH/8oE+/MYHdyxriC6H7o4W9jsf2ot/c9duJIjW4lfBNQknh6fxxIHBFZ8vMTr2PMjUx0e5SeLvOQbWNTfiNx/YeYkhWgl076mCyVwZFnl8KMHzNXS3ZfB7920RhogedyVCgbevb0RjglIt5Kc4OD06i/7JBVwtZgpFvNQ/JOQFdVlDLBTFnX0NqItdWpS4wBjljTw8z4fhEddCAbeA1JghWjspC0+9acK4EMt68emBhASZm/esj0XSY1BxCb5E9TewXYFBO0/+C9SKAg9roQzZ8IIEN3ExUiFwGinEZciKCsWzYR4/jmp2fsnFWC7P82cmv4Ox8jhc3wX3fFA28LYfzmP3K3mEoMCTITy9mBj5ocFXI0A4DugRIXwmszA0JQ4mx8D1OELReqwpNODh7xfROVCC64dgMleMNXp26jkcnz624uYgj5GMEJ1iLnkeyzzDtILNdmTqII7OHITtAY5J4mUK7u1+GB9q/WWkolde0TuP7Y134GNdX0QyGoHtq7B8C6ZDTo4Ch6qfkox4aHk+lThm6B9aF+RdUkLNY3A1Fbt3rsFv796J7vqrJ05G41H82t4tePC2PkRodUkU4th48sAZHJ/Ireo1Xjg9iwOnp+D7Vfgk8BeK4bG9G/HRW9ciHbs6Hk0mHWMP7+rBZ+5ej7iSFoevL5Xx1IlhPPNG/wrrgJL9wUOobcqnfaWG8PDONdjccTX3KmDyc5lDpYqSqyKkq/jE3beiLnZ14n1tmRju39wDj9RaZRn5/DxeOHkOV4tXB0cxMVcVa8SWHGxo60RfU+ayj73AGBluGY5LeR/K20iQDQlNC8QRospCkPdZ5CuKfJHIGbxb4BUIflrdfT3fxU6vT0Vv7nBIcxVRG6CFTZViKUwt/ypcxoXpYMP9cIyg9H85nKn0463Rt2A5qSA3Y0toO13F3S/nRZWJ8lVRhSonqjjBpXAMEuVhZPJ5KQT1IZOXUKdAaY9AbomA6TIQ1tE1reHu54pIFRyolgxT9jE/P4uDsy8gb+WWXYjU02dz4hopomE2uJuXhx5KstniNH918kVU7CoMRUJFddEb34oPdX4O9YlrY0dHQ0m2q/Nu9mDXJ8BDEhxHg8SiIPldDyHBiSpdJuR7L4QCA+UCF9UdVaFgCWxoSuPf3rUDa9uuTZw/JYdZd1Mz++LdG9DZUB8sFIkjt2Dj+2+s7IXMZHP8uWNjMAwDEiXKPQV3dLfjl3Z1I50I8idXg7xT5ZFkGJ+4bR02beyE5BpI+ElU8hX8YGAAecPgK8uuUBRBD5PR1dSMu7pXXwi5+BWZz8TcP9DsPymKdW11uL2rCdGLwrvVIpVIsfs2dSEjh+HRvtNcvHpyEG9PZq+YHTczP8sPnZ2CS+RpaNCYjPs3dKI1c3kxwwuNETdABSzfo5GHHqQKLct3ZUXJcTuf2KS8AvFL3gnDzl/qlUiPLrpNYmoI5aIWuSbMCsqUGp3WmgyHpErgIySFYOXLcMs0QfZSFI15fmjmJRhmCR6vwGMW4jMhfPSpCcSodCwzKLIKT1LhIUhKQ9ah+Apkj/I6pKXkg3LZTkSG1RKB0xGHuy4jSuCqHMLOfhk7DhREpcemKUemiqNTryFXWv60JsVrm7yixS/KEyyHw1Ov4FxhWPC3uOsgLTXgoZ6H0JC8dlXKgl8Rn9b2pgewJXmLCLNdxxVkTDoU3CuQN6F1IQwSrZGwhI/tXI8tzddPOXNTczP72O51gg6guzRSiuHo2Qns6x9ZdnMcHZ0VCWYwyg0qSIYZfmlHF7oyq9PEWgopNcLSksaaU/Xs89u7EI7VoSQxyLKBgYEpvDU6teRzg0ObyMFBGoJC4TvXN6O3tZsVXPOqqLC0gVUmiT3iyRy3d7eibYnNvlqsb8pgfUcDmMXgqpLgPr1ymkKtK8PRiTzODs5DlouC67Q21Yw9G5bOr15gjKibnFIZxORl4vQmXhBVbhhkssDBrVwMtYKkNN1QEaIJpccru58imiM3kyRq/cAo+Y4HLxt4Ry59OT5Uz4Ti+KCIi0I2VMxLXmvBq/DZygKOzZyECR0yXakD3L5vEM0zxApXEPdlaEQpoPYV8vwU0mQianpgZIUx9CUongZMVBCaqAqJRimsQWlNg8VVsFAdbj3oIz1eIcVvlCMeFioGTsydXva9Ct6S74l7TEaJbtdSWCjO8IPTR+H7inieIbnYlrkdW9r2XpdNnpSCeL0pXs/uaf8QdJ2qpxQGqXA8E45DFdGVckbB7yn3FUTqEjZ3tuK+rZ243njolh5sXdcqwmKif+TNCl4+PYZ89fK5o0LZ4M+dGkXWoeSwBtvzsGtdM/rWXFtV6GKs727Alu52GK4FX9KQq3p4/cwIStWFZbwjqkDSTxwxLYytXcGEmKRydQliOtToqKa1G4vI2Lb22t9jJhFnH96+AeEwR4RUVy0H+04OYnhudtUbfL5a4s/1j6Dq+fAUGR4zsaevDWualh7PdYExkgUpyodP7pnH4QjSoohsAyIihWrnJWzew9sLvpE1oXP1KlRthFEK8lK0qKWCQfVvSKYNv0w8CkeUxn2FQ/ZN4SlcjLQcZbOleeTMMgzKj7sMsSxw64kiuEyNtyp0XwKjMdaCeahAEoJvQegp9pNIyjJ4zIXqcaiTRSBbBlHxeEyGUqcLDkq9G8Keo8QXMcU9sX2OY4W3sGAsF6oF7TI+bSj6vsztyHlFTFfG4DAbzNIFM3hn87WNTFoKu9r2sky0R5BZibrhUm+ht7oO/PMhGt1HV1Kxt60OjYkrYyWvBulwnN3T1wYj7CDmUi6EY2BiFtUl+puL1QqGsyVI1Afo2FCiCdzR24SmJWgFV4tMNME+0NuAmBoRAye4xzCWLQlu3uVBx3bwRbmjuB5G47UynCUmcnyqpCKta2gIX5/pEnvXZLC2OQnTcqFLCsZnizgwvHLx6DyG50o4dm4C3KG9HEFzPIJ7Nrcv+5wL/PEwGSNGuY2ATW3LpEgozNBifocqQsEUCDJRomAtDAkXnfiUxPR8mnEfPIMIefScIL/wTsR8Cc4nteklPXpsxYE/lIVkUvNsUIGiKoQYJSRLkLXLJ+dOFo7BtG1ongpDcdBxJo94VSYNW4TIa6PmXqjC6tBJRn+S+reEsRVEzXfZP1SlqHAPkfEyXGrQTcpgmTBUWuSOjE3DBp70NMHOjnJgvDCAnLmAdPjyybnziWtidWsUFy1jjSaKsyiaZWGMfITRmehEd7gbNwrrE5txdOow6pEUlc3VaArQo0QrIif/0Ieqc+xYd+PmwG1rq0c6HYI3FUyWmcuWkSvl0Zq61O0fXMhhKpsNsl/cQyIcR3NdPSbmipxY68KGCuUEyrm4IpksCLkX4bxE07u/CfJktFbE68hAYzyJeDIMK+eK9TI6UxCNty2XKt0srnRKYtNpJCMS0ZAOL625tRLouihPRwx3uBLq41E0XKd2vsbGOrZn43p+bOSQCAEt28czxydwb08312MxpLTlmfCvnR3BbN5ATOawXRl3retER31i9cYopMZEbiNEJ47sw9A0lCMqlFwVXFXEVlV8BkcoOBID1FskOQbuBen1cCrDKtTwEOQS6IqDkOTdZOelWGRsL7aQiMpaiap4sij9+74JjxFrG3BkBTxy+cH3Y+UpGG5gAPUqR/u0BdnjwhsSkiVBKXDRrFJ5nf6C/w6TeFEUV1wz9ZERydH3fPiTC5DidfBpBlxdHFJpAfG8i8ysjfm2ECq0IMwKcuUF9Cwhp80XeSY0vZZyM8tV9kcK46gIN4rEPBz0xNeh/grLvleCjcl10LU4yiYXhtbnCmKrKAcHOWUKOX2saWpEc/1ld+B1QSYWR08qgxMzWXGolAwHM6UStrznMZaT5yE1xcZzJTjUeC0BXhiwigX8+fdfBlepeZgOsove2hULw4nVDQYTru2jaJiiWVVSPGQNG7nK0jPxxAFNB7wvQdc1aOrVyw+zQJlGHK40fSYW0aGHgjr39cDta1vxQkszBicmwWQbQyN5nJ3K4p7Ny1daR6fz/PUzA3DgosqAxkQY9/R1IxNdPql+wZ2IhlKQiU3NFdi+AVmVsRChUyMQBnMUCSHiHInRNAzMs8WpwmTyguilfEg+9TeR4VrMCVEeRpwGS5+35F2RhScPK/C4gpwKJStlm/JFlkgW25xDSRFTO3rJa8yWZnmpUoLEqc/KRcjyUZ+zodguWGjRdSXjychYLVbvAvqPWBzvFU4N8mAMEeqdkgCtZMPPVuA1R4XKAFc4Eh4TgwfmGhksTYbnOsiZyySxF1NqootI5MmW/lzmqtPCGHKP+sR8dOvLu7fXio5kKyJKHAteCYrrw/Y95Mw8z6xgkAItfi7oIPWxOGLajRtA15xOsXXJen5MmRM7sGr7mCzSgfUuyBDR96mFqpClYVoINrMgGTmMmCHRxH3+wtkFdigYu7R6ULqCCQ6c6/kIMx+WTFqmKizHFm0iSz5PEIGDilo0rKMucSHr+0pxPndHsieRsIZI5PqFyd31UWzvbcW5ySlo8FAulXHg3DTu2bxu2ee9OTmKocmymBzNXRedrWn0tTas+PcuyBklwmnoUli0YxgKUJI9DLWF4SoSHCofesFIIsqTWKKXMNjWIvG8mJiTXAvwyLUisyIocQGfaLmEqHA1301GkSKAJIUhO46IOR2rKjwjui5s2gg1GrvkJUq+iZJnCK4MdcjbxOSueuAa0RLOd6fQdJL35rYEhXURi/wP+mBFMptMcJDLYpS/ylvwPSp8C78JzDIQNj1UJSDs+KLRs+wVl3yL9PYpVBPhGi3kJR5HhD7Dr8K1XXguqdBJNHAbNxKkvCDRJF1qh5FsWJw6s1YgZbJ3AnfxXfY93Aj9ofdC01SRvQzWFoO1ZM7IFS0S4gC0Y7C0MDxJXizQOGJ98sUvsVZ9kutY/ZdPBzN34DkU4jlwqehCiX/bRt7yMWct1dcnTr53tl14iXTDlYLSJtSSFdJW6ie8MiSiSbZ7Qz30ZAKmFwLTHLx0agrHzg0suZmnynn+9Klz4I4M5rmij/XOnnY0pVemGlzgGTWGM2gJt+J47oxIZhvcQ64pCo48TEqbWFxIEVBOSIQaQiZkMSUnjD0luR1wuwopFAZI6XHxtckgLXk1i5MlgsdSV3OQOOdWVXhfHsn4cw+yLyG++RZEUpe6iWSsCnAFQZC8Nt0nZQAJrkhikgEKqAi0DmSP8k8kAau/pwnrvaTNIKbyFUmEiSBpiaIJVozCLfmCFyV7DjTLQ5lzRGzqjJaF57YUXApv6TIYfacGR+/yj6NcHTiI3UCJQ5o55y7jRV0XiKSwLjrvQVNZhPrUCgt7MbQ5X7D4aUjOElmVsv+MwmXRdHr5kMQXPVsSJN8T1dNNzQ3obEwKqRiqnl4uc3llV08HLHXdU5GHjJ4qDjmd1pXvYVNddIlnBVVqWu8SPZ4o7NcAfl7KhUjIqgxFvv6z+LbVp3BrZwterJSheBamF8p4tX8K23ou7x2dHJvDmZEKwrIrtNBamhpw77oLpUJWZYySeoJ1xbr5YZxE1A1D8h0MtkQwEVfRVgEMmWQqXGgkCwsJDlWcaFqIEMUg94Mo2jIkyhuR8aHNTJKz4o69Q0S65CKIuBX8IDJMgQ6eZYK5lCui0k4IVV5GOZlAy7ZgIOPFoCsIM5o6QgaRqPYeTFWBblaDkdqckq1kDejvkYdngfFYIHsRxJPBJYheNTJo1OeyKHvikRyHDHdwAb6nQiKrQr1cCuW0NJQk8gBpcMDSyUjyHF3hPS62ySxhuKiaR7IllMeiRmLSO3Nv8MBHUrAkb1RQOiQ6Uq6AZ3R+Q0jX91S+7N8S1ycHhQxxBJJy6KWg8IB5gbFyWBV7Nrbhtx7afeOt5Qo4X+wRZFFOSofX+LnyRbrxolVSRGL0+iKdrGMPbmrlRwfOoezRfbXx2uAsPjKT5WsuEpnLVeb5oTNZWAUTLkmkOCHcv6EVne2rCx0vWUE9qbXC7bO5IipnIw0xvN2jQLWAqhpClRpKaTGQ1pFofKUVQsaH8kg0uJGMh9C4ADcrgF0VWiu0uRmdWPSg99wzCql84jDRAqJfeQ5sqwJmViA5LqrCIEkoSBzO2lb4ay+vrxJBBFEpvCjvasFmEeTiKlQaq8RUkUfyqX/HJW9JBUjcjUInqrD55HXZQfKcJD4orU09P4uLnjRoKBlHYaPqVMGrVVQ1CQvRECTLh0V0AJkjJpQiLw9qTSE9I3qvolp5nsp+8QfCGMJqWkydpaVqWh4KvoUbCcsxULVtuPRZOJbQF1rR06EigxgiLImvSqUqJFVv1DVmSxWeLTtBLyQdPZKEDLHz6R45wd81vOB7XYQ2jSfaD0jWNlv4KWicrwKCJiOY18G6IgHCawEXB/xi4Mrorlx9ZW45UDd/V2NC0FJIO35wNot9py5tESGvaf/AMOBZohKciMSwe+3KuaLzuGRHbE33ojXdLghmZoiOZRevba3HWEZCsupAdYmHQzvWFcYlSCPRZqFGS0f8v3eqU4xUCC34VjUwSiSfIPJMQTmJvlMEIhHDmoyBWYFiBup6FEZRSV/xGKrMQpKHkbjvESQTl39zqhJCLJyERXkj5qPMXOSiHHmauyZxUsMVgmQiJBTtJh4kuygMEPGQSKRMeC7k3gs3enHDMXmx+hU09cKtimbQouxjPA3YGrGrPaFE0BmtX/JGCyKEMLzU7xsk0C+HpJZgTZF6WBKHSXrBHkd/fhK5cumGbfSB4iSmKjOQ6D4IvXM6PFbo2heVSCqNUxDNMJ6rYCF79Q2VK6FsWjg3Py+o7ORbxhWO5nRQ1j8faQfbEmjKREVFV5ZVwTebL5SxUCn+zGcgiOrXOz3jlOe5Ds4ao30WZO/Od4xebzQm4uyeTWuhyGEQRdhzOPYNTWEmdyEJ8vBQFpMLZUDxwLwIbl/fgo7mpqs3RsloA+5u3S0SfSZtGcfFYFMa+zbFAZlKlh5s+h15QEJKlsEmliV11fqkBRTExe/cc4qpbQOyWQW3ioBVAnPK4gt2GcyuwLOLkCsL4E5J9PpQQpEU6agTmWRMqlYZ2e4ORD/4EYRSl68+yKqK5lg3HAkoknwtlfpbIrCEK2zBosoHGULih9BGosqcXQJcU3gpvkz1AhLOCkKzIOEcJNZJPE6RqBHRhm8YKOkuRpo1zMUose/Dc2ykow1oji59CggFRZ9yDEFif6lSct4r8bXJVqhamEy7YKEfn+1HySzgRuFU+RyqHhUKHHicxPNWlhAhUAsPHfSqJGG6bGDgGrq7V8JYdgGj5QJkkWgHEikFdZEgNxNeHFt+flhCR30KekQVEsIkkDVulFCoXD6kux7I+1X+8z7aac+6NrTUZ0TVmOL5tyeL6B+de+f3MwtZ/pPTk5CtgIMYUhO4f0MbWuKr7wOULrepH2zajbp4UkiCVlUVuYiEF7c3YaQuIUh7lHtxSe+Ek4AWiQOQfGhATqTqQuAhUX+Z6PEIXpcvEswcEx4ZJtMELBNwDEieBcml5/mwFKDCyRB6gmNDDYCgrvrPfgotm9Yv/cYYsDm+EbqShGoqKMrA8c44sslYUPkgYyBaF2wo5KEsJg+5bUK2y9A9AypNNaHWFFHRC04c0qxRiPVtlWB7JdhkzMoW3m6WYPC4UG+UPBk9Db2IaEvr2RCDnLYDhbaitL/E8k3JcdYcbUZaI8KSDMdnGC1M4tjcGdwIzBtFfmz6BDQvLNpyiFxK3oRgwy8DMWmKsjYUPtPzXBP7hvIolMs3xAN56dwYzGIJDp0JkoQ1DfUkw3rZx7YnE2irS4uyvqYootR+ajp/Iy4LuWKJl+aqqFpzq3vfizI81xsMNxaNmSh2r68DtCgkyUcxX8SPz05g3gj6HI8MjWFgdBpQHFhMxYYWHZvarqw15RJjlFLDrK91I7ujcTsUrgu3mGRAR1NR/NMDnViI6AEDm/mw4YrFSBKyjifDJgVHbgR6zGKpkvdEHKOABiBIfyIUol4oSjIzUY2gsjgZIZ84Lq4Qn4Wt0gAWD0NxA9/+eB/k+3aJ61twiVRwGfgOOiMNaIjUi9dTuY/pVBgv98YhOyQj6sGkCbUu9YeRkaPrpg42HzKFkEYBzKqQVgc8zxZ6zBJpCJtFcKMIySwLjWjicwxlZDyzrUEwcWk0k8N03NGwGcno0u0GZLxJiJ9Ij2LqwzKeB1EsNiTXilE+3JdhGVX8aOwAbgQOzp3AmbkRuFxDiabBwIe9KO+yHM7/WnyGPkdI8nFweA4nJ6//pj89NMUPnB4TgvIUP5PntrWzDQ1LnLoddWm2qa1FSL04UhV2wcbrpwaQLV5/Q/ny2Un83jdfxtf2jeHM3PLKDYTzhf3r6xWxxX/fQJOkSbh3YxviYZr8Q3xDjtcGJzE2E3jsz5+dhCcKVy5UVcdDfa3oaLoymZYlSyCf7X0UbckWsflohA2Vrl9en8K3drdgPC4j6vqiVYP4R4KOLqa0ApbnweSOSBhT5S3oV7fg8woYNyGTZ8JtSL4pvkiug7SSXdcFtcfSRvWIn2CamAhr+OoHNuDr20L489FncHTiFE8rl9cZTmpx1pxpxB0tt4gEteHS3AkNT99Sj6G6EJhDCt4cRcZRFdcTeG6ifkfeikexsAWX6AQUvlkVcEqk24ZgldNMKVgMBnPx3OY6jKd1WL4JxWVoruvAtsaNy95o6tIWXfHEVCfPbBnPoz4cZw+uuR26FoIliNgyjk/24zunn7/mzVSgLOQiJvJT/Ecnn8dCqSJCYjG3zqHP21xRdpbuGZWUJZ+JrnF61WLVwHffOIb50sqbcrXIlwr8O28NYi5L64eqlw6aEkns6Vm+9eTBTWtQH4oFzGjGsZ/4MSPzuJ7on5zg33zlTZybmMJXnz+GP/n2K9g/uLSawCI1K6iqrUJl/IpwA7yt94KGO/Q1NmNTZ6MoIHBFQTlfxYsnRnBwYIgfGykKm0hRUms6gt09l8rKroQl70dnuA1fWv8R+PFUMN+KjnUm4emdDXhqZzOyFJPLjujG9VwTDreEm+9JNMiRNHIA2w2aSMkrIE8pUA+keI68DxMWt2DBQ4XMmaMI1mxersCQbZyqU/G3D7Th5fVROC7DgYHj+D8P/jVenlhayCwdjrAPdO5Gk96McjiEkuRjLhnD1+5shSmpqCgVRA2qrhEniJJsFomGgMFePK1oIoMrKjHcC4wneXmUI8uRuqVs4/m1YfH+ZUrc04glCXiwfQ9608vP9iExFiI8UvKa5DcvzzJ6FztbdmBz+3ZYno2qL2PGqeArZ57EkdlT17TRk5LMcm6VZytF/szIQbw0dxKerIp5ax4pcNLMOEpJr6iLGygc0JYS3i73EXJdvHp2FD84MoS8cW0J96xX5Dkzx186PY2fvH1WGGX6hCjMvbdvDfo6l5cC2dicwq0bWyHxiGh0zlcdfPfocQxPT14XQzm1sMD/8eUzOD03B42mo1CKwbWRii5d0SLRQNEQvkgGvtZKPF/U3wpqDRSt3Li8WFKKsFQqzh7Y3A5ZiYgWIBqsse/0EL7z+jEslMqBU8EU3NXdju72K9fcWtIYqckwu6fzNvzG+kdEU6mlyKhKDuY0Cf+0uwv/48EeDKbDYK4itnPF98T8K0b5FQpHRGjCYHpUeqWyqywaCS3XA0WZVSbDRAiOHxY5B1upoiKVIdk+jjdF8N8f7cKzW+vE3yXRfos7qDoeYqIrbmnc3tbHHlp3F2I2icRxVCSG5zYn8M3d9SIUKWg2HN9A1XdQ5T4s3xXGxiNPjVtQqBpnV4VXR6V4wwn6fih5faBFwRN3NGIiTp6VJsYb9TRvwMfW3LHijRbsKUEbCCQfVtrr9dEU+3TnvWLah2a58CQfZ+ZG8RcnnsTJhdFrWsay4eL5udfxlVM/QMW0UBGDHxk8mzw/qqipK+otBW0z4lMOjLmkiM/OcmR8/fUzePnNU8gZS0tprISw7eHQuUl8ed8RuEVDnMxUiuxpb8WHdzSv+Px0Is4euWUtorEouC7B1mwcOjGGJw4NYTa/OtnapTBfyvMnDg/g5TNnxMh2wUuTGT65vRUbm5behPwi5dNr92XYhf9eoQJ6PbC7qwnb2qKCx+WpHqZyBezrnwLskjicG6Jh7Nl4de1Ly3qKkq7jsxs/hI913yUIfqpBw+UUuJKDZzfF8H9/eCNe7G4UG0VVLKi2irwkoSjbguvjCm/JWZTapE3oiHYDR3ZFpze1V7guVds8WH4ZhivhK3t68N8+3oejLQnotgTfVUVVL55K4nd2fB4b0yt3hn+u9wPY2rwFXtkCddaR6/gPexvxz7e1wVQA1XaEZ1ai6wRHlTEUGEfF80F1kaIkwbBUlEQMR4bKwmtdHH/2wV6caM5Ad3TRHBuNJfHb6x5Fb/0KEw8Xe+CEx+gR5+h8W8Dy2Nu8HZ/e+BDskALZJY6ShFfO7MOfHv5HnJwbvqqVV6ga/PtDr+HPXvs65vM5eJ6FuBQSYnkOFc1FKw+duMtfn9CqJFqGRCc8NWnGkUjHBOWjtDCNv3ihH8+8NYFS+eoM0gsn5/A3P+rH7HgWhkbVTRvxRAy/vncj1tStPACBsLMtg4d3rodshRD1XTiehycOHsPXDg1gNn91pf7p3Dz/5v5BfOvVkzAqrhgbRdNy7uprwb23XDiL7OcRTXUZdve6enikkupS6kOCY1H7liTaxjZ3NmBd6+o+n4uxLNU2JWssFc3gd3d+mpPG0RNvPysqUxSbmEzBWx3A6U+04u6hOB48lcXewRKitNGZA0dIkYTAXRJmc8GVgJcU9NQHPT1hkpnlwEhCwevrWvH8pgxOtMVRUlSoPkOViIqeJSQ0/uCWT+BjvXeu6jBpTTey39v2Sf5H1TwGp4fBdQVRE/jq3mYcbeH49QMFbJjJI2wbKKsMCVMVUiIlXcwSheyYIolLYdxoNIRnN3XiO7cnMRHWodO4Jpmo/xJ+ve9j2Nu5dVU3mvhFpHdDtTpHXhQkWwGpSIx9fsP9fDQ/he+Nvi56ooh39dy5wxjNl/Hbmx7i93bvRH1kdYnCo+On+bdGXsUTZ14N5FhlCS3xetxftw2PTx4Qs7IU1xBTW4jftByC9h2iQhDXzENC5/jM7h34h/1vIJ8zUSjN4C9+fABnx7rx6Ts38L7WlRUWy9YCH5228OSbI/jxiWOYK5lIqz58JwxJt/GFPZvx8K0XDiFYDrKu4LHdGzA1U8Br/eegqjQgsYpvvngYs3Nj+NU9u3lfdyCPW7AtntSWnnuWNyr81FgW33rtJA4MjIncmoQQyjCxqaMBX9qzHfXJ66/l9H7E1t416Dg2jvEpk5IPQoHApXmKIeCevjVXrWm1Kt5/e7yR/e7WX+JSSMK/nHoBc84CdJOE7XXRsvBMbyte72xC79wkbh0pYceYg4aKgwyRJCkvs0giJLVIalotaTJKehgTGR2H2jS81ZbE2y0Z+IoCJpEmko2458FiIWxs7sMf7vgU9sSX7xS+GJvrevDH6z+B/8P7HsZnB5APMUT9MA6sXYPBBhd3DOaxd2QeHTkD9UpJzPkSbbCeDq5xjCd1HG+tx0/60jjRGofiKpAVA9yhlpgoPr7tg/j02ruR0lcn2CWaiamSRt4R5Z9WeS6HIwn8hx2fQoX5ePbcQSGUThSKE7Nn8V/Lk7h18ggead/Fd9T1IBOOI8xkpBdnZM2aBV6wqhjMTePA6En8ZOoATmfPUaefGDwQSdThd3Z9Gikk8PjE6+COBoO0sBm18Kzwfhabm0Unj8idRbB9rYJfC+3E379wEPmFBUhuBT98YxAHJmZwW28rv3NNI7obo4hoEdFAKcT8fQrjLQzmith/bhZvnh3HyNQcTDiolzxhiPSEi0d234KP7FqPK0FMTTIWzfMv3b0WE56D/sFhEQtQbuu5t4t4c/YVfHh9K7+npxWNjcR6d3k6/O7UitligZdJqG06j5fO5vHawAhmyyXIngVdJuVOGeta2/C799+GrWuWVjD8ecPW9nZ238YW/o25WVFBD6uUQAV60424vfPyel6rwaqbkDozjewPt32G90Y68Q8nnsSwMwmPGI5CnraAiqrgjbZ2HG7zUG9YiJkOGgsuGsuBMJoY/Eiz4kMMkwkVlUgIFS2E+bAMS/Eh+xb0xROZGNn5WAKf6b4H/7bvEexoCsKgnGXxzApTO88jHQ6zD227G15Y4//j0BM4tNCPolSCokmY9X184/YYntqqY+2cgojhIuyYiDgcVU1GNqGJayyEFLiqi6jnoKwCOnlQMU2ETr+96eOIRJefk/VekKMhwiBw4fWt1hjRCOjGulb8l22PIcplfGfoZXBPQchTUSrbeO7U69g3eATNiXr0JtvQEEnT47jLHRS9MsZLczhZmEDOMBF1GKIsjrJqojeTwr/f8hi+uP6D7Af9h4RSQMxPiNCUeDwrZTSCR9BQPg8SKXBSO4+UxEe2haC46/C3r05gfn4OCcVEdszCj8bm8FxER0O6CfVxBWFSWaVUnEuDBS1MLCwgb1YRZRIU1YNOfWVmBKwhis/dthafvG0LiYdd8YanMT19vSn8oa7wv/6hgSOjBXDZhO6XUBgv4J+mFvCvx0bRWRdCW109dPLfSTeL+chVShiarwhJEtekmXIOdIkqyzRRJYKtnXX43Xs3YOfmTpbzDZ6RaOreLwbuWNuBpw+dQ96wA3K0Sl5RNzoar15364qUneojcfalbQ9ha30X/6ezr+LH/a9j3sxB8UMwZAkqJXo9F5MhBVJIw1AiIOh7oh9ncQIt6VgLHhGFLj50mwvJTtlTBddIV0K4tb4XX9j4Aezt6ENn6l1x8dUaovfikd47WDqR5H/15g/wyvBRVA0Dti9DrUiiwnaqkXIlpL9EI4qImEmhIzE2qP3fg+qosGkwpcTQXN+Mf3/Lx/DRztsRVsOXDMFbDqRg6dEEDeIPe6oQd1sNkotUhnRTF/5ozxd4Y7oB/3zqFUzNz8Gh5D418LoOBmcnMTgzLUTwhOQJNfjSbpcZfMdFRKKwmcMJybincw9+b8MHsbU1mHVOJH/ZS4iKGlVOxdj2VfRF+ZIKmcYbUW+fawg1zYSeZA9v6+PpaBT/tE/BqckCoAUDFEgVc2J6HKMzoltZzBELJumRcXahEf9LjqIiVBtkbOhM4TP39OH27m7Ux69NnmRnRzf7z4+G+NcOn8Trbw6CZjpYmgcdFnJ5C8UscFyZDqbpEjt/0djagrpAHjtVYGUojodkRMGdt/Tgc7f3YeNi1Wg1hkhM8hDVNBmcWqWWaPRdLYIeb0rckQoFdVDe+Gbl86gy0mYnwq8JX4qgLqnjjq6rnXIS4Kpk5u5oXc82ptv4J9fsxBNn9+Hg5AkMV7Nilhi57WKqB32QYrDcYk+X+JCp9CCLxlLJCgT9iWEMWUF9PIEtjZ34UNcOPLruDrRcR5GoPU0b2Zq9DfypxoN4cvAAzs6cQ8EuosJoOpsvPJWQT93gxMwOWjaYRPPqXUQVBa3RRtzRtQW/tfF+7GjYwAqex5Pylek/KDTbXdEX5SdCYvzQlaI13sB+Z+vH+W3Nm/D1Ey/g8MhpTBl5+CpJf/gi/GOuBY1yU1Sh9D3BByHdO10NY1u6Ex/u3o5f6bkHrXVNLOsGY3UEA0vRYWu0uEjFUxbTQpaTUXLIi9Wor8aDKjNIWjBaihCLZdiD2zPoaVnLn3zjJF48cRpT1Soch/rYJCiuK8bg0Ew8h3hmtAx9mrARgUZtPZmkmMX+8W3rsL796ufDXYwN7a3sP6WS/OX2dvzozdMYmJ6HQTMXSP9bcoX4HrUJCZWuxfAzRA3TkidE+yKajC09afzSri24bW0XkokrOxxlWUNElUiiCrYfvqzU7ZVA0T2ENNFbILh1yo1pTbsE2WqFHzszhmLZQ4jIy76N27rbsb2n65reEFtW9GwVmDMrfDY7i0NzQzgy048zs4MY9Bcwa5ehFMlqUsJWqNiK0mOI1AupMheLokdNoTNF8+J7sKe5F5vq16Axtryk5bViMjfPX507gf2zpzFemMdIdhqT5bxoQYHCoMkqYrKGjlgavdEW7GrahJ0tvViTbED9Yi7mavDK4DF+sjhDwiBiOuyutj5srW+/6tfLlgv8SPYs9s2ew7nsBM7Oj2OmWkCVVDG5L9og4qEo1kbrsS3Tjp2tm7CroQfrGy5NJJ+dHec/mXkbIWLAMwl1mQY8WLcJmejSp/1cpcgPnJmFYVZgSCYl23FvTxeS0QtDKaOY58NzVRyfzuHY+CSGZouYKZdQNC0h6xtiMqKajIZUGC1N9bhtTSv62uqxqfX6jTu6HGbmc/zsdA5Hx7I4O1vEXKGMmeyC0JwiLSQiqeqqgngshJ7GOLobE+hrbMAtazuQSVx5uEg4OjbNz0zMQ6UKrRxFTyaCW3uvfg28MjLMR8fz4vCwJQWbW+K4pevqX2+1ODkxz//rt36IickKmOwiFIniTz5zL/ZuWPezNUbvRc4o87xZRskuY76Yx5CZR5mUH8+PtQEXi69Oj2NNohFpPYaEFkZr/KdfhaDqiOEaKNomSrYB06WMTqCFE4GMuBZFMhRGXfzGGsfrgelKjhcqBRRtAxVy/al5VVYRVnWkQ1GklYiozN2ov29YBR4Orazkt1Aq86JlomS5cEiZgUJiX0FY1aCHJESjwkP+qd/vmUKJV60iSlXiwQVTchWSLpaBiBZCOE7TLa5uAu3PI77+0nH+3595CbobjBjbvX0z/sujt6I5dW336OrVwC+DTDjGMuFFSdjVKwf8TJAKR1kKUdy4eRY/PTRHM6w5uvoqBg0MvNo5XRcj79rcl3SYtsnT2vKvmY7HWDp+qWTwzxrBCKPVFyN+kTFbyvPXzg5CtWXQeEHKN97d23TNhui6G6Mabg5cL0NESClazWP4BcJbA7M4OTkPpjBIdgntXeuwpfPaEtfn8dNLv9dQQw03NSqVAn/h7CxKVRsKJfVDcdzR3YQNLQFx9FpRM0Y11FDDqnA2m8XhkSnRgUAV52Qiibt6V+4TXC1qxqiGGmpYFV49NYlqbj4YjMAUbG+vw9rmq2dcX4yaMaqhhhpWxMB8lr/YvwATBgwZiIWiuL+vGZnrWGWsJbBrqKGGFXF4eAoTY3kxjtt3JfS2prG96/qWzGvGqIYaalgW2UqVP3d0AL5XEXLRIabink1tSIWvz0Tc86iFaTXUUMOyODQ2h6GpGdg6qaCqaG2L4I61rQjr15esXPOMaqihhmWRkDl+ec92ODRG25Kwtrsevc3Xp5x/w9pBaqihhhquFrUwrYYaanhfoGaMaqihhvcFasaohhpqeF+gZoxqqKEGvB/w/wN2eGxCoe1qJAAAAABJRU5ErkJggg==";
+  document.getElementById('brand-logo').src = "data:image/png;base64," + LOGO_B64;
+  document.querySelectorAll('.doc-logo').forEach(function(img){
+    img.src = document.getElementById('brand-logo').src;
+  });
+
+  /* ---------- Theme toggle ---------- */
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t){
+    if(t === 'dark'){ root.setAttribute('data-theme','dark'); themeBtn.textContent = 'Light mode'; }
+    else { root.removeAttribute('data-theme'); themeBtn.textContent = 'Dark mode'; }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem('oos-fieldguide-theme'); }catch(e){}
+  applyTheme(saved === 'dark' ? 'dark' : 'light');
+  themeBtn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try{ localStorage.setItem('oos-fieldguide-theme', next); }catch(e){}
+  });
+
+  /* ---------- Search ---------- */
+  var searchBox = document.getElementById('searchBox');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main.content > section.topic-section'));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.sidenav a'));
+  searchBox.addEventListener('input', function(){
+    var q = searchBox.value.trim().toLowerCase();
+    if(!q){
+      sections.forEach(function(s){ s.classList.remove('search-hidden'); });
+      navLinks.forEach(function(a){ a.classList.remove('nav-dim'); });
+      return;
+    }
+    sections.forEach(function(s){
+      var hit = s.innerText.toLowerCase().indexOf(q) !== -1;
+      s.classList.toggle('search-hidden', !hit);
+    });
+    navLinks.forEach(function(a){
+      var id = (a.getAttribute('href')||'').replace('#','');
+      var target = document.getElementById(id);
+      var visible = target ? !target.classList.contains('search-hidden') : true;
+      a.classList.toggle('nav-dim', !visible);
+    });
+  });
+
+  /* ---------- Active nav highlight ---------- */
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var link = document.querySelector('nav.sidenav a[href="#' + e.target.id + '"]');
+      if(!link) return;
+      if(e.isIntersecting) {
+        navLinks.forEach(function(a){ a.classList.remove('active'); });
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(function(s){ observer.observe(s); });
+
+  /* ---------- Doc export / print / csv ---------- */
+  var DOC_TITLES = {
+    tdd: 'OOS Technical Design Document',
+    modules: 'OOS Module & Component Design',
+    standards: 'OOS Coding Standards & Naming Conventions',
+    checklist: 'OOS Code Review Checklist',
+    testplan: 'OOS Unit & Integration Test Plan',
+    branching: 'OOS Branching & Pull-Request Workflow',
+    dod: 'OOS Definition of Done'
+  };
+  var DOC_FILES = {
+    tdd: 'OOS-TDD-001_Technical-Design-Document',
+    modules: 'OOS-MOD-001_Module-Component-Design',
+    standards: 'OOS-STD-001_Coding-Standards',
+    checklist: 'OOS-CRC-001_Code-Review-Checklist',
+    testplan: 'OOS-TST-001_Test-Plan',
+    branching: 'OOS-BR-001_Branching-PR-Workflow',
+    dod: 'OOS-DOD-001_Definition-of-Done'
+  };
+  var ORIGINAL_TITLE = document.title;
+
+  window.downloadDocHTML = function(id){
+    var styleText = document.getElementById('site-style').textContent;
+    var bodyHTML = document.getElementById('docbody-' + id).innerHTML;
+    var html = '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+      + '<meta name="viewport" content="width=device-width, initial-scale=1">'
+      + '<title>' + DOC_TITLES[id] + '</title>'
+      + '<style>' + styleText + ' body{padding:24px;background:var(--bg);} .doc-body{max-width:1000px;margin:0 auto;}</style>'
+      + '</head><body>' + bodyHTML + '</body></html>';
+    var blob = new Blob([html], {type: 'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = DOC_FILES[id] + '.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  };
+
+  window.printDoc = function(id){
+    var root = document.getElementById('print-root');
+    root.innerHTML = document.getElementById('docbody-' + id).innerHTML;
+    document.title = DOC_TITLES[id];
+    window.print();
+  };
+  window.addEventListener('afterprint', function(){
+    document.getElementById('print-root').innerHTML = '';
+    document.title = ORIGINAL_TITLE;
+  });
+
+  function csvEscape(v){
+    v = String(v == null ? '' : v);
+    if(/[",\n]/.test(v)) v = '"' + v.replace(/"/g,'""') + '"';
+    return v;
+  }
+  function tableToCSV(selectors){
+    var rows = [];
+    selectors.forEach(function(sel){
+      var table = document.querySelector(sel);
+      if(!table) return;
+      Array.prototype.forEach.call(table.querySelectorAll('tr'), function(tr){
+        var cells = Array.prototype.map.call(tr.querySelectorAll('th,td'), function(c){ return csvEscape(c.innerText.trim()); });
+        rows.push(cells.join(','));
+      });
+    });
+    return rows.join('\r\n');
+  }
+  var CSV_TABLES = {
+    checklist: ['#checklistTable'],
+    testplan: ['#testplanTableUnit', '#testplanTableInt', '#testplanTableE2E'],
+    dod: ['#dodTable']
+  };
+  window.downloadCSV = function(id){
+    var csv = tableToCSV(CSV_TABLES[id] || []);
+    var blob = new Blob([csv], {type: 'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = DOC_FILES[id] + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  };
+
+  /* ---------- Ask the Guide (offline Q&A) ---------- */
+  var QA = [
+    {q:"What is DRY?", kw:["dry","repeat","duplicate","duplication"], a:"Don't Repeat Yourself: if the same non-trivial logic (5+ lines) appears in three places, lift it into one shared function. Three is the threshold — two occurrences is sometimes just a coincidence.", target:"dry-solid"},
+    {q:"What does SOLID stand for?", kw:["solid","single responsibility","open closed","liskov","interface segregation","dependency inversion"], a:"Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion — five lightweight rules for designing modules that change independently. See the guide's SOLID table for a one-line definition of each.", target:"dry-solid"},
+    {q:"What is the testing pyramid?", kw:["testing pyramid","pyramid","unit integration e2e","test mix"], a:"A distribution target for the test suite: ~70% unit tests (fast, precise), ~20% integration tests, ~10% end-to-end tests. A suite with more E2E than unit tests is a process violation — E2E is slow and flaky.", target:"testing-pyramid"},
+    {q:"What test types are required for a feature?", kw:["test types","required tests","happy path","failure path","boundary","idempotency case"], a:"Every feature ships with four case types: happy path, failure path, boundary cases, and an idempotency check. A feature with only happy-path coverage is incomplete.", target:"doc-testplan"},
+    {q:"What is technical debt?", kw:["technical debt","tech debt","shortcut"], a:"A deliberate shortcut with interest that accrues until repaid. It's acceptable if it's written down and someone owns paying it back — undocumented debt is a landmine for the next person who touches that code.", target:"tech-debt"},
+    {q:"What is separation of concerns?", kw:["separation of concerns","modularity","single responsibility module"], a:"Each module does one thing, nameable in a sentence without the word 'and.' In OOS, six modules exist because six distinct responsibilities exist — none of them know how to do another's job, only how to call its contract.", target:"modularity"},
+    {q:"What is an interface contract?", kw:["interface","contract","api signature"], a:"A promise stated so the compiler and reviewer can both check it: given these typed inputs, you get this typed output, or one of these named errors — nothing silent. It's what lets an architect approve code by reading its signature, not its internals.", target:"contracts"},
+    {q:"What is the branch naming convention?", kw:["branch naming","branch name","feature branch","fix branch"], a:"feature/OOS-<ticket>-<slug> for new capability, fix/OOS-<ticket>-<slug> for bug fixes, chore/<slug> for tooling and cleanup. Example: feature/OOS-108-allergy-hold-routing.", target:"doc-branching"},
+    {q:"What is the PR size limit?", kw:["pr size","pull request size","diff size"], a:"Soft cap of ~400 changed lines. Larger PRs require a split rationale in the description. Merges are squash-only, and branches open more than 5 days should be rebased or closed.", target:"doc-branching"},
+    {q:"What is idempotency and why does it matter?", kw:["idempotency","idempotent","retry safe","duplicate submission"], a:"Running the same operation twice with the same input must produce the same end state, with no duplicate side effects. It matters because retries and double-submissions are normal, not exceptional — a script that 'works once but breaks on the second run' is broken, not fragile.", target:"error-handling"},
+    {q:"What happens if a kitchen station goes offline?", kw:["station offline","kitchen station offline","station down","backup station"], a:"The Station Health Monitor flags the station OFFLINE after 3 missed heartbeats (30s). The Routing Rule Engine then reroutes new tickets to the location's backup station, and already-queued tickets replay once the station reconnects.", target:"doc-tdd"},
+    {q:"What modules make up the Order Orchestration Service?", kw:["modules","components","order ingest gateway","routing rule engine","ticket dispatcher","kds sync gateway","notification service","station health monitor"], a:"Six modules: Order Ingest Gateway, Routing Rule Engine, Ticket Dispatcher, KDS Sync Gateway, Notification Service, and Station Health Monitor. Each has one responsibility and a typed contract — see Document 2.", target:"doc-modules"},
+    {q:"What is the RoutingRuleEngine's contract?", kw:["routingruleengine","routeitems","routing engine contract"], a:"routeItems(order: Order, rules: RoutingRule[]): StationAssignment[] — throws ValidationError on an empty order, NoStationAvailableError when no rule matches, and RuleConflictError when two rules tie in priority. It is a pure function with no I/O.", target:"doc-modules"},
+    {q:"What are the naming conventions for TypeScript code?", kw:["naming convention","camelcase","pascalcase","file naming","typescript style"], a:"camelCase for variables/functions, PascalCase for classes/types/interfaces, UPPER_SNAKE_CASE for constants, kebab-case for filenames, error classes suffixed 'Error', Zod schemas suffixed 'Schema'.", target:"doc-standards"},
+    {q:"What is on the code review checklist?", kw:["code review checklist","review checklist","pr checklist"], a:"15 items across Correctness, Contracts & Types, Error Handling, Idempotency, Tests, Security, Readability, Modularity, Observability, and Performance. Any open Blocker item stops the merge.", target:"doc-checklist"},
+    {q:"What is the Definition of Done?", kw:["definition of done","dod","shippable bar"], a:"10 objective criteria — design traceability, passing types, passing tests across all four case types, a completed review checklist, no secrets, idempotency, observability, a documented failure path, updated docs, and a completed sign-off block.", target:"doc-dod"},
+    {q:"What are the current engineering KPIs?", kw:["kpi","engineering kpi","metrics"], a:"Test coverage 84% (up 11pts/quarter), PR cycle time 6.2h average (down from 9.8h), defect escape rate 1.8% (down from 4.1%), and deployment frequency 3.4/day (up from 1.1/day).", target:"kpis"},
+    {q:"What is the current test coverage?", kw:["test coverage","coverage percent"], a:"84%, trending up roughly 11 percentage points per quarter.", target:"kpis"},
+    {q:"What is a silent catch and why is it forbidden?", kw:["silent catch","empty catch","swallow exception"], a:"An empty catch block — try { ... } catch (e) {} — that makes an error disappear instead of handling it. It is the most common AI-generated defect and is an automatic Blocker on code review, no exceptions.", target:"error-handling"},
+    {q:"What is the difference between unit, integration, and end-to-end tests?", kw:["unit vs integration","difference between tests","e2e vs unit"], a:"Unit tests check one pure function in isolation, in milliseconds. Integration tests check two or more real modules working together (e.g. gateway to database). End-to-end tests drive the full user journey through a real or staging environment. Cost and confidence both rise as you move up the pyramid — so most tests should be unit tests.", target:"testing-pyramid"},
+    {q:"Who approves this design?", kw:["who approves","sign off","approval","vp engineering"], a:"Each document carries a Prepared / Reviewed / Approved sign-off block. For OOS: prepared by the AI Solution Architect learner, reviewed by the OOS Platform Engineering Lead, approved by the VP Engineering at Verde Table Co.", target:"doc-tdd"},
+    {q:"What database does the Order Orchestration Service use?", kw:["database","postgres","data store"], a:"Postgres, holding the Routing Rules table and the Orders & Tickets tables. See the entity-relationship diagram in Document 1.", target:"doc-tdd"},
+    {q:"How does the system handle a duplicate order submission?", kw:["duplicate order","double submit","double tap"], a:"The Order Ingest Gateway requires an Idempotency-Key header; a repeated key returns the cached IngestResult instead of creating a second order. The Ticket Dispatcher enforces the same guarantee at the ticket level with a dispatch key.", target:"doc-modules"},
+    {q:"What is the architect's review lens for AI-generated code?", kw:["review lens","architect review","approve ai code"], a:"Seven questions: does it match the chosen design, are inputs/outputs/errors typed, is there a failure-path test, does every catch do something, can it run twice safely, would a new engineer understand it in one sitting, and does it cross a governance boundary that needs escalation.", target:"review-lens"},
+    {q:"What is clean code?", kw:["clean code","good naming","readable code"], a:"Code whose names carry the burden of explanation, so a reader doesn't have to open a function body to know what it does. A misleading name is treated as a bug, not a style nit.", target:"clean-code"},
+    {q:"What is the good vs bad code example about?", kw:["good vs bad","bad code example","good code example"], a:"A side-by-side comparison of routeItems implemented two ways: an untyped version with a silent catch and a hardcoded default station (reject), versus a typed version with named errors and no silent fallback (approve). See the Good vs. Bad Code section.", target:"good-bad-code"}
+  ];
+
+  function tokenize(s){ return s.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean); }
+
+  function bestMatch(query){
+    var qTokens = tokenize(query);
+    var qLower = query.toLowerCase();
+    var best = null, bestScore = 0;
+    QA.forEach(function(entry){
+      var score = 0;
+      entry.kw.forEach(function(k){ if(qLower.indexOf(k) !== -1) score += k.split(' ').length; });
+      qTokens.forEach(function(t){ if(entry.q.toLowerCase().indexOf(t) !== -1 && t.length > 2) score += 0.3; });
+      if(score > bestScore){ bestScore = score; best = entry; }
+    });
+    return bestScore > 0 ? best : null;
+  }
+
+  function sectionTitle(id){
+    var el = document.getElementById(id);
+    if(!el) return id;
+    var h = el.querySelector('h2, h1');
+    return h ? h.textContent.trim() : id;
+  }
+
+  window.askGuide = function(inputId, answerId){
+    var input = document.getElementById(inputId);
+    var q = input.value.trim();
+    var answerBox = document.getElementById(answerId);
+    if(!q){ return; }
+    var match = bestMatch(q);
+    if(match){
+      answerBox.innerHTML =
+        '<div class="ask-answer">' +
+          '<div class="ask-q">You asked</div>' +
+          '<div style="font-size:13.5px;font-weight:600;margin-bottom:8px;">' + q.replace(/</g,'&lt;') + '</div>' +
+          '<div class="ask-a">' + match.a + '</div>' +
+          '<a class="ask-jump" href="#' + match.target + '" onclick="' + (answerId==='askAnswerFloat' ? "toggleAskFloat();" : "") + '">Jump to: ' + sectionTitle(match.target) + ' →</a>' +
+        '</div>';
+    } else {
+      answerBox.innerHTML =
+        '<div class="ask-answer miss">' +
+          '<div class="ask-q">You asked</div>' +
+          '<div style="font-size:13.5px;font-weight:600;margin-bottom:8px;">' + q.replace(/</g,'&lt;') + '</div>' +
+          '<div class="ask-a">No close match in the guide yet. Try the search box, or one of the suggested questions below.</div>' +
+        '</div>';
+    }
+  };
+
+  var SUGGESTED = ["What is DRY?","What is the branch naming convention?","What is idempotency?","What is the testing pyramid?","What is the Definition of Done?","What happens if a kitchen station goes offline?"];
+  function buildChips(containerId, inputId, answerId){
+    var box = document.getElementById(containerId);
+    SUGGESTED.forEach(function(s){
+      var chip = document.createElement('span');
+      chip.className = 'ask-chip'; chip.textContent = s;
+      chip.onclick = function(){ document.getElementById(inputId).value = s; askGuide(inputId, answerId); };
+      box.appendChild(chip);
+    });
+  }
+  buildChips('askChipsMain','askInputMain','askAnswerMain');
+  buildChips('askChipsFloat','askInputFloat','askAnswerFloat');
+
+  ['askInputMain','askInputFloat'].forEach(function(id){
+    document.getElementById(id).addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ askGuide(id, id === 'askInputMain' ? 'askAnswerMain' : 'askAnswerFloat'); }
+    });
+  });
+
+  window.toggleAskFloat = function(){
+    document.getElementById('askFloatPanel').classList.toggle('open');
+  };
+})();
+</script>
+</body>
+</html>
