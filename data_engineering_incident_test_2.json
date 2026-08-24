@@ -1,0 +1,118 @@
+{
+  "incident_id": "INC-2026-002",
+  "incident_title": "Nightly Inventory Reconciliation Pipeline Failure",
+  "reported_at": "2026-08-21T03:45:00",
+  "severity": "Critical",
+  "incident_description": "The nightly_inventory_reconciliation pipeline failed during the gold-layer reconciliation join. An executor ran out of memory mid-join, and the job aborted after only partially writing its output.",
+  "pipeline_metadata": {
+    "pipeline_name": "nightly_inventory_reconciliation",
+    "environment": "production",
+    "schedule": "Daily at 03:00",
+    "expected_duration_minutes": 45,
+    "failed_stage": "gold_inventory_reconciliation",
+    "stages": [
+      {
+        "name": "extract_warehouse_snapshots",
+        "layer": "source_to_raw",
+        "status": "SUCCESS"
+      },
+      {
+        "name": "bronze_inventory_events",
+        "layer": "raw_to_bronze",
+        "status": "SUCCESS"
+      },
+      {
+        "name": "silver_inventory_events",
+        "layer": "bronze_to_silver",
+        "status": "SUCCESS"
+      },
+      {
+        "name": "gold_inventory_reconciliation",
+        "layer": "silver_to_gold",
+        "status": "FAILED"
+      }
+    ],
+    "upstream_dependencies": [
+      "warehouse_management_system",
+      "supplier_intransit_events"
+    ],
+    "downstream_dependencies": [
+      "inventory_position_report",
+      "replenishment_planner"
+    ]
+  },
+  "dependency_graph": {
+    "edges": [
+      {"upstream": "gold_inventory_reconciliation", "downstream": "inventory_position_report"},
+      {"upstream": "gold_inventory_reconciliation", "downstream": "replenishment_planner"},
+      {"upstream": "inventory_position_report", "downstream": "supplier_scorecard_dashboard"},
+      {"upstream": "replenishment_planner", "downstream": "regional_stock_alerts"},
+      {"upstream": "regional_stock_alerts", "downstream": "store_replenishment_queue"}
+    ],
+    "criticality_tags": {
+      "replenishment_planner": "critical",
+      "regional_stock_alerts": "critical",
+      "supplier_scorecard_dashboard": "high"
+    }
+  },
+  "execution_logs": [
+    "2026-08-21 03:00:02 INFO Pipeline nightly_inventory_reconciliation started",
+    "2026-08-21 03:00:10 INFO Extracting warehouse snapshots from warehouse_management_system",
+    "2026-08-21 03:04:55 INFO 892340 source records extracted",
+    "2026-08-21 03:05:40 INFO Bronze ingestion completed successfully",
+    "2026-08-21 03:07:15 INFO Silver transformation completed successfully, 892340 rows",
+    "2026-08-21 03:08:02 INFO Starting gold_inventory_reconciliation join across 6 warehouse regions",
+    "2026-08-21 03:31:47 WARN Executor 14 memory usage at 94% of container limit",
+    "2026-08-21 03:33:12 ERROR ExecutorLostFailure: Executor 17 exited caused by out of memory (OOM). Container killed by YARN for exceeding memory limits. 18.2 GB of 18 GB physical memory used",
+    "2026-08-21 03:33:15 ERROR Job aborted due to stage failure: task 442 in stage 9.0 failed 4 times, most recent failure: ExecutorLostFailure",
+    "2026-08-21 03:33:16 WARN Partial write detected: 3 of 8 output partitions committed before failure",
+    "2026-08-21 03:33:18 INFO Pipeline marked FAILED",
+    "2026-08-21 03:33:19 INFO Downstream jobs were not started"
+  ],
+  "sql_info": {
+    "transformation_name": "gold_inventory_reconciliation",
+    "query": "SELECT w.region, w.sku, w.on_hand_qty, s.in_transit_qty, s.supplier_id FROM silver_inventory_events w JOIN supplier_intransit_events s ON w.sku = s.sku AND w.region = s.region"
+  },
+  "data_quality_checks": {
+    "source_row_count": 892340,
+    "bronze_row_count": 892340,
+    "silver_row_count": 892340,
+    "gold_row_count_expected": 890000,
+    "gold_row_count_actual": 334892,
+    "null_supplier_id_count": 20763,
+    "duplicate_sku_region_count": 0,
+    "unexpected_columns": [],
+    "missing_expected_columns": [],
+    "last_successful_gold_refresh": "2026-08-19T00:45:00",
+    "freshness_hours_actual": 51,
+    "freshness_hours_expected": 24
+  },
+  "recent_changes": [
+    {
+      "timestamp": "2026-08-18T09:00:00",
+      "system": "warehouse_management_system",
+      "change": "EMEA region (3 new warehouses) onboarded; daily inventory event volume increased approximately 40%."
+    },
+    {
+      "timestamp": "2026-08-20T14:00:00",
+      "system": "nightly_inventory_reconciliation",
+      "change": "No-code pipeline configuration update: join strategy for supplier_intransit_events changed from broadcast to standard shuffle join."
+    }
+  ],
+  "business_context": {
+    "sla": "inventory_position_report must refresh by 05:00 to support the 06:00 regional replenishment planning run",
+    "affected_consumers": [
+      "Supply Chain Operations",
+      "Procurement",
+      "Regional Warehouse Managers"
+    ],
+    "business_impact": "Replenishment planning across all 6 regions will run on stale or incomplete inventory data, risking incorrect reorder quantities, especially in the newly onboarded EMEA region."
+  },
+  "expected_root_cause_for_testing": {
+    "category": "Resource Exhaustion",
+    "root_cause": "The gold_inventory_reconciliation join ran out of executor memory: a recent config change disabled the broadcast join for supplier_intransit_events, forcing a full shuffle join right as EMEA onboarding increased data volume by roughly 40%. The job aborted mid-write with only 3 of 8 output partitions committed.",
+    "recommended_fix": "Re-enable (or explicitly configure) the broadcast join for supplier_intransit_events, or increase executor memory to match the post-EMEA data volume. Clear the partially-committed gold partitions and rerun gold_inventory_reconciliation from a clean state, then re-baseline resource sizing now that EMEA volume is part of steady-state load.",
+    "note": "This section is included only so you can verify agent accuracy during development. Remove it later when testing the agents without revealing the answer."
+  },
+  "test_design_notes": "This fixture intentionally differs from data_engineering_incident_test.json to exercise different branches of the 5-prompt chain: error_category resource_limit_exceeded instead of schema_mismatch; data-quality failures on row_count, null_rate, AND freshness while schema_check PASSes (the first file only failed row_count + schema); a 3-hop dependency graph with explicit criticality_tags including 'critical' nodes (the first file never reached criticality above 'high' and had no explicit tags, only inferred ones); and two competing contributing factors (a config change plus a volume increase) instead of one single clear cause, so rank-root-causes has something real to weigh rather than an obvious single answer."
+}

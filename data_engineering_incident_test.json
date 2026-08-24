@@ -1,0 +1,160 @@
+{
+  "incident_id": "INC-2026-001",
+  "incident_title": "Daily Customer Orders Pipeline Failure",
+  "reported_at": "2026-08-20T06:10:00",
+  "severity": "High",
+  "incident_description": "The daily_customer_orders pipeline failed during the morning processing cycle. The failure occurred shortly after a deployment to the upstream customer ordering system.",
+  "pipeline_metadata": {
+    "pipeline_name": "daily_customer_orders",
+    "environment": "production",
+    "schedule": "Daily at 06:00",
+    "expected_duration_minutes": 18,
+    "failed_stage": "silver_customer_orders",
+    "stages": [
+      {
+        "name": "extract_customer_orders",
+        "layer": "source_to_raw",
+        "status": "SUCCESS"
+      },
+      {
+        "name": "bronze_customer_orders",
+        "layer": "raw_to_bronze",
+        "status": "SUCCESS"
+      },
+      {
+        "name": "silver_customer_orders",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      },
+      {
+        "name": "gold_customer_sales",
+        "layer": "silver_to_gold",
+        "status": "NOT_STARTED"
+      }
+    ],
+    "upstream_dependencies": [
+      "customer_ordering_api",
+      "raw_customer_orders"
+    ],
+    "downstream_dependencies": [
+      "customer_sales_summary",
+      "daily_revenue_dashboard",
+      "customer_analytics"
+    ]
+  },
+  "execution_logs": [
+    "2026-08-20 06:00:01 INFO Pipeline daily_customer_orders started",
+    "2026-08-20 06:00:05 INFO Extracting source data from customer_ordering_api",
+    "2026-08-20 06:02:41 INFO 125483 source records extracted",
+    "2026-08-20 06:03:12 INFO Bronze ingestion completed successfully",
+    "2026-08-20 06:04:38 INFO Starting silver_customer_orders transformation",
+    "2026-08-20 06:05:01 WARN Schema validation detected unexpected column customer_category",
+    "2026-08-20 06:05:02 ERROR AnalysisException: Cannot resolve column 'customer_type'",
+    "2026-08-20 06:05:02 ERROR Query failed while executing silver_customer_orders transformation",
+    "2026-08-20 06:05:03 INFO Pipeline marked FAILED",
+    "2026-08-20 06:05:04 INFO Downstream jobs were not started"
+  ],
+  "sql_info": {
+    "transformation_name": "silver_customer_orders",
+    "query": "SELECT customer_id, order_id, customer_type, order_amount, order_date FROM bronze_customer_orders WHERE order_status = 'COMPLETED'"
+  },
+  "schema_history": {
+    "previous_schema": [
+      {
+        "column": "customer_id",
+        "type": "STRING"
+      },
+      {
+        "column": "order_id",
+        "type": "STRING"
+      },
+      {
+        "column": "customer_type",
+        "type": "STRING"
+      },
+      {
+        "column": "order_amount",
+        "type": "DECIMAL(12,2)"
+      },
+      {
+        "column": "order_date",
+        "type": "DATE"
+      },
+      {
+        "column": "order_status",
+        "type": "STRING"
+      }
+    ],
+    "current_schema": [
+      {
+        "column": "customer_id",
+        "type": "STRING"
+      },
+      {
+        "column": "order_id",
+        "type": "STRING"
+      },
+      {
+        "column": "customer_category",
+        "type": "STRING"
+      },
+      {
+        "column": "order_amount",
+        "type": "DECIMAL(12,2)"
+      },
+      {
+        "column": "order_date",
+        "type": "DATE"
+      },
+      {
+        "column": "order_status",
+        "type": "STRING"
+      }
+    ],
+    "last_schema_change": {
+      "timestamp": "2026-08-19T22:14:00",
+      "source_system_release": "customer-ordering-v4.8",
+      "change_note": "Customer classification terminology updated as part of the v4.8 source application release."
+    }
+  },
+  "data_quality_checks": {
+    "source_row_count": 125483,
+    "bronze_row_count": 125483,
+    "silver_row_count": 0,
+    "null_customer_id_count": 0,
+    "duplicate_order_id_count": 12,
+    "unexpected_columns": [
+      "customer_category"
+    ],
+    "missing_expected_columns": [
+      "customer_type"
+    ]
+  },
+  "recent_changes": [
+    {
+      "timestamp": "2026-08-19T22:14:00",
+      "system": "customer_ordering_api",
+      "change": "Production release customer-ordering-v4.8 deployed"
+    },
+    {
+      "timestamp": "2026-08-18T15:30:00",
+      "system": "daily_customer_orders",
+      "change": "No-code pipeline configuration update: retry count changed from 2 to 3"
+    }
+  ],
+  "business_context": {
+    "sla": "Daily revenue dashboard must refresh by 07:00",
+    "affected_consumers": [
+      "Finance",
+      "Sales Operations",
+      "Customer Analytics"
+    ],
+    "business_impact": "Morning sales and customer dashboards will contain stale data until the pipeline completes."
+  },
+  "expected_root_cause_for_testing": {
+    "category": "Schema Change",
+    "root_cause": "The upstream source renamed customer_type to customer_category, but the silver transformation SQL still references customer_type.",
+    "recommended_fix": "Update the silver transformation to use customer_category, validate downstream compatibility, rerun the failed stage, and add automated schema-change validation.",
+    "note": "This section is included only so you can verify agent accuracy during development. Remove it later when testing the agents without revealing the answer."
+  }
+}
