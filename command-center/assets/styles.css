@@ -170,3 +170,36 @@ code{ font-family: "SFMono-Regular", Consolas, "Roboto Mono", monospace; font-si
 }
 
 .cc-footnote{ color: var(--text-faint); font-size: .78rem; margin-top: 2rem; }
+
+/* ---------- gantt (Project Management tab) ---------- */
+.cc-gantt{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+.cc-gantt-row{ display:flex; align-items:center; gap:.8rem; padding:.4rem 0; }
+.cc-gantt-label{ width: 190px; flex-shrink:0; font-size:.85rem; font-weight:600; }
+.cc-gantt-track{ position:relative; flex:1; height: 22px; background: var(--surface-2); border-radius:5px; }
+.cc-gantt-bar{
+  position:absolute; top:0; height:100%; border-radius:5px; background: var(--accent);
+  color:#fff; font-size:.72rem; display:flex; align-items:center; padding:0 .5rem; white-space:nowrap; overflow:visible;
+  cursor:pointer; border:0; text-align:left; z-index:1;
+}
+.cc-gantt-bar:hover{ z-index:2; }
+.cc-gantt-bar.demo{ background: var(--sample); }
+.cc-gantt-today{ position:absolute; top:-4px; bottom:-4px; width:2px; background: var(--danger); }
+
+/* ---------- sparkline (Outcomes tab) ---------- */
+.cc-sparkline{ display:block; margin: .4rem 0; }
+
+/* ---------- knowledge base ---------- */
+.cc-kb-ask{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); margin-top: 1.5rem; }
+.cc-kb-ask form{ display:flex; gap:.5rem; }
+.cc-kb-ask input[type=text]{
+  flex:1; padding:.55rem .7rem; border:1px solid var(--border); border-radius:6px; font: inherit; font-size:.9rem;
+}
+.cc-kb-ask button{
+  border:0; background: var(--accent); color:#fff; border-radius:6px; padding:.55rem 1.1rem; font: inherit; font-weight:600; cursor:pointer;
+}
+.cc-kb-ask button:hover{ background: var(--accent-hover); }
+.cc-kb-answer{ margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); font-size:.9rem; }
+.cc-kb-answer .src{ color: var(--text-faint); font-size:.78rem; }
+
+.cc-req-gap{ background: var(--danger-soft); }
+

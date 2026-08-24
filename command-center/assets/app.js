@@ -5,7 +5,8 @@
    ever copied into this script — if you delete a story from
    plan.json and reload, it disappears from every tab that lists
    it, because every tab re-derives from the fetched data on
-   every render.
+   every render. Tab content itself lives in tabs.js (loaded
+   before this file); this file is routing and chrome only.
    ============================================================ */
 
 const DATA_PATHS = {
@@ -16,23 +17,33 @@ const DATA_PATHS = {
 };
 
 const TABS = [
-  { id: 'overview',   label: 'Overview',        built: true },
-  { id: 'outcomes',   label: 'Outcomes',         built: false },
-  { id: 'users',      label: 'Users & Use Case', built: false },
-  { id: 'guardrails', label: 'Guardrails',       built: false },
-  { id: 'systems',    label: 'Systems',          built: false },
-  { id: 'pm',         label: 'Project Mgmt',     built: false },
-  { id: 'agents',     label: 'AI Agents',        built: false },
-  { id: 'kb',         label: 'Knowledge Base',   built: false },
-  { id: 'datamodel',  label: 'Data Model',       built: false },
+  { id: 'overview',   label: 'Overview' },
+  { id: 'outcomes',   label: 'Outcomes' },
+  { id: 'users',      label: 'Users & Use Case' },
+  { id: 'guardrails', label: 'Guardrails' },
+  { id: 'systems',    label: 'Systems' },
+  { id: 'pm',         label: 'Project Mgmt' },
+  { id: 'agents',     label: 'AI Agents' },
+  { id: 'kb',         label: 'Knowledge Base' },
+  { id: 'datamodel',  label: 'Data Model' },
 ];
+
+// Sample-mode illustrative story states. Used ONLY when the Sample
+// toggle is on; Real mode always reads state from progress.json.
+const SAMPLE_STORY_STATES = {
+  'STORY-001': 'verified', 'STORY-002': 'verified', 'STORY-003': 'verified',
+  'STORY-004': 'verified', 'STORY-010': 'verified', 'STORY-005': 'verified',
+  'STORY-006': 'in_progress', 'STORY-007': 'in_progress',
+  'STORY-008': 'submitted',
+  'STORY-009': 'not_started',
+};
 
 const state = {
   data: null,        // { plan, progress, manifest, profile }
   loadError: null,
   mode: (localStorage.getItem('cc_mode') === 'sample') ? 'sample' : 'real',
   activeTab: (location.hash.replace('#/', '') || 'overview'),
-  overviewDetail: null,
+  detail: null,       // generic drilldown key for the active tab
 };
 
 async function loadAll() {
@@ -48,6 +59,12 @@ async function loadAll() {
     }
   }
   return results;
+}
+
+/* ---------- shared helpers (used across tabs.js) ---------- */
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function fmtAbsoluteDate(d) {
@@ -74,6 +91,32 @@ function dataAsOf(generatedAtISO) {
     text: `Data as of ${fmtAbsoluteDate(gen)} (${fmtRelative(diffMs)})`,
     warn: days > 7,
   };
+}
+
+function daysBetween(a, b) {
+  return (new Date(b) - new Date(a)) / 86400000;
+}
+
+function statePill(st) {
+  const map = {
+    not_started: ['grey', 'Not started'],
+    in_progress: ['amber', 'In progress'],
+    submitted: ['amber', 'Submitted'],
+    verified: ['green', 'Verified'],
+  };
+  const [cls, label] = map[st] || ['grey', st];
+  return `<span class="cc-pill ${cls}">${escapeHtml(label)}</span>`;
+}
+
+function effectiveStoryState(storyId, ctx) {
+  if (ctx.isSample) return SAMPLE_STORY_STATES[storyId] || 'not_started';
+  const p = ctx.progress.stories.find(ps => ps.id === storyId);
+  return p ? p.verification.state : 'not_started';
+}
+
+function sampleStrip(isSample, note) {
+  if (!isSample) return '';
+  return `<div class="cc-sample-strip"><span class="cc-sample-badge">Sample</span>&nbsp;${escapeHtml(note)}</div>`;
 }
 
 /* ---------- shell rendering ---------- */
@@ -108,10 +151,6 @@ function renderHeader() {
   });
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
 function renderAll() {
   renderHeader();
   renderTabBody();
@@ -119,7 +158,7 @@ function renderAll() {
 
 function switchTab(id) {
   state.activeTab = id;
-  state.overviewDetail = null;
+  state.detail = null;
   location.hash = `#/${id}`;
   renderAll();
 }
@@ -128,7 +167,7 @@ window.addEventListener('hashchange', () => {
   const id = location.hash.replace('#/', '') || 'overview';
   if (TABS.some(t => t.id === id)) {
     state.activeTab = id;
-    state.overviewDetail = null;
+    state.detail = null;
     renderAll();
   }
 });
@@ -151,214 +190,32 @@ function renderTabBody() {
     return;
   }
   const tabDef = TABS.find(t => t.id === state.activeTab) || TABS[0];
-  if (!tabDef.built) {
-    main.innerHTML = renderPlaceholder(tabDef);
-    return;
-  }
-  if (tabDef.id === 'overview') {
-    main.innerHTML = renderOverview();
-    wireOverview();
-    return;
-  }
-  main.innerHTML = renderPlaceholder(tabDef);
+  const entry = TAB_RENDERERS[tabDef.id];
+  const ctx = { plan: state.data.plan, progress: state.data.progress, isSample: state.mode === 'sample' };
+  const bodyHtml = entry.render(ctx);
+  const detailHtml = state.detail ? entry.detail(state.detail, ctx) : '';
+  main.innerHTML = bodyHtml + detailHtml;
+  wireDetailButtons();
+  if (entry.wire) entry.wire(ctx);
 }
 
-function renderPlaceholder(tabDef) {
-  return `
-    <div class="cc-placeholder">
-      <div class="icon">&#128203;</div>
-      <h3>${escapeHtml(tabDef.label)} — not built yet</h3>
-      <p>The build is paused after the Overview tab for review.<br>
-      Say <span class="say">build the rest</span> to continue and this tab will be built out.</p>
-    </div>
-  `;
-}
-
-/* ---------- Overview tab ---------- */
-
-function sampleOverviewNumbers() {
-  return {
-    phase: 'Building',
-    phaseNote: 'Sample: shown as if the build were mid-way through r1.',
-    stories_verified: 6, stories_total: 10,
-    criteria_passed: 22, criteria_total: 30,
-    points_awarded: 340,
-  };
-}
-
-function schedulePhase(schedule) {
-  const now = new Date();
-  const buildStart = new Date(schedule.build_start);
-  const buildEnd = new Date(schedule.build_end + 'T23:59:59');
-  const demoDay = new Date(schedule.demo_day);
-  if (now < buildStart) return 'Pre-build';
-  if (now <= buildEnd) return 'Building';
-  if (now < demoDay) return 'Demo prep';
-  if (now.toDateString() === demoDay.toDateString()) return 'Demo day';
-  return 'Post-demo';
-}
-
-function realOverviewNumbers(plan, progress) {
-  return {
-    phase: schedulePhase(plan.schedule),
-    phaseNote: null,
-    stories_verified: progress.totals.stories_verified,
-    stories_total: progress.totals.stories_total,
-    criteria_passed: progress.totals.criteria_passed,
-    criteria_total: progress.totals.criteria_total,
-    points_awarded: progress.totals.points_awarded,
-  };
-}
-
-function renderOverview() {
-  const { plan, progress } = state.data;
-  const isSample = state.mode === 'sample';
-  const nums = isSample ? sampleOverviewNumbers() : realOverviewNumbers(plan, progress);
-
-  const banner = `
-    <div class="cc-banner">
-      <strong>Build paused for review — Overview only, by design.</strong>
-      This is the first checkpoint. The other 8 tabs are reachable in the nav above but
-      not built yet. Look this over, then say <strong>build the rest</strong> to continue.
-    </div>
-  `;
-
-  const sampleStrip = isSample ? `
-    <div class="cc-sample-strip"><span class="cc-sample-badge">Sample</span>
-      &nbsp;This tab is showing made-up data so you can see the shape of it. Switch to
-      <strong>Real</strong> above to see what your project has actually produced.
-    </div>` : '';
-
-  const hero = `
-    <div class="cc-section-title"><h1>${escapeHtml(plan.project.name)}</h1></div>
-    <p class="cc-section-sub">${escapeHtml(plan.project.descriptor)}</p>
-  `;
-
-  const cards = `
-    <div class="cc-grid">
-      <button class="cc-card" data-detail="schedule">
-        <span class="kicker">Schedule</span>
-        <span class="big">${escapeHtml(nums.phase)}</span>
-        <span class="caption">${isSample ? escapeHtml(nums.phaseNote) : `Build ${plan.schedule.build_start} &rarr; ${plan.schedule.build_end} · Demo ${plan.schedule.demo_day}`}</span>
-        <span class="arrow">View schedule &rarr;</span>
-      </button>
-      <button class="cc-card" data-detail="stories">
-        <span class="kicker">Stories</span>
-        <span class="big">${nums.stories_verified} / ${nums.stories_total}</span>
-        <span class="caption">verified</span>
-        <span class="arrow">View stories &rarr;</span>
-      </button>
-      <button class="cc-card" data-detail="criteria">
-        <span class="kicker">Acceptance criteria</span>
-        <span class="big">${nums.criteria_passed} / ${nums.criteria_total}</span>
-        <span class="caption">passed</span>
-        <span class="arrow">What this counts &rarr;</span>
-      </button>
-      <button class="cc-card" data-detail="points">
-        <span class="kicker">Points</span>
-        <span class="big">${nums.points_awarded}</span>
-        <span class="caption">awarded</span>
-        <span class="arrow">What this counts &rarr;</span>
-      </button>
-    </div>
-  `;
-
-  const detail = state.overviewDetail ? renderOverviewDetail(state.overviewDetail, plan, progress, isSample) : '';
-
-  return banner + sampleStrip + hero + cards + detail;
-}
-
-function renderOverviewDetail(key, plan, progress, isSample) {
-  if (key === 'schedule') {
-    return `
-      <div class="cc-detail">
-        <button class="back" data-back>&larr; Back</button>
-        <h3>Release schedule</h3>
-        ${isSample ? '<p class="cc-footnote" style="margin-top:0">Sample mode — the phase above is illustrative, but the dates below are your real plan.json dates.</p>' : ''}
-        <table>
-          <thead><tr><th>Release</th><th>Name</th><th>Starts</th><th>Ends</th><th>Demo target</th></tr></thead>
-          <tbody>
-            ${plan.releases.map(r => `<tr><td>${escapeHtml(r.key)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.starts_on)}</td><td>${escapeHtml(r.ends_on)}</td><td>${r.is_demo_target ? '<span class="cc-pill green">Yes</span>' : ''}</td></tr>`).join('')}
-          </tbody>
-        </table>
-        <p class="cc-footnote">Demo day: ${escapeHtml(plan.schedule.demo_day)}. Full Gantt view lives on the Project Management tab (not built yet).</p>
-      </div>
-    `;
-  }
-  if (key === 'stories') {
-    const rows = plan.stories.map(s => {
-      const p = progress.stories.find(ps => ps.id === s.id);
-      const st = p ? p.verification.state : 'not_started';
-      return `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.title)}</td><td>${escapeHtml(s.release)}</td><td>${statePill(st)}</td></tr>`;
-    }).join('');
-    return `
-      <div class="cc-detail">
-        <button class="back" data-back>&larr; Back</button>
-        <h3>Stories</h3>
-        ${isSample ? '<p class="cc-footnote" style="margin-top:0">Sample mode is showing a summary count above; this table is your real story list.</p>' : ''}
-        <table>
-          <thead><tr><th>ID</th><th>Title</th><th>Release</th><th>State</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    `;
-  }
-  if (key === 'criteria') {
-    return `
-      <div class="cc-detail">
-        <button class="back" data-back>&larr; Back</button>
-        <h3>Acceptance criteria</h3>
-        <p>This counts every acceptance criterion across every story, and how many are marked
-        passed in <code>.colaberry/progress.json</code>.</p>
-        ${progress.totals.criteria_total === 0 && !isSample
-          ? '<p><strong>Currently 0 of 0.</strong> None of the 10 project stories have acceptance criteria defined in progress.json yet — that happens as each story is built, not before. This is not a bug.</p>'
-          : ''}
-      </div>
-    `;
-  }
-  if (key === 'points') {
-    return `
-      <div class="cc-detail">
-        <button class="back" data-back>&larr; Back</button>
-        <h3>Points</h3>
-        <p>Points are awarded per story in <code>.colaberry/progress.json</code> once its
-        acceptance criteria are verified. ${!isSample ? '<strong>0 awarded so far</strong> — no story has been verified yet.' : ''}</p>
-      </div>
-    `;
-  }
-  return '';
-}
-
-function statePill(st) {
-  const map = {
-    not_started: ['grey', 'Not started'],
-    in_progress: ['amber', 'In progress'],
-    submitted: ['amber', 'Submitted'],
-    verified: ['green', 'Verified'],
-  };
-  const [cls, label] = map[st] || ['grey', st];
-  return `<span class="cc-pill ${cls}">${escapeHtml(label)}</span>`;
-}
-
-function wireOverview() {
+function wireDetailButtons() {
   document.querySelectorAll('[data-detail]').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.overviewDetail = btn.dataset.detail;
+      state.detail = btn.dataset.detail;
       renderTabBody();
-      wireOverview();
       document.querySelector('.cc-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
   document.querySelectorAll('[data-back]').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.overviewDetail = null;
+      state.detail = null;
       renderTabBody();
-      wireOverview();
     });
   });
 }
 
-/* ---------- nav wiring (delegated, header re-renders each time) ---------- */
+/* ---------- nav wiring (delegated) ---------- */
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-tab]');
   if (a) {
