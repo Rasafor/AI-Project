@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Engineer Field Guide — Colaberry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET ============ */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+button{font-family:inherit;}
+
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --cherry:#FB2832;
+  --berry:#367895;
+  --leaf:#5BA63C;
+  --amber:#E8920C;
+  --text:#1A1A1A;
+  --muted:#6B6B6B;
+  --border:#E4E4E3;
+  --surface:#FFFFFF;
+  --surface-alt:#F8F8F7;
+  --font-body:'Roboto',system-ui,-apple-system,Arial,sans-serif;
+  --font-mono:'Roboto Mono',ui-monospace,Consolas,monospace;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(26,26,26,0.06),0 4px 14px rgba(26,26,26,0.05);
+}
+html.theme-dark{
+  --text:#F2F2F2;
+  --muted:#A8A8A8;
+  --border:#2A2A2A;
+  --surface:#171717;
+  --surface-alt:#0F0F0F;
+  --cherry:#FF5960;
+  --berry:#5EA9C4;
+  --leaf:#8AC759;
+}
+@media (prefers-color-scheme: dark){
+  html:not(.theme-light):not(.theme-dark){
+    --text:#F2F2F2;
+    --muted:#A8A8A8;
+    --border:#2A2A2A;
+    --surface:#171717;
+    --surface-alt:#0F0F0F;
+    --cherry:#FF5960;
+    --berry:#5EA9C4;
+    --leaf:#8AC759;
+  }
+}
+
+body{
+  font-family:var(--font-body);
+  background:var(--surface-alt);
+  color:var(--text);
+  line-height:1.55;
+  scroll-behavior:smooth;
+}
+
+/* ============ LAYOUT SHELL ============ */
+.app-shell{display:flex;min-height:100vh;}
+
+/* ---- Sidebar ---- */
+.sidebar{
+  width:270px;flex:0 0 270px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  padding:20px 14px 40px;
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.sidebar-logo img{height:34px;width:auto;}
+.sidebar-logo .tag{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;}
+.nav-group{margin-bottom:6px;}
+.nav-heading{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:14px 10px 6px;}
+.nav-link{
+  display:block;padding:7px 10px;border-radius:8px;font-size:13.5px;color:var(--text);text-decoration:none;
+  border-left:3px solid transparent;
+}
+.nav-link:hover{background:var(--surface-alt);}
+.nav-link.active{background:var(--surface-alt);border-left-color:var(--cherry);font-weight:500;color:var(--berry);}
+.nav-sub{padding-left:14px;}
+.nav-sub .nav-link{font-size:12.5px;color:var(--muted);padding:5px 10px;}
+
+/* ---- Topbar ---- */
+.topbar{
+  position:sticky;top:0;z-index:40;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.search-wrap{position:relative;flex:1 1 320px;max-width:460px;}
+.search-input{
+  width:100%;padding:9px 14px 9px 36px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface-alt);color:var(--text);font-size:13.5px;font-family:var(--font-body);
+}
+.search-input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none;}
+.search-results{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);max-height:340px;overflow-y:auto;z-index:50;
+}
+.search-results[hidden]{display:none;}
+.search-result-item{display:block;padding:10px 14px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--surface-alt);}
+.search-result-item .srt{font-weight:700;font-size:13px;color:var(--berry);}
+.search-result-item .srs{font-size:12px;color:var(--muted);margin-top:2px;}
+.search-empty{padding:14px;font-size:13px;color:var(--muted);}
+
+.topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.icon-btn{
+  width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);
+}
+.icon-btn:hover{background:var(--surface-alt);}
+.btn{
+  font-family:var(--font-body);font-size:13px;font-weight:500;padding:9px 16px;border-radius:8px;border:1px solid var(--border);
+  cursor:pointer;background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+}
+.btn:hover{background:var(--surface-alt);}
+.btn-primary{background:var(--cherry);border-color:var(--cherry);color:#fff;}
+.btn-primary:hover{filter:brightness(0.94);}
+.btn-outline-berry{border-color:var(--berry);color:var(--berry);background:transparent;}
+.btn-outline-berry:hover{background:var(--berry);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+
+/* ---- Main content ---- */
+.main{flex:1;min-width:0;padding:0 0 80px;}
+.content-inner{max-width:1080px;margin:0 auto;padding:32px 36px 0;}
+
+section{scroll-margin-top:84px;}
+.flash{animation:flashbg 1.4s ease;}
+@keyframes flashbg{0%{background:rgba(251,40,50,0.12);}100%{background:transparent;}}
+
+h1,h2,h3,h4{font-family:var(--font-body);color:var(--berry);font-weight:700;letter-spacing:-0.01em;}
+h1{font-size:30px;margin:0 0 8px;}
+h2{font-size:23px;margin:44px 0 14px;padding-top:6px;border-top:1px solid var(--border);}
+section:first-of-type h2, .no-rule{border-top:none!important;}
+h3{font-size:17px;margin:26px 0 10px;color:var(--text);}
+h4{font-size:14px;margin:18px 0 6px;color:var(--text);}
+p{margin:0 0 12px;color:var(--text);}
+.lede{font-size:15.5px;color:var(--muted);max-width:760px;}
+.muted{color:var(--muted);}
+code,.mono{font-family:var(--font-mono);font-size:0.92em;}
+code{background:var(--surface-alt);border:1px solid var(--border);padding:1px 6px;border-radius:5px;}
+
+/* ---- Hero ---- */
+.hero{
+  background:linear-gradient(135deg,var(--berry) 0%,#2b5a70 100%);
+  color:#fff;border-radius:16px;padding:34px 36px;margin:28px 36px 0;
+}
+.hero .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:8px;}
+.hero h1{color:#fff;font-size:32px;}
+.hero p{color:rgba(255,255,255,0.88);max-width:680px;font-size:15px;}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.hero-badge{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);padding:5px 12px;border-radius:999px;font-size:12px;font-family:var(--font-mono);}
+
+/* ---- Cards / callouts ---- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.grid{display:grid;gap:16px;}
+.grid-2{grid-template-columns:1fr 1fr;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:820px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+.callout{border-radius:10px;padding:14px 16px;margin:16px 0;border:1px solid var(--border);border-left:4px solid var(--berry);background:var(--surface);}
+.callout .callout-label{font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block;}
+.callout.info{border-left-color:var(--berry);}
+.callout.info .callout-label{color:var(--berry);}
+.callout.warn{border-left-color:var(--amber);}
+.callout.warn .callout-label{color:var(--amber);}
+.callout.success{border-left-color:var(--leaf);}
+.callout.success .callout-label{color:var(--leaf);}
+.callout.critical{border-left-color:var(--cherry);}
+.callout.critical .callout-label{color:var(--cherry);}
+.callout p:last-child{margin-bottom:0;}
+
+/* ---- Tables ---- */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin:14px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;}
+thead th{
+  background:var(--berry);color:#fff;text-align:left;padding:10px 12px;font-weight:700;font-size:12px;
+  text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;
+}
+tbody td{padding:10px 12px;border-top:1px solid var(--border);vertical-align:top;}
+tbody tr:nth-child(even){background:var(--surface-alt);}
+tbody tr:hover{background:rgba(54,120,149,0.06);}
+td.mono,th.mono{font-family:var(--font-mono);}
+
+/* ---- Badges/pills ---- */
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;font-family:var(--font-mono);letter-spacing:.02em;}
+.pill-critical{background:rgba(251,40,50,0.12);color:var(--cherry);}
+.pill-high{background:rgba(232,146,12,0.14);color:var(--amber);}
+.pill-medium{background:rgba(54,120,149,0.13);color:var(--berry);}
+.pill-low{background:rgba(91,166,60,0.14);color:var(--leaf);}
+.pill-pass{background:rgba(91,166,60,0.14);color:var(--leaf);}
+.pill-fail{background:rgba(251,40,50,0.12);color:var(--cherry);}
+.pill-blocked{background:rgba(232,146,12,0.14);color:var(--amber);}
+.pill-p1{background:var(--cherry);color:#fff;}
+.pill-p2{background:var(--amber);color:#fff;}
+.pill-p3{background:var(--berry);color:#fff;}
+.pill-p4{background:var(--muted);color:#fff;}
+
+/* ---- KPI tiles ---- */
+.kpi-tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 18px 16px;box-shadow:var(--shadow);}
+.kpi-tile .kpi-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.kpi-tile .kpi-value{font-size:32px;font-weight:900;margin:6px 0 2px;color:var(--text);}
+.kpi-tile .kpi-sub{font-size:12px;color:var(--muted);}
+.kpi-tile .kpi-sub.good{color:var(--leaf);font-weight:700;}
+.kpi-tile .kpi-sub.bad{color:var(--cherry);font-weight:700;}
+
+/* ---- Document card (deliverable) ---- */
+.doc-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin:22px 0 40px;}
+.doc-cover{background:linear-gradient(135deg,var(--berry),#274a5b);color:#fff;padding:38px 40px 32px;position:relative;}
+.doc-cover img.doc-logo{height:34px;margin-bottom:22px;filter:brightness(0) invert(1);}
+.doc-cover .doc-kicker{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:.09em;opacity:.85;margin-bottom:6px;}
+.doc-cover h2{color:#fff;border-top:none;margin:0 0 6px;font-size:26px;}
+.doc-cover .doc-sub{color:rgba(255,255,255,0.85);font-size:14px;max-width:640px;}
+.doc-control-strip{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:rgba(0,0,0,0.16);
+  margin-top:22px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.18);
+}
+.doc-control-strip .dcs-cell{padding:10px 14px;border-right:1px solid rgba(255,255,255,0.16);}
+.doc-control-strip .dcs-cell:last-child{border-right:none;}
+.doc-control-strip .dcs-k{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.75;}
+.doc-control-strip .dcs-v{font-size:13px;font-weight:700;margin-top:2px;}
+.doc-body{padding:30px 40px 8px;}
+.doc-body h3{margin-top:28px;}
+.doc-toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:16px 40px 24px;border-top:1px solid var(--border);background:var(--surface-alt);}
+.doc-signoff{margin:26px 0 6px;}
+.signoff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media (max-width:760px){.signoff-grid{grid-template-columns:1fr;}}
+.signoff-box{border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--surface-alt);}
+.signoff-box .so-role{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.signoff-box .so-name{font-weight:700;margin:5px 0 2px;font-size:14px;}
+.signoff-box .so-meta{font-size:11.5px;color:var(--muted);}
+.signoff-box .so-sig{margin-top:10px;font-family:'Roboto Mono',cursive;font-size:17px;color:var(--berry);border-top:1px dashed var(--border);padding-top:8px;}
+.doc-footer{padding:16px 40px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+
+/* ---- Diagram / chart panels ---- */
+.viz-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin:18px 0;}
+.viz-panel h4{margin-top:0;color:var(--berry);font-size:14px;text-transform:uppercase;letter-spacing:.04em;}
+.viz-panel .viz-caption{font-size:12px;color:var(--muted);margin-top:10px;}
+svg text{font-family:var(--font-body);}
+svg .mono-label{font-family:var(--font-mono);}
+
+/* ---- Ask assistant ---- */
+.ask-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:var(--shadow);}
+.ask-form{display:flex;gap:10px;}
+.ask-input{flex:1;padding:11px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);font-size:14px;}
+.ask-log{margin-top:18px;display:flex;flex-direction:column;gap:14px;max-height:520px;overflow-y:auto;}
+.ask-bubble-q{align-self:flex-end;background:var(--berry);color:#fff;padding:10px 14px;border-radius:12px 12px 2px 12px;max-width:78%;font-size:13.5px;}
+.ask-bubble-a{align-self:flex-start;background:var(--surface-alt);border:1px solid var(--border);padding:12px 15px;border-radius:12px 12px 12px 2px;max-width:88%;font-size:13.5px;}
+.ask-bubble-a .aa-src{margin-top:8px;font-size:11.5px;}
+.ask-suggest{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.ask-chip{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface-alt);cursor:pointer;}
+.ask-chip:hover{border-color:var(--berry);color:var(--berry);}
+
+/* ---- footer ---- */
+.site-footer{max-width:1080px;margin:60px auto 0;padding:24px 36px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+/* ---- print ---- */
+@media print{
+  .sidebar,.topbar,.doc-toolbar,.site-footer,.hero,#askSection,.no-print{display:none!important;}
+  .main{padding:0;}
+  .content-inner{max-width:100%;padding:0;}
+  body{background:#fff;}
+  section{display:none!important;}
+  section.print-target{display:block!important;scroll-margin-top:0;}
+  .doc-card{box-shadow:none;border:none;margin:0;}
+  .doc-cover{background:var(--berry)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  a[href]:after{content:"";}
+}
+
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img data-logo alt="Colaberry logo">
+    <div class="tag">Field Guide</div>
+  </div>
+  <nav>
+    <div class="nav-group">
+      <a class="nav-link" href="#overview">Overview</a>
+      <a class="nav-link" href="#foundations">QA Foundations</a>
+      <div class="nav-sub">
+        <a class="nav-link" href="#f-pyramid">Testing pyramid</a>
+        <a class="nav-link" href="#f-functional">Functional vs non-functional</a>
+        <a class="nav-link" href="#f-gwt">Given / When / Then</a>
+        <a class="nav-link" href="#f-casetypes">Positive, negative, boundary, idempotency</a>
+        <a class="nav-link" href="#f-traceability">Traceability &amp; coverage</a>
+        <a class="nav-link" href="#f-severity">Severity vs priority</a>
+        <a class="nav-link" href="#f-regression">Regression vs exploratory</a>
+        <a class="nav-link" href="#f-shiftleft">Shift-left</a>
+        <a class="nav-link" href="#f-goodbad">Good vs bad testing</a>
+        <a class="nav-link" href="#f-kpis">QA KPIs</a>
+        <a class="nav-link" href="#f-lens">The architect's review lens</a>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-heading">Visuals</div>
+      <a class="nav-link" href="#visuals">Diagrams &amp; charts</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-heading">ClaimsIQ Deliverables</div>
+      <a class="nav-link" href="#doc-strategy">1. Test Strategy</a>
+      <a class="nav-link" href="#doc-plan">2. Test Plan</a>
+      <a class="nav-link" href="#doc-cases">3. Test Cases</a>
+      <a class="nav-link" href="#doc-rtm">4. Traceability Matrix</a>
+      <a class="nav-link" href="#doc-defect">5. Defect Report</a>
+      <a class="nav-link" href="#doc-summary">6. Test Summary Report</a>
+      <a class="nav-link" href="#doc-coverage">7. Coverage Matrix</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-heading">Help</div>
+      <a class="nav-link" href="#askSection">Ask the guide</a>
+    </div>
+  </nav>
+</aside>
+
+<div class="main">
+  <!-- ============ TOPBAR ============ -->
+  <div class="topbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input id="searchInput" class="search-input" type="text" placeholder="Search the field guide (e.g. idempotency, ship recommendation, WCAG)" autocomplete="off">
+      <div id="searchResults" class="search-results" hidden></div>
+    </div>
+    <div class="topbar-actions">
+      <a href="#askSection" class="btn btn-outline-berry btn-sm">Ask the guide</a>
+      <button id="themeToggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="content-inner">
+
+    <!-- ============ HERO ============ -->
+    <section id="overview" data-searchable data-title="Overview">
+    </section>
+    <div class="hero">
+      <div class="eyebrow">Colaberry Enterprise AI Leadership Accelerator &middot; Deep Dive, Week 6</div>
+      <h1>QA Engineer Field Guide</h1>
+      <p>The 20% of quality assurance an AI Solution Architect must master &mdash; not to execute tests by hand, but to <strong>direct, evaluate, and approve</strong> the tests and quality evidence that AI systems and QA engineers generate on your behalf. Every document in this guide is written against one concrete initiative so you can see the discipline applied, not just defined.</p>
+      <div class="hero-badges">
+        <span class="hero-badge">Industry: Insurance</span>
+        <span class="hero-badge">Initiative: ClaimsIQ &mdash; AI-Assisted FNOL Intake &amp; Triage</span>
+        <span class="hero-badge">Carrier: Meridian Mutual Insurance</span>
+        <span class="hero-badge">Release: 3.2</span>
+      </div>
+    </div>
+
+    <section id="why-this-guide" data-searchable data-title="Overview: why this guide exists">
+      <h2 class="no-rule" style="border-top:none;">Why this guide exists</h2>
+      <p class="lede">As an AI Solution Architect you will rarely write a test case yourself. You will review one an AI assistant wrote, decide whether it is trustworthy, and put your name on the recommendation that follows it. That is a different skill from execution &mdash; it is judgment. This guide teaches the vocabulary and the checklist behind that judgment, then hands you seven real deliverables built around a single believable initiative so the vocabulary has somewhere to live.</p>
+      <div class="grid grid-3">
+        <div class="card">
+          <h4 style="margin-top:0;color:var(--berry);">The initiative</h4>
+          <p style="font-size:13.5px;margin-bottom:0;">Meridian Mutual is piloting <strong>ClaimsIQ</strong>: an AI layer that ingests First Notice of Loss (FNOL) submissions from web, mobile, and phone-transcript channels, extracts structured claim data, classifies severity, screens for fraud signals, and straight-through processes small glass-only claims.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;color:var(--berry);">How to use this page</h4>
+          <p style="font-size:13.5px;margin-bottom:0;">Read <a href="#foundations">QA Foundations</a> once. Then use <strong>Search</strong> or <strong>Ask the guide</strong> to jump straight to what you need when reviewing a real deliverable. Every document below is individually downloadable as a styled HTML file, a print-ready PDF, and (where tabular) a CSV.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;color:var(--berry);">What "approve" means here</h4>
+          <p style="font-size:13.5px;margin-bottom:0;">Approval is not "tests are green." It is: every requirement traces to a test, negative and boundary and idempotency paths exist alongside the happy path, severity and priority are justified separately, and the ship/no-ship call is backed by named evidence.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOUNDATIONS ============ -->
+    <section id="foundations" data-searchable data-title="QA Foundations">
+      <h2>QA Foundations: the 20% that matters</h2>
+      <p class="lede">Software is probabilistic while it's being built and must become deterministic before it ships. Quality assurance is the discipline that closes that gap: it turns "I think this works" into "here is the evidence this works, and here is what we know it does <em>not</em> handle." An AI Solution Architect does not need to run every test &mdash; but does need to recognize when evidence is thin, when a happy-path-only suite is being presented as "done," and when a severity label has been inflated or deflated to make a release look safer than it is.</p>
+    </section>
+
+    <section id="f-pyramid" data-searchable data-title="The testing pyramid">
+      <h3>Test strategy vs. test plan vs. test cases</h3>
+      <p>These three documents are frequently used interchangeably by non-practitioners &mdash; and that confusion is itself a review red flag. They sit at different altitudes:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Document</th><th>Altitude</th><th>Answers</th><th>Changes how often</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Test Strategy</strong></td><td>Program-level</td><td>What quality means for this product; which levels and types of testing we run and why; standing entry/exit rules.</td><td>Rarely &mdash; roughly once per product line</td></tr>
+          <tr><td><strong>Test Plan</strong></td><td>Release-level</td><td>What is in and out of scope <em>this cycle</em>; schedule; environments; who does what; this cycle's suspension criteria.</td><td>Every release or sprint</td></tr>
+          <tr><td><strong>Test Cases</strong></td><td>Feature-level</td><td>The literal steps and expected results that prove one requirement, one path, one condition.</td><td>Continuously, as features change</td></tr>
+        </tbody>
+      </table></div>
+      <p>An AI assistant asked for "the test plan" will sometimes hand back test cases, or hand back a strategy dressed up as a plan. Check the altitude before you check the content.</p>
+
+      <h3 id="f-pyramid-h">The testing pyramid</h3>
+      <p>Automated test investment should be heaviest at the bottom (fast, cheap, deterministic) and lightest at the top (slow, expensive, occasionally flaky). A suite that inverts this &mdash; more end-to-end tests than unit tests &mdash; is a maintenance liability wearing a green checkmark.</p>
+      <div id="pyramidDiagram"></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Tier</th><th>Target share</th><th>Lives in</th><th>ClaimsIQ example</th></tr></thead>
+        <tbody>
+          <tr><td>Unit</td><td>~70%</td><td>Pure logic, formatters, extractors, scoring functions</td><td>VIN-format validator; severity-score rounding rules</td></tr>
+          <tr><td>Integration</td><td>~20%</td><td>Service-to-service, DB, mocked external APIs</td><td>FNOL service &rarr; fraud-signal service &rarr; adjuster-queue assignment</td></tr>
+          <tr><td>End-to-end</td><td>~10%</td><td>Real browser / API flows against staging</td><td>Full FNOL submission through auto-approval and payment</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="f-functional" data-searchable data-title="Functional vs non-functional testing">
+      <h3>Functional vs. non-functional testing</h3>
+      <p><strong>Functional</strong> testing asks "does it do the right thing?" &mdash; given this input, is the output correct. <strong>Non-functional</strong> testing asks "does it do the right thing <em>well enough, safely enough, and under real conditions</em>?" AI-generated test suites disproportionately over-invest in functional happy paths and under-invest in non-functional testing, because non-functional targets require someone to pick a number. That number is where the architect's judgment is required.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Non-functional dimension</th><th>ClaimsIQ target</th><th>Why it's numeric, not vibes</th></tr></thead>
+        <tbody>
+          <tr><td>Performance</td><td>P95 FNOL-to-triage latency &lt; 12s</td><td>Above 12s, the mobile app's own timeout fires and the claim silently drops.</td></tr>
+          <tr><td>Availability</td><td>99.5% during 7am&ndash;9pm local, graceful manual fallback otherwise</td><td>Below this, state insurance SLAs for claim acknowledgment are at risk.</td></tr>
+          <tr><td>Accessibility</td><td>WCAG 2.1 AA on all FNOL intake surfaces</td><td>Legal exposure and genuine exclusion of policyholders using assistive tech.</td></tr>
+          <tr><td>Security / privacy</td><td>Zero PII in plaintext logs; 100% of exports redacted</td><td>A single unredacted export is a reportable incident, not a "minor" defect.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout warn"><span class="callout-label">Review flag</span><p>If a non-functional "test" has no number attached &mdash; "the system should be fast," "the form should be accessible" &mdash; it is not a test yet. It's a wish. Send it back for a measurable target before you accept it as coverage.</p></div>
+    </section>
+
+    <section id="f-gwt" data-searchable data-title="Given When Then acceptance tests">
+      <h3>Given / When / Then acceptance tests</h3>
+      <p>Behavior-driven acceptance tests are written in a fixed three-part grammar so that a business stakeholder, a QA engineer, and an AI generating test code can all read the same sentence and agree on what "correct" means:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Clause</th><th>States</th><th>ClaimsIQ example</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">Given</td><td>The starting state / preconditions</td><td>Given a policy in good standing with a $750 windshield-only glass claim</td></tr>
+          <tr><td class="mono">When</td><td>The action under test</td><td>When the policyholder submits FNOL through the mobile app</td></tr>
+          <tr><td class="mono">Then</td><td>The observable, checkable outcome</td><td>Then the claim is auto-approved, a single payment is issued, and an audit entry is written with model version and reason code</td></tr>
+        </tbody>
+      </table></div>
+      <p>Given/When/Then is used throughout the <a href="#doc-cases">Test Cases</a> document below for every acceptance test.</p>
+    </section>
+
+    <section id="f-casetypes" data-searchable data-title="Positive negative boundary idempotency test cases">
+      <h3>Positive, negative, boundary, and idempotency cases</h3>
+      <p>A requirement is not covered by one test &mdash; it's covered by a <em>family</em> of tests that probes the requirement from every angle an adversarial user or a flaky network could produce.</p>
+      <div class="grid grid-2">
+        <div class="card"><h4 style="margin-top:0;">Positive (happy path)</h4><p style="font-size:13.5px;margin-bottom:0;">Valid input, expected preconditions, expected outcome. Proves the feature works when everything goes right. <strong>Necessary but never sufficient.</strong></p></div>
+        <div class="card"><h4 style="margin-top:0;">Negative</h4><p style="font-size:13.5px;margin-bottom:0;">Invalid input, missing preconditions, unavailable dependency. Proves the system fails safely instead of silently or destructively.</p></div>
+        <div class="card"><h4 style="margin-top:0;">Boundary</h4><p style="font-size:13.5px;margin-bottom:0;">Values exactly at, one below, and one above a threshold. Off-by-one errors live here &mdash; e.g. a claim at exactly $1,500.00.</p></div>
+        <div class="card"><h4 style="margin-top:0;">Idempotency</h4><p style="font-size:13.5px;margin-bottom:0;">The same operation, submitted twice (retry, duplicate webhook, double-tap), must produce the same end state with no duplicate side effect. Non-negotiable for anything that moves money.</p></div>
+      </div>
+      <div class="callout critical"><span class="callout-label">Review flag</span><p>A test suite with only positive cases is the single most common defect in AI-generated QA evidence. If you see 20 passing tests and all 20 are happy-path, treat requirements coverage as effectively zero until negative, boundary, and idempotency siblings exist.</p></div>
+    </section>
+
+    <section id="f-traceability" data-searchable data-title="Traceability and coverage">
+      <h3>Traceability to requirements &amp; coverage</h3>
+      <p><strong>Traceability</strong> is the explicit link from a requirement to the test(s) that prove it. <strong>Coverage</strong> is the resulting measurement &mdash; what percentage of requirements have at least one passing test, and (separately, more precisely) what percentage of code branches or paths are exercised. The two numbers are not interchangeable: 100% code coverage with zero negative-path assertions is easy for an AI to produce and tells you almost nothing about safety.</p>
+      <p>The rule this guide enforces throughout: <strong>every requirement has at least one test, and every test traces back to a requirement.</strong> A test with no requirement behind it is "orphan" &mdash; it may be testing something nobody asked for, or worse, papering over a requirement nobody wrote down. See the <a href="#doc-rtm">Requirements Traceability Matrix</a> for the worked example.</p>
+    </section>
+
+    <section id="f-severity" data-searchable data-title="Defect severity vs priority">
+      <h3>Defect severity vs. priority</h3>
+      <p>These are two independent axes, and collapsing them into one is the second most common defect in AI-generated defect logs.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Severity</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Question it answers</strong></td><td>How badly is the system broken?</td><td>How soon must it be fixed?</td></tr>
+          <tr><td><strong>Who typically sets it</strong></td><td>QA / the engineer who found it, from technical impact</td><td>Product / release owner, from business urgency</td></tr>
+          <tr><td><strong>Example</strong></td><td>A typo in a footer copyright year &mdash; Severity: Low</td><td>...but it ships to 40,000 renewal letters tomorrow &mdash; Priority: P1</td></tr>
+          <tr><td><strong>Independent example</strong></td><td>A crash in an admin tool used twice a year &mdash; Severity: Critical</td><td>...but next use is in 8 months &mdash; Priority: P4</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout warn"><span class="callout-label">Review flag</span><p>"Every defect is Critical / P1" is not rigor, it's the absence of triage. If a defect log has no spread across severities, the triage step was skipped &mdash; push back before you sign off on the <a href="#doc-summary">Test Summary Report</a>.</p></div>
+    </section>
+
+    <section id="f-regression" data-searchable data-title="Regression and exploratory testing">
+      <h3>Regression &amp; exploratory testing</h3>
+      <p><strong>Regression testing</strong> re-runs previously-passing tests after a change to catch anything the change broke that nobody was looking for. It should be automated and it should run on every build. <strong>Exploratory testing</strong> is structured, time-boxed, human-driven investigation with no fixed script &mdash; a skilled tester (or a well-prompted AI red-team pass) actively trying to break the system in ways the written test cases didn't anticipate. Both are required; neither substitutes for the other. ClaimsIQ's exploratory charter includes deliberately feeding the FNOL narrative extractor ambiguous, contradictory, and adversarial free-text claim descriptions.</p>
+    </section>
+
+    <section id="f-shiftleft" data-searchable data-title="Shift-left testing">
+      <h3>Shift-left</h3>
+      <p>Shift-left means moving quality activities earlier in the lifecycle &mdash; writing acceptance tests before the code that satisfies them, validating a requirement's testability at design time, running static analysis and contract checks on every commit rather than at the end of a sprint. The later a defect is caught, the more it costs: a requirement ambiguity caught in review costs a conversation; the same ambiguity caught in production costs an incident, a defect report, a fix, a retest, and (for ClaimsIQ) potentially a regulatory disclosure if it affected a payment decision.</p>
+    </section>
+
+    <section id="f-goodbad" data-searchable data-title="Good testing vs bad testing">
+      <h3>Good testing vs. bad testing</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Good testing</th><th>Bad testing</th></tr></thead>
+        <tbody>
+          <tr><td>Tests trace to a written requirement</td><td>Tests exist because "that's what the framework generated"</td></tr>
+          <tr><td>Covers positive, negative, boundary, idempotency</td><td>Happy path only</td></tr>
+          <tr><td>Non-functional targets carry numbers</td><td>"Should be fast," "should be secure"</td></tr>
+          <tr><td>Failures are specific: expected X, got Y, at step 3</td><td>"Test failed" with no repro</td></tr>
+          <tr><td>Severity and priority set independently, with rationale</td><td>Everything is Critical / P1, or everything is Low</td></tr>
+          <tr><td>Flaky tests are quarantined and fixed</td><td>Flaky tests are re-run until green and ignored</td></tr>
+          <tr><td>Ship recommendation cites the evidence behind it</td><td>"Looks good to me"</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="f-kpis" data-searchable data-title="QA KPIs">
+      <h3>QA KPIs worth tracking</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>KPI</th><th>What it tells you</th><th>Watch for</th></tr></thead>
+        <tbody>
+          <tr><td>Test pass rate</td><td>% of executed tests currently passing</td><td>High pass rate with low case count is meaningless &mdash; check coverage alongside it</td></tr>
+          <tr><td>Requirements coverage</td><td>% of requirements with &ge;1 passing test</td><td>100% coverage can still hide happy-path-only tests</td></tr>
+          <tr><td>Defect density</td><td>Defects per requirement, per KLOC, or per 100 test cases</td><td>Rising density late in a cycle is a stop-ship signal</td></tr>
+          <tr><td>Defect escape rate</td><td>% of defects found in production vs. pre-release</td><td>The single best long-term measure of suite effectiveness</td></tr>
+          <tr><td>Mean time to resolution (MTTR)</td><td>Average time from defect logged to verified fixed</td><td>Rising MTTR on Critical/High defects near a release date</td></tr>
+          <tr><td>Automation rate</td><td>% of regression suite that runs unattended</td><td>Low automation rate means regression testing doesn't scale with release cadence</td></tr>
+        </tbody>
+      </table></div>
+      <p>These KPIs are instantiated with real ClaimsIQ numbers in the <a href="#doc-summary">Test Summary Report</a>.</p>
+    </section>
+
+    <section id="f-lens" data-searchable data-title="The architect's review lens checklist">
+      <h3>The architect's review lens</h3>
+      <p class="lede">When an AI assistant hands you a test suite, a defect log, or a ship recommendation, run it through this checklist before your name goes anywhere near "approved."</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Question</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Does every requirement have at least one test, and does every test trace to a requirement?</td><td>Catches gaps and orphan tests in one pass</td></tr>
+          <tr><td>2</td><td>Are negative, boundary, and idempotency cases present, or is this happy-path only?</td><td>The most common gap in generated suites</td></tr>
+          <tr><td>3</td><td>Do non-functional requirements carry a measurable number and an actual measured result?</td><td>Separates a test from a hope</td></tr>
+          <tr><td>4</td><td>Are severity and priority both present, independently justified, and not uniformly Critical?</td><td>Signals real triage happened</td></tr>
+          <tr><td>5</td><td>Could this test suite pass while the feature is actually broken?</td><td>The false-confidence check &mdash; e.g. a mocked dependency that never exercises the real failure mode</td></tr>
+          <tr><td>6</td><td>Is the ship/no-ship recommendation explicit, and is the evidence behind it named and checkable?</td><td>"Looks fine" is not a recommendation an architect can stand behind</td></tr>
+          <tr><td>7</td><td>Are known, deferred, or accepted risks stated out loud, or only the passing tests?</td><td>What's omitted is often more important than what's shown</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ============ VISUALS ============ -->
+    <section id="visuals" data-searchable data-title="Diagrams and charts">
+      <h2>Diagrams &amp; charts</h2>
+      <p class="lede">Four process diagrams and four quantitative charts, all inline SVG &mdash; no external chart libraries, so this page works fully offline. These are referenced from the documents below and repeated here as a standalone visual reference.</p>
+
+      <div class="grid grid-2">
+        <div class="viz-panel">
+          <h4>Testing pyramid</h4>
+          <svg viewBox="0 0 320 220" role="img" aria-label="Testing pyramid: 70% unit, 20% integration, 10% end-to-end">
+            <polygon points="160,14 246,84 74,84" fill="var(--leaf)"></polygon>
+            <polygon points="74,90 246,90 274,160 46,160" fill="var(--berry)"></polygon>
+            <polygon points="46,166 274,166 302,206 18,206" fill="var(--cherry)"></polygon>
+            <text x="160" y="54" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Unit</text>
+            <text x="160" y="130" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Integration</text>
+            <text x="160" y="190" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">End-to-End</text>
+            <text x="288" y="54" text-anchor="start" fill="var(--muted)" font-size="11" class="mono-label">70%</text>
+            <text x="288" y="128" text-anchor="start" fill="var(--muted)" font-size="11" class="mono-label">20%</text>
+            <text x="315" y="190" text-anchor="end" fill="var(--muted)" font-size="11" class="mono-label">10%</text>
+          </svg>
+          <div class="viz-caption">Heaviest investment at the base: fast, deterministic, cheap to run on every commit.</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Defect lifecycle (state diagram)</h4>
+          <svg viewBox="0 0 340 260" role="img" aria-label="Defect lifecycle state diagram">
+            <defs><marker id="arrLife" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"></path></marker></defs>
+            <g font-size="10.5" font-family="var(--font-mono)">
+              <rect x="10" y="10" width="70" height="30" rx="6" fill="var(--berry)"></rect><text x="45" y="29" text-anchor="middle" fill="#fff">New</text>
+              <rect x="130" y="10" width="80" height="30" rx="6" fill="var(--berry)"></rect><text x="170" y="29" text-anchor="middle" fill="#fff">Triaged</text>
+              <rect x="250" y="10" width="80" height="30" rx="6" fill="var(--berry)"></rect><text x="290" y="29" text-anchor="middle" fill="#fff">In Progress</text>
+              <rect x="250" y="90" width="80" height="30" rx="6" fill="var(--leaf)"></rect><text x="290" y="109" text-anchor="middle" fill="#fff">Fixed</text>
+              <rect x="130" y="90" width="80" height="30" rx="6" fill="var(--leaf)"></rect><text x="170" y="109" text-anchor="middle" fill="#fff">Verifying</text>
+              <rect x="10" y="90" width="80" height="30" rx="6" fill="var(--leaf)"></rect><text x="50" y="109" text-anchor="middle" fill="#fff">Closed</text>
+              <rect x="130" y="170" width="80" height="30" rx="6" fill="var(--amber)"></rect><text x="170" y="189" text-anchor="middle" fill="#fff">Reopened</text>
+              <rect x="10" y="170" width="90" height="30" rx="6" fill="var(--muted)"></rect><text x="55" y="189" text-anchor="middle" fill="#fff">Deferred</text>
+              <rect x="250" y="170" width="80" height="30" rx="6" fill="var(--cherry)"></rect><text x="290" y="189" text-anchor="middle" fill="#fff">Rejected</text>
+
+              <line x1="80" y1="25" x2="128" y2="25" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="210" y1="25" x2="248" y2="25" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="290" y1="40" x2="290" y2="88" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="250" y1="105" x2="212" y2="105" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="130" y1="105" x2="92" y2="105" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="170" y1="120" x2="170" y2="168" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="170" y1="170" x2="290" y2="42" stroke="var(--muted)" stroke-dasharray="3 3" marker-end="url(#arrLife)"></line>
+              <line x1="130" y1="185" x2="102" y2="185" stroke="var(--muted)" marker-end="url(#arrLife)"></line>
+              <line x1="170" y1="90" x2="70" y2="42" stroke="var(--muted)" stroke-dasharray="3 3" marker-end="url(#arrLife)"></line>
+            </g>
+          </svg>
+          <div class="viz-caption">Solid = normal flow. Dashed = exception paths (verification failure &rarr; reopened; triage rejects as not-a-bug).</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Test execution flow</h4>
+          <svg viewBox="0 0 340 130" role="img" aria-label="Test execution flow">
+            <defs><marker id="arrFlow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--berry)"></path></marker></defs>
+            <g font-size="10" font-family="var(--font-mono)" fill="#fff">
+              <rect x="4" y="45" width="58" height="40" rx="8" fill="var(--berry)"></rect><text x="33" y="62" text-anchor="middle">Plan</text><text x="33" y="74" text-anchor="middle">&amp; Design</text>
+              <rect x="76" y="45" width="58" height="40" rx="8" fill="var(--berry)"></rect><text x="105" y="62" text-anchor="middle">Env.</text><text x="105" y="74" text-anchor="middle">Setup</text>
+              <rect x="148" y="45" width="58" height="40" rx="8" fill="var(--berry)"></rect><text x="177" y="65" text-anchor="middle">Execute</text>
+              <rect x="220" y="45" width="58" height="40" rx="8" fill="var(--amber)"></rect><text x="249" y="62" text-anchor="middle">Log</text><text x="249" y="74" text-anchor="middle">Defects</text>
+              <rect x="292" y="45" width="46" height="40" rx="8" fill="var(--leaf)"></rect><text x="315" y="62" text-anchor="middle">Report</text>
+              <line x1="62" y1="65" x2="74" y2="65" stroke="var(--berry)" marker-end="url(#arrFlow)"></line>
+              <line x1="134" y1="65" x2="146" y2="65" stroke="var(--berry)" marker-end="url(#arrFlow)"></line>
+              <line x1="206" y1="65" x2="218" y2="65" stroke="var(--berry)" marker-end="url(#arrFlow)"></line>
+              <line x1="278" y1="65" x2="290" y2="65" stroke="var(--berry)" marker-end="url(#arrFlow)"></line>
+              <path d="M249,45 C249,10 177,10 177,43" fill="none" stroke="var(--muted)" stroke-dasharray="3 3" marker-end="url(#arrFlow)"></path>
+            </g>
+            <text x="213" y="15" font-size="9" fill="var(--muted)" text-anchor="middle" class="mono-label">retest after fix</text>
+          </svg>
+          <div class="viz-caption">Defects loop back into execution for retest before a cycle can exit.</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Sequence: failing retry path (auto-approval payment)</h4>
+          <svg viewBox="0 0 340 230" role="img" aria-label="Sequence diagram of a failing retry path with idempotency protection">
+            <defs><marker id="arrSeq" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--text)"></path></marker></defs>
+            <line x1="40" y1="26" x2="40" y2="216" stroke="var(--border)"></line>
+            <line x1="170" y1="26" x2="170" y2="216" stroke="var(--border)"></line>
+            <line x1="300" y1="26" x2="300" y2="216" stroke="var(--border)"></line>
+            <g font-size="10" font-weight="700" fill="var(--berry)">
+              <text x="40" y="16" text-anchor="middle">Mobile App</text>
+              <text x="170" y="16" text-anchor="middle">ClaimsIQ API</text>
+              <text x="300" y="16" text-anchor="middle">Payment Svc</text>
+            </g>
+            <g font-size="9.5" fill="var(--text)">
+              <line x1="40" y1="42" x2="168" y2="42" stroke="var(--text)" marker-end="url(#arrSeq)"></line>
+              <text x="46" y="38">submit FNOL (idempotency-key: k1)</text>
+              <line x1="170" y1="60" x2="298" y2="60" stroke="var(--text)" marker-end="url(#arrSeq)"></line>
+              <text x="176" y="56">POST /pay (key: k1)</text>
+              <line x1="300" y1="90" x2="172" y2="90" stroke="var(--amber)" stroke-dasharray="4 3" marker-end="url(#arrSeq)"></line>
+              <text x="176" y="86" fill="var(--amber)">timeout (5s, no response)</text>
+              <line x1="170" y1="108" x2="298" y2="108" stroke="var(--text)" marker-end="url(#arrSeq)"></line>
+              <text x="176" y="104">retry POST /pay (same key: k1)</text>
+              <text x="176" y="122" fill="var(--muted)">payment svc checks key k1 &rarr; already processing</text>
+              <line x1="300" y1="140" x2="172" y2="140" stroke="var(--leaf)" marker-end="url(#arrSeq)"></line>
+              <text x="176" y="136" fill="var(--leaf)">200 OK (existing result, no 2nd charge)</text>
+              <line x1="170" y1="160" x2="42" y2="160" stroke="var(--leaf)" marker-end="url(#arrSeq)"></line>
+              <text x="46" y="156" fill="var(--leaf)">claim approved, single payment</text>
+              <text x="20" y="186" fill="var(--muted)" font-family="var(--font-mono)">&#10003; idempotency key prevented a duplicate charge</text>
+              <text x="20" y="202" fill="var(--muted)" font-family="var(--font-mono)">   despite the client-observed timeout + retry.</text>
+            </g>
+          </svg>
+          <div class="viz-caption">This exact scenario is covered by TC-021 in the <a href="#doc-cases">Test Cases</a> document.</div>
+        </div>
+      </div>
+
+      <h3>Quantitative charts (Release 3.2 QA cycle)</h3>
+      <div class="grid grid-4" style="margin-bottom:6px;">
+        <div class="kpi-tile"><div class="kpi-label">Test Pass Rate</div><div class="kpi-value">92%</div><div class="kpi-sub good">211 / 229 executed</div></div>
+        <div class="kpi-tile"><div class="kpi-label">Requirements Coverage</div><div class="kpi-value">100%</div><div class="kpi-sub good">15 / 15 requirements</div></div>
+        <div class="kpi-tile"><div class="kpi-label">P95 Triage Latency</div><div class="kpi-value">9.4s</div><div class="kpi-sub good">Target &lt; 12s</div></div>
+        <div class="kpi-tile"><div class="kpi-label">Defect Density</div><div class="kpi-value">0.87</div><div class="kpi-sub">defects / test case, cumulative</div></div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="viz-panel">
+          <h4>Defects by severity (33 total, cumulative)</h4>
+          <svg viewBox="0 0 300 180" role="img" aria-label="Bar chart of defects by severity: Critical 3, High 7, Medium 14, Low 9">
+            <g font-size="10" font-family="var(--font-mono)">
+              <line x1="30" y1="150" x2="290" y2="150" stroke="var(--border)"></line>
+              <rect x="45" y="150" width="40" rx="4" height="-30" fill="var(--cherry)" transform="translate(0,-30)"></rect>
+              <rect x="45" y="120" width="40" height="30" fill="var(--cherry)" rx="3"></rect>
+              <text x="65" y="112" text-anchor="middle" fill="var(--text)">3</text>
+              <text x="65" y="164" text-anchor="middle" fill="var(--muted)">Critical</text>
+
+              <rect x="110" y="80" width="40" height="70" fill="var(--amber)" rx="3"></rect>
+              <text x="130" y="72" text-anchor="middle" fill="var(--text)">7</text>
+              <text x="130" y="164" text-anchor="middle" fill="var(--muted)">High</text>
+
+              <rect x="175" y="10" width="40" height="140" fill="var(--berry)" rx="3"></rect>
+              <text x="195" y="2" text-anchor="middle" fill="var(--text)" dy="10">14</text>
+              <text x="195" y="164" text-anchor="middle" fill="var(--muted)">Medium</text>
+
+              <rect x="240" y="60" width="40" height="90" fill="var(--leaf)" rx="3"></rect>
+              <text x="260" y="52" text-anchor="middle" fill="var(--text)">9</text>
+              <text x="260" y="164" text-anchor="middle" fill="var(--muted)">Low</text>
+            </g>
+          </svg>
+          <div class="viz-caption">Spread across all four severities &mdash; evidence real triage occurred, not a uniform label.</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Test result mix (last full run)</h4>
+          <svg viewBox="0 0 200 160" role="img" aria-label="Donut chart of test results: 80% pass, 10% fail, 6% blocked, 4% not run">
+            <g transform="translate(60,80)">
+              <circle r="54" fill="none" stroke="var(--border)" stroke-width="16"></circle>
+              <circle r="54" fill="none" stroke="var(--leaf)" stroke-width="16" stroke-dasharray="271.43 339.29" transform="rotate(-90)"></circle>
+              <circle r="54" fill="none" stroke="var(--cherry)" stroke-width="16" stroke-dasharray="33.93 305.36" transform="rotate(198)"></circle>
+              <circle r="54" fill="none" stroke="var(--amber)" stroke-width="16" stroke-dasharray="20.36 318.93" transform="rotate(234)"></circle>
+              <circle r="54" fill="none" stroke="var(--muted)" stroke-width="16" stroke-dasharray="13.57 325.72" transform="rotate(255.6)"></circle>
+              <text x="0" y="6" text-anchor="middle" font-size="20" font-weight="900" fill="var(--text)">80%</text>
+            </g>
+            <g font-size="10" font-family="var(--font-mono)" fill="var(--text)">
+              <rect x="130" y="18" width="10" height="10" fill="var(--leaf)"></rect><text x="145" y="27">Pass 80%</text>
+              <rect x="130" y="38" width="10" height="10" fill="var(--cherry)"></rect><text x="145" y="47">Fail 10%</text>
+              <rect x="130" y="58" width="10" height="10" fill="var(--amber)"></rect><text x="145" y="67">Blocked 6%</text>
+              <rect x="130" y="78" width="10" height="10" fill="var(--muted)"></rect><text x="145" y="87">Not run 4%</text>
+            </g>
+          </svg>
+          <div class="viz-caption">"Blocked" = waiting on the SIU sandbox fraud-signal environment (see Test Plan risks).</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Defect trend by sprint</h4>
+          <svg viewBox="0 0 300 160" role="img" aria-label="Line chart of open defects by sprint, declining from 5 to 2 over six sprints">
+            <g stroke="var(--border)"><line x1="30" y1="10" x2="30" y2="130"></line><line x1="30" y1="130" x2="290" y2="130"></line></g>
+            <polyline points="50,70 90,26 130,46 170,54 210,86 250,110" fill="none" stroke="var(--berry)" stroke-width="2.5"></polyline>
+            <g fill="var(--berry)">
+              <circle cx="50" cy="70" r="4"></circle><circle cx="90" cy="26" r="4"></circle><circle cx="130" cy="46" r="4"></circle>
+              <circle cx="170" cy="54" r="4"></circle><circle cx="210" cy="86" r="4"></circle><circle cx="250" cy="110" r="4"></circle>
+            </g>
+            <g font-size="9.5" font-family="var(--font-mono)" fill="var(--muted)">
+              <text x="50" y="145" text-anchor="middle">Spr 1</text><text x="90" y="145" text-anchor="middle">Spr 2</text>
+              <text x="130" y="145" text-anchor="middle">Spr 3</text><text x="170" y="145" text-anchor="middle">Spr 4</text>
+              <text x="210" y="145" text-anchor="middle">Spr 5</text><text x="250" y="145" text-anchor="middle">Spr 6</text>
+            </g>
+            <g font-size="9.5" font-family="var(--font-mono)" fill="var(--text)">
+              <text x="50" y="63">5</text><text x="90" y="19">9</text><text x="130" y="39">7</text>
+              <text x="170" y="47">6</text><text x="210" y="79">4</text><text x="250" y="103">2</text>
+            </g>
+          </svg>
+          <div class="viz-caption">Open defects converge toward zero heading into release &mdash; the shape reviewers should expect before a "ship" call.</div>
+        </div>
+
+        <div class="viz-panel">
+          <h4>Coverage % by module</h4>
+          <svg viewBox="0 0 300 190" role="img" aria-label="Horizontal bar chart of test coverage percent by module">
+            <g font-size="9.5" font-family="var(--font-mono)" fill="var(--text)">
+              <text x="4" y="14">FNOL Intake</text><rect x="100" y="4" width="192" height="12" rx="3" fill="var(--berry)"></rect><text x="292" y="14" text-anchor="end" fill="#fff">96%</text>
+              <text x="4" y="34">Extraction / NLP</text><rect x="100" y="24" width="184" height="12" rx="3" fill="var(--berry)"></rect><text x="284" y="34" text-anchor="end" fill="#fff">92%</text>
+              <text x="4" y="54">Severity Triage</text><rect x="100" y="44" width="176" height="12" rx="3" fill="var(--berry)"></rect><text x="276" y="54" text-anchor="end" fill="#fff">88%</text>
+              <text x="4" y="74">Fraud Signals</text><rect x="100" y="64" width="162" height="12" rx="3" fill="var(--amber)"></rect><text x="262" y="74" text-anchor="end" fill="#fff">81%</text>
+              <text x="4" y="94">Auto-Approval Pay</text><rect x="100" y="84" width="200" height="12" rx="3" fill="var(--leaf)"></rect><text x="298" y="94" text-anchor="end" fill="#fff">100%</text>
+              <text x="4" y="114">Adjuster Assignment</text><rect x="100" y="104" width="180" height="12" rx="3" fill="var(--berry)"></rect><text x="280" y="114" text-anchor="end" fill="#fff">90%</text>
+              <text x="4" y="134">Audit / Logging</text><rect x="100" y="124" width="190" height="12" rx="3" fill="var(--berry)"></rect><text x="290" y="134" text-anchor="end" fill="#fff">95%</text>
+              <text x="4" y="154">Accessibility</text><rect x="100" y="144" width="168" height="12" rx="3" fill="var(--amber)"></rect><text x="268" y="154" text-anchor="end" fill="#fff">84%</text>
+            </g>
+          </svg>
+          <div class="viz-caption">Fraud Signals and Accessibility are the two modules below the 85% coverage bar &mdash; both are called out as conditions in the Test Summary Report.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DOCUMENTS INTRO ============ -->
+    <section id="documents" data-searchable data-title="ClaimsIQ deliverables">
+      <h2>The seven ClaimsIQ deliverables</h2>
+      <p class="lede">Each document below is a complete, standalone artifact for Meridian Mutual's ClaimsIQ Release 3.2 &mdash; not a summary of one. Each carries its own cover, document-control strip, and sign-off block, and each can be downloaded independently as a styled HTML file, printed to PDF via the browser's native print dialog, and (where tabular) exported to CSV for Excel.</p>
+    </section>
+
+    <!-- ============ DOC 1: TEST STRATEGY ============ -->
+    <section id="doc-strategy" data-searchable data-title="Test Strategy">
+    <article class="doc-card" id="docCard-strategy">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 1 of 7 &middot; Program-Level</div>
+        <h2>Test Strategy</h2>
+        <div class="doc-sub">ClaimsIQ &mdash; AI-Assisted FNOL Intake &amp; Triage &middot; Meridian Mutual Insurance</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-STRAT-CLQ-01</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Maya Torres</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-06-01</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <h3>1. Purpose &amp; scope</h3>
+        <p>This strategy governs all testing for the ClaimsIQ program: the AI-assisted First Notice of Loss (FNOL) intake, extraction, severity triage, fraud-signal screening, and straight-through payment capability being rolled out to Meridian Mutual's personal auto line. It applies across releases; release-specific scope, schedule, and staffing live in the <a href="#doc-plan">Test Plan</a>.</p>
+        <p>In scope: web, iOS/Android app, and phone-transcript FNOL channels; the AI extraction and severity-classification services; fraud-signal screening; adjuster-queue assignment; straight-through payment for qualifying glass claims; the audit/logging layer. Out of scope for this strategy: the legacy mainframe policy system of record (tested under its own program) and third-party SIU (Special Investigations Unit) case-management tooling, which is validated only at the integration boundary.</p>
+
+        <h3>2. Quality objectives</h3>
+        <ul>
+          <li>No claim decision (approval, denial, fraud flag) is made without a human-overridable, audited AI output.</li>
+          <li>No policyholder is charged, paid, or denied twice for the same loss event, regardless of retries or duplicate submissions.</li>
+          <li>Every requirement in the current release has at least one automated test; non-functional requirements carry a measured, numeric result.</li>
+          <li>FNOL intake surfaces meet WCAG 2.1 AA; no policyholder is excluded by assistive-technology incompatibility.</li>
+        </ul>
+
+        <h3>3. Testing levels &amp; types</h3>
+        <p>ClaimsIQ follows the standard testing pyramid (see <a href="#f-pyramid">Foundations &rarr; Testing pyramid</a>): ~70% unit, ~20% integration, ~10% end-to-end. Investment scales with blast radius:</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Risk tier</th><th>Examples</th><th>Required coverage</th></tr></thead>
+          <tbody>
+            <tr><td>High &mdash; irreversible / financial</td><td>Auto-approval payment, fraud-flag suppression, PII handling</td><td>Unit + integration + E2E + idempotency + security review</td></tr>
+            <tr><td>Medium &mdash; internal workflow</td><td>Adjuster-queue assignment, severity triage</td><td>Unit + integration</td></tr>
+            <tr><td>Low &mdash; display / formatting</td><td>Claim status labels, adjuster dashboard formatting</td><td>Unit only</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>4. AI-specific testing considerations</h3>
+        <p>ClaimsIQ's core novelty &mdash; and risk &mdash; is that several decision points are made by a model rather than deterministic code. The strategy treats these as first-class test targets, not an exception to normal QA:</p>
+        <div class="grid grid-2">
+          <div class="card"><h4 style="margin-top:0;">Contract testing on model I/O</h4><p style="font-size:13.5px;margin-bottom:0;">The extraction and severity-classification services expose a typed contract (structured JSON out, regardless of model version). Contract tests run on every model or prompt change, independent of the underlying model provider.</p></div>
+          <div class="card"><h4 style="margin-top:0;">Golden-set regression</h4><p style="font-size:13.5px;margin-bottom:0;">A held-out set of 400 real (de-identified) historical FNOL narratives with adjuster-confirmed severity labels is re-scored on every model change; agreement must stay &ge;90% or the change is blocked.</p></div>
+          <div class="card"><h4 style="margin-top:0;">Human-override capture</h4><p style="font-size:13.5px;margin-bottom:0;">Every adjuster override of an AI severity call is logged with before/after values and feeds the model-feedback backlog &mdash; tested as a functional requirement (REQ-09), not just a data-science nice-to-have.</p></div>
+          <div class="card"><h4 style="margin-top:0;">Adversarial / exploratory red-team</h4><p style="font-size:13.5px;margin-bottom:0;">A scheduled exploratory charter feeds ambiguous, contradictory, and adversarial narrative text to the extractor and fraud screen to probe for prompt-injection and misclassification risk.</p></div>
+        </div>
+
+        <h3>5. Entry &amp; exit criteria (standing)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th></th><th>Criteria</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Entry</strong></td><td>Requirements traced in the RTM; test environment matches the release's dependency versions; test data is synthetic or de-identified only.</td></tr>
+            <tr><td><strong>Exit</strong></td><td>100% requirements coverage; zero open Critical defects; open High defects have an accepted-risk sign-off; all NFR targets measured and met or explicitly waived; ship/no-ship recommendation issued.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>6. Environments &amp; tools</h3>
+        <p>Unit and integration tests run in CI on every commit against containerized dependencies. End-to-end tests run nightly against a dedicated ClaimsIQ staging environment seeded with synthetic policyholder data. Tools: Jest/Vitest (unit), a contract-testing harness for model I/O, Playwright (E2E, browser and mobile web), k6 (performance/load), axe-core (accessibility), and a manual SIU-sandbox pass for fraud-signal review pending automated coverage.</p>
+
+        <h3>7. Roles &amp; responsibilities</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Role</th><th>Responsibility</th></tr></thead>
+          <tbody>
+            <tr><td>QA Lead</td><td>Owns strategy and plan; gatekeeps exit criteria</td></tr>
+            <tr><td>SDET</td><td>Builds and maintains automated suites across all three pyramid tiers</td></tr>
+            <tr><td>AI Solution Architect</td><td>Reviews and approves AI-specific test design, traceability completeness, and the final ship/no-ship recommendation</td></tr>
+            <tr><td>Claims SME / Adjuster liaison</td><td>Validates severity and fraud-signal test oracles against real claims judgment</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="callout info"><span class="callout-label">Deviation note</span><p>Per the 12-factor production-readiness principle, any deviation from this strategy (e.g. skipping a testing level for a specific feature) must be logged in that feature's directive with reasoning &mdash; not silently absorbed into "we ran out of time."</p></div>
+
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-05-28</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-05-30</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-06-01</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-strategy','QA_Strategy_ClaimsIQ.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-strategy')">Save as PDF</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-STRAT-CLQ-01 &middot; v1.2 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>Page 1 of 1</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 2: TEST PLAN ============ -->
+    <section id="doc-plan" data-searchable data-title="Test Plan">
+    <article class="doc-card" id="docCard-plan">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 2 of 7 &middot; Release-Level</div>
+        <h2>Test Plan</h2>
+        <div class="doc-sub">ClaimsIQ Release 3.2 &mdash; Auto-Approval Expansion &amp; Fraud-Signal Tuning</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-PLAN-CLQ-R3.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.0</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Maya Torres</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-05</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <h3>1. Release scope</h3>
+        <p>Release 3.2 raises the straight-through auto-approval ceiling for glass-only claims from $1,000 to $1,500, ships a re-tuned fraud-signal model (v2.3), and adds phone-transcript as a third FNOL intake channel alongside web and mobile app. This plan governs the QA cycle for that scope only; standing rules live in the <a href="#doc-strategy">Test Strategy</a>.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>In scope this release</th><th>Out of scope this release</th></tr></thead>
+          <tbody>
+            <tr><td>Auto-approval threshold change ($1,000 &rarr; $1,500)</td><td>Commercial-line claims (personal auto only)</td></tr>
+            <tr><td>Fraud-signal model v2.3 retraining validation</td><td>Homeowners / property FNOL (separate program)</td></tr>
+            <tr><td>Phone-transcript intake channel (new)</td><td>Adjuster mobile app redesign (deferred to R3.3)</td></tr>
+            <tr><td>Regression across web + app + phone-transcript channels</td><td>Legacy policy-system-of-record migration</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>2. Schedule &amp; milestones</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Milestone</th><th>Date</th><th>Exit gate</th></tr></thead>
+          <tbody>
+            <tr><td>Test design complete, RTM baselined</td><td>2026-08-07</td><td>100% of REQs have &ge;1 planned test</td></tr>
+            <tr><td>Sprint 1&ndash;3 execution (functional)</td><td>2026-08-08 &ndash; 2026-08-16</td><td>&ge;95% planned cases executed</td></tr>
+            <tr><td>NFR pass (perf, security, accessibility)</td><td>2026-08-17 &ndash; 2026-08-19</td><td>All numeric targets measured</td></tr>
+            <tr><td>Regression + exploratory pass</td><td>2026-08-20 &ndash; 2026-08-21</td><td>Zero new Critical/High</td></tr>
+            <tr><td>Test Summary Report &amp; ship/no-ship</td><td>2026-08-24</td><td>Signed recommendation issued</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>3. Entry &amp; exit criteria (this cycle)</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th></th><th>Criteria</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Entry</strong></td><td>Fraud model v2.3 deployed to staging; phone-transcript channel feature-complete; synthetic test-data set refreshed with $1,000&ndash;$1,500 boundary claims.</td></tr>
+            <tr><td><strong>Exit</strong></td><td>All Release 3.2 requirements traced and covered; zero open Critical defects; all High defects have a documented accepted-risk or fix-verified status; P95 latency &lt; 12s measured under load; WCAG 2.1 AA scan clean on the new phone-transcript intake UI.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>4. Test deliverables</h3>
+        <ul>
+          <li><a href="#doc-cases">Test Cases</a> covering all Release 3.2 requirements, including boundary cases at the new $1,500 threshold</li>
+          <li><a href="#doc-rtm">Requirements Traceability Matrix</a></li>
+          <li><a href="#doc-defect">Defect log</a> against the shared template</li>
+          <li><a href="#doc-summary">Test Summary Report</a> with explicit ship/no-ship recommendation</li>
+          <li><a href="#doc-coverage">Coverage Matrix</a> by module and test type</li>
+        </ul>
+
+        <h3>5. Environment &amp; test data</h3>
+        <p>All testing runs against the ClaimsIQ staging environment, isolated from production policy and payment systems. Test data is 100% synthetic: policyholder identities, VINs, and loss narratives are generated or drawn from a de-identified historical corpus with names, addresses, and policy numbers replaced. No production PII enters the test environment at any point &mdash; this is a hard gate, not a preference.</p>
+
+        <h3>6. Risks &amp; mitigations</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr></thead>
+          <tbody>
+            <tr><td>SIU sandbox for fraud-signal integration testing has limited availability windows</td><td>Medium</td><td>Reserved slots pre-booked; fraud-signal unit/contract tests carry extra weight to reduce dependency on sandbox time</td></tr>
+            <tr><td>Phone-transcript channel is new; historical golden-set data doesn't cover it yet</td><td>High</td><td>50 synthetic phone-transcript samples hand-authored with adjuster-confirmed expected severity as an interim golden set</td></tr>
+            <tr><td>Auto-approval threshold change increases financial blast radius</td><td>Medium</td><td>Idempotency and duplicate-payment testing elevated to mandatory exit-gate status, not just "nice to have"</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>7. Suspension / resumption criteria</h3>
+        <p>Testing is suspended if: the staging environment's fraud-signal model diverges from the production candidate build, or if a Critical defect blocks more than 20% of planned test cases from executing. Resumption requires a fix or a documented workaround, re-verified by the QA Lead before execution continues.</p>
+
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-04</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-04</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-05</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-plan','QA_TestPlan_ClaimsIQ_R3.2.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-plan')">Save as PDF</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-PLAN-CLQ-R3.2 &middot; v1.0 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>Page 1 of 1</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 3: TEST CASES ============ -->
+    <section id="doc-cases" data-searchable data-title="Test Cases">
+    <article class="doc-card" id="docCard-cases">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 3 of 7 &middot; Feature-Level</div>
+        <h2>Test Cases</h2>
+        <div class="doc-sub">ClaimsIQ Release 3.2 &mdash; Given / When / Then acceptance tests, all 15 requirements</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-TC-CLQ-R3.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.1</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Devon Park</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-12</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>27 acceptance tests across all 15 Release 3.2 requirements. Every requirement carries at least one Positive case plus, where applicable, Negative, Boundary, Idempotency, and Non-Functional siblings &mdash; per the Foundations rule that a happy path alone is not coverage. Full detail below; a flat CSV export is available for import into a test-management tool.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>TC ID</th><th>Req</th><th>Type</th><th>Given</th><th>When</th><th>Then</th><th>Pri.</th></tr></thead>
+          <tbody id="tcTableBody">
+            <tr><td class="mono">TC-001</td><td class="mono">REQ-01</td><td><span class="pill pill-low">Positive</span></td><td>a policyholder completes all required FNOL fields on the web portal</td><td>they submit the form</td><td>a claim record is created with a unique claim ID and channel = web</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-002</td><td class="mono">REQ-01</td><td><span class="pill pill-low">Positive</span></td><td>a policyholder completes FNOL in the mobile app while offline-then-reconnected</td><td>connectivity resumes and the form syncs</td><td>a claim record is created with channel = mobile-app, no data loss from the offline window</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-003</td><td class="mono">REQ-01</td><td><span class="pill pill-low">Positive</span></td><td>a policyholder reports a loss by phone and the call is transcribed</td><td>the transcript is submitted to ClaimsIQ</td><td>a claim record is created with channel = phone-transcript, using the same data model as web/app</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-004</td><td class="mono">REQ-02</td><td><span class="pill pill-low">Positive</span></td><td>a narrative contains policy #, VIN, loss date, and loss location in free text</td><td>the extraction service processes it</td><td>all four fields are extracted correctly, matching &ge;95% field accuracy against the 400-item golden set</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-005</td><td class="mono">REQ-02</td><td><span class="pill pill-medium">Negative</span></td><td>a narrative omits the VIN entirely</td><td>the extraction service processes it</td><td>the VIN field is flagged missing, the claim is routed to manual review, and auto-approval is never attempted</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-006</td><td class="mono">REQ-02</td><td><span class="pill pill-high">Boundary</span></td><td>a narrative is exactly the 5,000-character maximum input length</td><td>the extraction service processes it</td><td>extraction completes without truncation or a timeout error</td><td><span class="pill pill-p3">P3</span></td></tr>
+            <tr><td class="mono">TC-007</td><td class="mono">REQ-03</td><td><span class="pill pill-low">Positive</span></td><td>the 400-item golden set of adjuster-confirmed severity labels</td><td>severity classification runs against it</td><td>agreement with adjuster labels is &ge;90%</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-008</td><td class="mono">REQ-03</td><td><span class="pill pill-medium">Negative</span></td><td>a narrative is ambiguous or internally contradictory</td><td>severity classification runs</td><td>the confidence score falls below threshold and the claim routes to manual severity review instead of auto-classifying</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-009</td><td class="mono">REQ-04</td><td><span class="pill pill-low">Positive</span></td><td>a claim narrative matches a known staged-accident pattern</td><td>fraud-signal screening runs</td><td>the claim is flagged and routed to SIU review</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-010</td><td class="mono">REQ-04</td><td><span class="pill pill-medium">Negative</span></td><td>a claim has no fraud indicators present</td><td>fraud-signal screening runs</td><td>the claim proceeds without an SIU flag (no false positive)</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-011</td><td class="mono">REQ-04</td><td><span class="pill pill-high">Boundary</span></td><td>a policyholder's claims velocity is exactly 3 claims in the trailing 12 months (the flag threshold)</td><td>fraud-signal screening runs</td><td>the claim is flagged &mdash; the threshold is inclusive</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-012</td><td class="mono">REQ-05</td><td><span class="pill pill-low">Positive</span></td><td>a glass-only claim of $1,499.99 on a policy in good standing</td><td>triage completes</td><td>the claim is auto-approved and a single payment is issued</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-013</td><td class="mono">REQ-05</td><td><span class="pill pill-high">Boundary</span></td><td>a glass-only claim of exactly $1,500.00</td><td>triage completes</td><td>the claim is auto-approved &mdash; the $1,500 ceiling is inclusive</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-014</td><td class="mono">REQ-05</td><td><span class="pill pill-high">Boundary</span></td><td>a glass-only claim of $1,500.01</td><td>triage completes</td><td>the claim is routed to an adjuster and is <em>not</em> auto-approved</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-015</td><td class="mono">REQ-05</td><td><span class="pill pill-medium">Negative</span></td><td>a glass-only claim under $1,500 on a lapsed policy</td><td>triage completes</td><td>auto-approval is blocked and the claim routes to manual review</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-016</td><td class="mono">REQ-06</td><td><span class="pill pill-low">Positive</span></td><td>three open claims of varying severity across two adjuster regions with uneven current workload</td><td>queue assignment runs</td><td>each claim routes to the correct region and the adjuster with lowest current workload in that region</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-017</td><td class="mono">REQ-07</td><td><span class="pill pill-critical">Idempotency</span></td><td>an identical FNOL (same policy + loss date + VIN + channel) is submitted twice within 60 seconds</td><td>both submissions are processed</td><td>only one claim record exists; the second submission returns the existing claim ID, not a new one</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-018</td><td class="mono">REQ-07</td><td><span class="pill pill-critical">Idempotency</span></td><td>a mobile client retries FNOL submission after a network timeout, reusing the same idempotency key</td><td>the retried request reaches the server</td><td>no duplicate claim is created; the original claim ID is returned</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-019</td><td class="mono">REQ-08</td><td><span class="pill pill-medium">Security</span></td><td>a claim record containing policyholder name, partial SSN, and address is queued for the analytics export</td><td>the export job runs</td><td>all PII fields are redacted or tokenized in the exported dataset, with zero plaintext PII present</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-020</td><td class="mono">REQ-09</td><td><span class="pill pill-low">Positive</span></td><td>an adjuster disagrees with an AI-assigned severity tier</td><td>they submit an override</td><td>the override is captured with before/after values and correlation ID, and queued to the model-feedback backlog</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-021</td><td class="mono">REQ-12</td><td><span class="pill pill-critical">Idempotency</span></td><td>an auto-approval payment request times out client-side after 5s with no response received</td><td>the client retries with the same idempotency key</td><td>exactly one payment is issued; the retry returns the original result with no second charge (see sequence diagram)</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-022</td><td class="mono">REQ-11</td><td><span class="pill pill-medium">Performance</span></td><td>500 concurrent FNOL submissions at production-equivalent load</td><td>the load test runs for 15 minutes</td><td>P95 end-to-end submit-to-triage-complete latency is under 12 seconds</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-023</td><td class="mono">REQ-10</td><td><span class="pill pill-medium">Availability</span></td><td>the AI severity-classification service is forced offline</td><td>a policyholder submits FNOL during business hours</td><td>the claim is captured and routed to the manual-intake fallback queue; no submission is lost</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-024</td><td class="mono">REQ-13</td><td><span class="pill pill-medium">Accessibility</span></td><td>the FNOL web and mobile-web intake forms</td><td>an axe-core automated scan runs</td><td>zero WCAG 2.1 AA violations are reported</td><td><span class="pill pill-p2">P2</span></td></tr>
+            <tr><td class="mono">TC-025</td><td class="mono">REQ-14</td><td><span class="pill pill-low">Positive</span></td><td>any AI decision is made (extraction, severity, fraud flag, or auto-approval)</td><td>the decision completes</td><td>an audit entry is written with correlation ID, model version, and reason code, tagged for 7-year retention</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-026</td><td class="mono">REQ-15</td><td><span class="pill pill-medium">Security</span></td><td>an adjuster is assigned to Region A only</td><td>they query a claim assigned to Region B</td><td>access is denied (403) and no Region B claim data is returned</td><td><span class="pill pill-p1">P1</span></td></tr>
+            <tr><td class="mono">TC-027</td><td class="mono">REQ-15</td><td><span class="pill pill-medium">Security</span></td><td>a commercial-lines adjuster account</td><td>they query a personal-lines claim record</td><td>access is denied and no cross-tenant data is returned</td><td><span class="pill pill-p1">P1</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout success"><span class="callout-label">Coverage check</span><p>All 15 requirements appear in the Req column at least once (REQ-05 and REQ-15 appear most, reflecting their financial and access-control blast radius). Cross-check against the <a href="#doc-rtm">Traceability Matrix</a> for the formal requirement-by-requirement view.</p></div>
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-11</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-12</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-12</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-cases','QA_TestCases_ClaimsIQ_R3.2.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-cases')">Save as PDF</button>
+        <button class="btn" onclick="downloadCSV(testCasesData,'QA_TestCases_ClaimsIQ_R3.2.csv')">Download CSV</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-TC-CLQ-R3.2 &middot; v1.1 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>27 test cases &middot; 15/15 requirements represented</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 4: RTM ============ -->
+    <section id="doc-rtm" data-searchable data-title="Requirements Traceability Matrix">
+    <article class="doc-card" id="docCard-rtm">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 4 of 7 &middot; Feature-Level</div>
+        <h2>Requirements Traceability Matrix</h2>
+        <div class="doc-sub">ClaimsIQ Release 3.2 &mdash; every requirement mapped to its proving tests</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-RTM-CLQ-R3.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.1</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Devon Park</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-12</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>The rule enforced here: <strong>every requirement has &ge;1 test, and no test exists without a requirement behind it.</strong> No orphans in either direction. All 15 Release 3.2 requirements are Fully Covered.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Req ID</th><th>Requirement</th><th>Type</th><th>Test Case(s)</th><th>Coverage</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">REQ-01</td><td>Capture FNOL via web, mobile app, and phone transcript in one data model</td><td>Functional</td><td class="mono">TC-001, TC-002, TC-003</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-02</td><td>Extract structured claim fields from unstructured narrative, &ge;95% field accuracy</td><td>Functional / AI</td><td class="mono">TC-004, TC-005, TC-006</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-03</td><td>Classify severity into 4 tiers, &ge;90% agreement vs. adjuster</td><td>Functional / AI</td><td class="mono">TC-007, TC-008</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-04</td><td>Detect fraud-signal indicators and flag for SIU review</td><td>Functional / AI</td><td class="mono">TC-009, TC-010, TC-011</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-05</td><td>Auto-approve straight-through payment for glass claims &lt; $1,500 in good standing</td><td>Functional</td><td class="mono">TC-012, TC-013, TC-014, TC-015</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-06</td><td>Assign non-auto-approved claims by severity + geography + workload</td><td>Functional</td><td class="mono">TC-016</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-07</td><td>Idempotent claim creation &mdash; duplicate FNOL never creates a duplicate record</td><td>Functional / Idempotency</td><td class="mono">TC-017, TC-018</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-08</td><td>PII/PHI redaction in logs and downstream analytics exports</td><td>Security</td><td class="mono">TC-019</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-09</td><td>AI severity classification is human-overridable; override captured for feedback</td><td>Functional / AI</td><td class="mono">TC-020</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-10</td><td>99.5% availability during business hours; graceful manual fallback on AI outage</td><td>Availability</td><td class="mono">TC-023</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-11</td><td>P95 end-to-end FNOL-to-triage under 12 seconds</td><td>Performance</td><td class="mono">TC-022</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-12</td><td>Straight-through payment fires exactly once per approved claim, even under retry</td><td>Idempotency</td><td class="mono">TC-021</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-13</td><td>WCAG 2.1 AA on FNOL web / mobile intake forms</td><td>Accessibility</td><td class="mono">TC-024</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-14</td><td>Audit trail for every AI decision, retained 7 years</td><td>Compliance</td><td class="mono">TC-025</td><td><span class="pill pill-pass">Full</span></td></tr>
+            <tr><td class="mono">REQ-15</td><td>Role-based access &mdash; adjusters scoped to their queue/region; no cross-tenant leakage</td><td>Security</td><td class="mono">TC-026, TC-027</td><td><span class="pill pill-pass">Full</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout success"><span class="callout-label">Traceability result</span><p>15 / 15 requirements Fully Covered. 27 / 27 test cases trace to a requirement &mdash; zero orphan tests found on this pass.</p></div>
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-11</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-12</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-12</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-rtm','QA_RTM_ClaimsIQ_R3.2.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-rtm')">Save as PDF</button>
+        <button class="btn" onclick="downloadCSV(rtmData,'QA_RTM_ClaimsIQ_R3.2.csv')">Download CSV</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-RTM-CLQ-R3.2 &middot; v1.1 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>15/15 requirements fully covered</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 5: DEFECT REPORT ============ -->
+    <section id="doc-defect" data-searchable data-title="Defect Report Template">
+    <article class="doc-card" id="docCard-defect">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 5 of 7 &middot; Template + Worked Example</div>
+        <h2>Bug / Defect Report</h2>
+        <div class="doc-sub">Template fields, one fully worked example (DEF-0042), and a representative log excerpt</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-DEF-CLQ-01</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.0</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Devon Park</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-18</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <h3>Template fields</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">Defect ID</td><td>Stable identifier, never reused</td></tr>
+            <tr><td class="mono">Title</td><td>One line, specific enough to triage without opening the ticket</td></tr>
+            <tr><td class="mono">Severity</td><td>Technical impact &mdash; see <a href="#f-severity">severity vs. priority</a></td></tr>
+            <tr><td class="mono">Priority</td><td>Business urgency &mdash; set independently of severity</td></tr>
+            <tr><td class="mono">Status</td><td>New &rarr; Triaged &rarr; In Progress &rarr; Fixed &rarr; Verifying &rarr; Closed (see lifecycle diagram)</td></tr>
+            <tr><td class="mono">Environment / Build</td><td>Exact staging build and dependency versions, so the bug can be reproduced</td></tr>
+            <tr><td class="mono">Steps to Reproduce</td><td>Numbered, deterministic, no ambiguity</td></tr>
+            <tr><td class="mono">Expected vs. Actual</td><td>Both stated explicitly &mdash; never just "it's broken"</td></tr>
+            <tr><td class="mono">Evidence</td><td>Logs, correlation ID, screenshots, request/response payloads (PII-redacted)</td></tr>
+            <tr><td class="mono">Root Cause</td><td>Filled in during Diagnostic Mode, not skipped even after a quick fix</td></tr>
+            <tr><td class="mono">Fix Summary &amp; Verification</td><td>What changed, and the test that proves the fix holds</td></tr>
+            <tr><td class="mono">Related Req / TC</td><td>Links the defect back to the requirement and test case it violated</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Worked example</h3>
+        <div class="card" style="border-left:4px solid var(--cherry);">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+            <h4 style="margin:0;">DEF-0042 &mdash; Duplicate payment issued on webhook retry within 400ms window</h4>
+            <div><span class="pill pill-critical">Severity: Critical</span> <span class="pill pill-p1">Priority: P1</span></div>
+          </div>
+          <div class="table-wrap"><table>
+            <tbody>
+              <tr><td style="width:160px;"><strong>Status</strong></td><td><span class="pill pill-pass">Closed &mdash; Fixed &amp; Verified</span></td></tr>
+              <tr><td><strong>Reported By</strong></td><td>Devon Park, Senior SDET</td></tr>
+              <tr><td><strong>Date Reported</strong></td><td>2026-08-14</td></tr>
+              <tr><td><strong>Environment / Build</strong></td><td>ClaimsIQ staging, build 3.2.0-rc4, Payment Svc v1.9.2</td></tr>
+              <tr><td><strong>Related Req / TC</strong></td><td class="mono">REQ-12 / TC-021</td></tr>
+              <tr><td><strong>Steps to Reproduce</strong></td><td>
+                1. Submit an eligible glass-only claim ($900) for straight-through auto-approval.<br>
+                2. Simulate a payment-service response delay &gt; the client's 5s timeout.<br>
+                3. Allow the mobile client to auto-retry the payment POST using the same idempotency key, but fire the retry at exactly 400ms after the original request (before the original request's DB transaction commits).<br>
+                4. Inspect the payments table for the claim.
+              </td></tr>
+              <tr><td><strong>Expected Result</strong></td><td>Exactly one payment row exists for the claim, regardless of retry timing.</td></tr>
+              <tr><td><strong>Actual Result</strong></td><td>Two payment rows were created for the same claim, both for $900 &mdash; the policyholder was paid twice.</td></tr>
+              <tr><td><strong>Evidence</strong></td><td class="mono">correlation_id=8f2a...c19e appears on both payment rows; payment_svc logs show two "processing" states for idempotency_key=k-88213 with a 400ms gap, both passing the pre-insert existence check before either row committed.</td></tr>
+              <tr><td><strong>Root Cause</strong></td><td>The idempotency check was "check-then-insert": a <code>SELECT</code> for the existing key followed by an <code>INSERT</code>, not wrapped in a single atomic operation. Two concurrent requests within the same ~400ms window could both pass the SELECT before either INSERT committed &mdash; a classic time-of-check-to-time-of-use (TOCTOU) race condition.</td></tr>
+              <tr><td><strong>Fix Summary</strong></td><td>Replaced check-then-insert with a single atomic upsert: a unique constraint on <code>idempotency_key</code> plus <code>INSERT ... ON CONFLICT DO NOTHING</code>, with the conflicting request reading back and returning the winning row's result instead of racing to insert its own.</td></tr>
+              <tr><td><strong>Verification</strong></td><td>TC-021 re-run under a 500-iteration concurrent-retry load test (k6): zero duplicate payments across all iterations. Fixed in build 3.2.0-rc6, verified 2026-08-16.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <h3>Representative defect log excerpt</h3>
+        <p class="muted" style="font-size:12.5px;">33 defects were logged across the Release 3.2 cycle (see <a href="#doc-summary">Test Summary Report</a> for the full severity breakdown). The excerpt below is a representative sample for this template document; the complete log is tracked in the team's issue tracker.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Defect ID</th><th>Title</th><th>Severity</th><th>Priority</th><th>Status</th><th>Related Req</th></tr></thead>
+          <tbody id="defectTableBody">
+            <tr><td class="mono">DEF-0042</td><td>Duplicate payment on webhook retry within 400ms window</td><td><span class="pill pill-critical">Critical</span></td><td><span class="pill pill-p1">P1</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-12</td></tr>
+            <tr><td class="mono">DEF-0038</td><td>Fraud-signal false positive on legitimate multi-vehicle household claims</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-p2">P2</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-04</td></tr>
+            <tr><td class="mono">DEF-0035</td><td>Phone-transcript channel drops loss-location field when narrative includes cross-street references</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-p2">P2</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-02</td></tr>
+            <tr><td class="mono">DEF-0031</td><td>Adjuster queue rebalancing lags by up to 90s under burst load, briefly overloading one region</td><td><span class="pill pill-medium">Medium</span></td><td><span class="pill pill-p3">P3</span></td><td><span class="pill pill-blocked">Deferred (R3.3)</span></td><td class="mono">REQ-06</td></tr>
+            <tr><td class="mono">DEF-0029</td><td>Auto-approval boundary off-by-one: $1,500.00 exactly was rejected instead of approved</td><td><span class="pill pill-critical">Critical</span></td><td><span class="pill pill-p1">P1</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-05</td></tr>
+            <tr><td class="mono">DEF-0024</td><td>Screen-reader focus order skips the loss-date field on the mobile-web intake form</td><td><span class="pill pill-medium">Medium</span></td><td><span class="pill pill-p2">P2</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-13</td></tr>
+            <tr><td class="mono">DEF-0019</td><td>Audit log missing model_version field for severity decisions made during a canary rollout</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-p2">P2</span></td><td><span class="pill pill-pass">Closed</span></td><td class="mono">REQ-14</td></tr>
+            <tr><td class="mono">DEF-0012</td><td>Footer copyright year on the adjuster dashboard is hardcoded to 2025</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-p4">P4</span></td><td><span class="pill pill-blocked">Open</span></td><td class="mono">&mdash;</td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout warn"><span class="callout-label">Why this excerpt matters to a reviewer</span><p>Note DEF-0029: an off-by-one at the exact boundary this release changed ($1,500). This is precisely the class of defect that boundary testing (TC-013/TC-014) exists to catch, and precisely why "we tested the happy path" is never an acceptable substitute for boundary cases on a threshold that moved this release.</p></div>
+
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-17</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-18</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-18</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-defect','QA_DefectReport_ClaimsIQ.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-defect')">Save as PDF</button>
+        <button class="btn" onclick="downloadCSV(defectData,'QA_DefectLog_ClaimsIQ_R3.2.csv')">Download CSV</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-DEF-CLQ-01 &middot; v1.0 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>1 worked example &middot; 8-row log excerpt</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 6: TEST SUMMARY REPORT ============ -->
+    <section id="doc-summary" data-searchable data-title="Test Summary Report ship no-ship">
+    <article class="doc-card" id="docCard-summary">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 6 of 7 &middot; Release-Level</div>
+        <h2>Test Summary Report</h2>
+        <div class="doc-sub">ClaimsIQ Release 3.2 &mdash; end-of-cycle results and ship recommendation</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-SUM-CLQ-R3.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.0</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Maya Torres</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved &mdash; Conditional Ship</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-24</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <h3>Executive summary</h3>
+        <p>Release 3.2 (auto-approval threshold to $1,500, fraud model v2.3, phone-transcript intake) completed its QA cycle 2026-08-08 through 2026-08-24. All 15 requirements are fully traced and covered by 27 acceptance tests plus supporting non-functional testing. 211 of 229 total executed tests pass (92%). Zero Critical defects remain open; one High-severity defect (DEF-0031, adjuster-queue rebalancing lag under burst load) is deferred to Release 3.3 with an accepted-risk sign-off below.</p>
+
+        <h3>Scope tested</h3>
+        <p>Functional: FNOL intake across web, mobile app, and the new phone-transcript channel; extraction accuracy; severity triage; fraud-signal screening at model v2.3; auto-approval at the new $1,500 threshold; adjuster-queue assignment; audit logging. Non-functional: performance under 500-concurrent-user load, WCAG 2.1 AA accessibility scan, PII redaction verification, and idempotency under simulated network retry.</p>
+
+        <h3>Results at a glance</h3>
+        <div class="grid grid-4" style="margin-bottom:10px;">
+          <div class="kpi-tile"><div class="kpi-label">Requirements Coverage</div><div class="kpi-value">100%</div><div class="kpi-sub good">15 / 15</div></div>
+          <div class="kpi-tile"><div class="kpi-label">Test Pass Rate</div><div class="kpi-value">92%</div><div class="kpi-sub good">211 / 229 executed</div></div>
+          <div class="kpi-tile"><div class="kpi-label">Open Critical Defects</div><div class="kpi-value">0</div><div class="kpi-sub good">Exit gate met</div></div>
+          <div class="kpi-tile"><div class="kpi-label">P95 Triage Latency</div><div class="kpi-value">9.4s</div><div class="kpi-sub good">Target &lt; 12s</div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="viz-panel">
+            <h4>Defects by severity (cumulative, this release)</h4>
+            <svg viewBox="0 0 300 170" role="img" aria-label="Bar chart, defects by severity">
+              <g font-size="10" font-family="var(--font-mono)">
+                <line x1="20" y1="150" x2="290" y2="150" stroke="var(--border)"></line>
+                <rect x="45" y="120" width="40" height="30" fill="var(--cherry)" rx="3"></rect><text x="65" y="112" text-anchor="middle">3</text><text x="65" y="164" text-anchor="middle" fill="var(--muted)">Critical</text>
+                <rect x="110" y="80" width="40" height="70" fill="var(--amber)" rx="3"></rect><text x="130" y="72" text-anchor="middle">7</text><text x="130" y="164" text-anchor="middle" fill="var(--muted)">High</text>
+                <rect x="175" y="10" width="40" height="140" fill="var(--berry)" rx="3"></rect><text x="195" y="4" dy="10" text-anchor="middle">14</text><text x="195" y="164" text-anchor="middle" fill="var(--muted)">Medium</text>
+                <rect x="240" y="60" width="40" height="90" fill="var(--leaf)" rx="3"></rect><text x="260" y="52" text-anchor="middle">9</text><text x="260" y="164" text-anchor="middle" fill="var(--muted)">Low</text>
+              </g>
+            </svg>
+          </div>
+          <div class="viz-panel">
+            <h4>Final test result mix</h4>
+            <svg viewBox="0 0 200 150" role="img" aria-label="Donut chart of pass fail blocked not-run">
+              <g transform="translate(60,72)">
+                <circle r="54" fill="none" stroke="var(--border)" stroke-width="16"></circle>
+                <circle r="54" fill="none" stroke="var(--leaf)" stroke-width="16" stroke-dasharray="271.43 339.29" transform="rotate(-90)"></circle>
+                <circle r="54" fill="none" stroke="var(--cherry)" stroke-width="16" stroke-dasharray="33.93 305.36" transform="rotate(198)"></circle>
+                <circle r="54" fill="none" stroke="var(--amber)" stroke-width="16" stroke-dasharray="20.36 318.93" transform="rotate(234)"></circle>
+                <circle r="54" fill="none" stroke="var(--muted)" stroke-width="16" stroke-dasharray="13.57 325.72" transform="rotate(255.6)"></circle>
+                <text x="0" y="6" text-anchor="middle" font-size="18" font-weight="900" fill="var(--text)">80%</text>
+              </g>
+              <g font-size="10" font-family="var(--font-mono)" fill="var(--text)">
+                <rect x="128" y="10" width="10" height="10" fill="var(--leaf)"></rect><text x="143" y="19">Pass 80%</text>
+                <rect x="128" y="28" width="10" height="10" fill="var(--cherry)"></rect><text x="143" y="37">Fail 10%</text>
+                <rect x="128" y="46" width="10" height="10" fill="var(--amber)"></rect><text x="143" y="55">Blocked 6%</text>
+                <rect x="128" y="64" width="10" height="10" fill="var(--muted)"></rect><text x="143" y="73">Not run 4%</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <h3>Non-functional results vs. targets</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Dimension</th><th>Target</th><th>Measured</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Performance (P95 latency)</td><td>&lt; 12s</td><td>9.4s under 500 concurrent submissions</td><td><span class="pill pill-pass">Met</span></td></tr>
+            <tr><td>Availability</td><td>99.5% business hours, graceful fallback</td><td>99.6% measured over 14-day staging soak; fallback verified (TC-023)</td><td><span class="pill pill-pass">Met</span></td></tr>
+            <tr><td>Accessibility</td><td>WCAG 2.1 AA, zero violations</td><td>Zero violations on web; 2 minor violations found and fixed on phone-transcript review UI (DEF-0024 class)</td><td><span class="pill pill-pass">Met</span></td></tr>
+            <tr><td>PII redaction</td><td>100% of exports redacted</td><td>100% across 40 sampled export batches</td><td><span class="pill pill-pass">Met</span></td></tr>
+            <tr><td>Idempotency (payment)</td><td>Zero duplicate charges under retry</td><td>Zero duplicates across 500-iteration concurrent-retry test post DEF-0042 fix</td><td><span class="pill pill-pass">Met</span></td></tr>
+            <tr><td>Fraud-signal coverage</td><td>&ge;85% module test coverage</td><td>81% &mdash; SIU sandbox availability limited full integration pass</td><td><span class="pill pill-blocked">Below target</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Known risks &amp; deferred items</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Item</th><th>Severity</th><th>Disposition</th></tr></thead>
+          <tbody>
+            <tr><td>DEF-0031 &mdash; adjuster-queue rebalancing lags up to 90s under burst load</td><td><span class="pill pill-medium">Medium</span></td><td>Accepted risk this release; fix scheduled for R3.3. Burst conditions require &gt;40 simultaneous high-severity claims in one region, observed rate &lt;1/month historically.</td></tr>
+            <tr><td>Fraud-signal module coverage at 81%, below the 85% bar</td><td><span class="pill pill-high">High</span></td><td>Condition on ship &mdash; see recommendation below.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Ship / no-ship recommendation</h3>
+        <div class="callout success" style="border-left-color:var(--leaf);">
+          <span class="callout-label" style="color:var(--leaf);">Recommendation: Conditional Ship</span>
+          <p><strong>Ship the auto-approval threshold increase, fraud model v2.3, and the phone-transcript channel to production</strong>, gated on two conditions: (1) fraud-signal module coverage is raised from 81% to &ge;85% via the pending SIU-sandbox integration pass, scheduled 2026-08-27 through 2026-08-29, before the fraud-signal component is enabled for the highest-severity claim tier; (2) DEF-0031 remains tracked as an accepted risk with a committed R3.3 fix date, not silently dropped.</p>
+          <p style="margin-bottom:0;">Evidence behind this call: 100% requirements traced and covered, zero open Critical defects, all financial-integrity (idempotency) and compliance (audit, PII) targets met and independently verified, P95 latency 22% under target with headroom. The one below-target metric (fraud-signal coverage) is isolated to a single module with a scheduled remediation window, not a systemic quality signal &mdash; which is why this is a conditional ship rather than a hold.</p>
+        </div>
+
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-23</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-24</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-24</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-summary','QA_TestSummaryReport_ClaimsIQ_R3.2.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-summary')">Save as PDF</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-SUM-CLQ-R3.2 &middot; v1.0 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>Recommendation: Conditional Ship</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ DOC 7: COVERAGE MATRIX ============ -->
+    <section id="doc-coverage" data-searchable data-title="Coverage Matrix">
+    <article class="doc-card" id="docCard-coverage">
+      <div class="doc-cover">
+        <img class="doc-logo" data-logo alt="Colaberry logo">
+        <div class="doc-kicker">Document 7 of 7 &middot; Release-Level</div>
+        <h2>Coverage Matrix</h2>
+        <div class="doc-sub">ClaimsIQ Release 3.2 &mdash; module &times; test-type coverage</div>
+        <div class="doc-control-strip">
+          <div class="dcs-cell"><div class="dcs-k">Doc ID</div><div class="dcs-v mono">QA-COV-CLQ-R3.2</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Version</div><div class="dcs-v">1.0</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Owner</div><div class="dcs-v">Maya Torres</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Status</div><div class="dcs-v">Approved</div></div>
+          <div class="dcs-cell"><div class="dcs-k">Date</div><div class="dcs-v">2026-08-24</div></div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>Requirements coverage (the RTM) answers "does every requirement have a test." This matrix answers a different question: "for each module, how thoroughly is it tested across every test type the strategy calls for." Reading it alongside the RTM prevents a false sense of security &mdash; a module can have 100% requirements coverage from a single thin test and still show gaps here.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Module</th><th>Unit</th><th>Integration</th><th>E2E</th><th>Security</th><th>Performance</th><th>Accessibility</th><th>Overall</th></tr></thead>
+          <tbody id="covTableBody">
+            <tr><td>FNOL Intake</td><td>98%</td><td>96%</td><td>92%</td><td>90%</td><td>88%</td><td>92%</td><td><strong>96%</strong></td></tr>
+            <tr><td>Extraction / NLP</td><td>95%</td><td>92%</td><td>88%</td><td>85%</td><td>n/a</td><td>n/a</td><td><strong>92%</strong></td></tr>
+            <tr><td>Severity Triage</td><td>94%</td><td>88%</td><td>84%</td><td>n/a</td><td>n/a</td><td>n/a</td><td><strong>88%</strong></td></tr>
+            <tr><td>Fraud Signals</td><td>90%</td><td>78%</td><td>72%</td><td>80%</td><td>n/a</td><td>n/a</td><td><strong>81%</strong></td></tr>
+            <tr><td>Auto-Approval Payment</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td><td>100%</td><td>n/a</td><td><strong>100%</strong></td></tr>
+            <tr><td>Adjuster Assignment</td><td>92%</td><td>90%</td><td>88%</td><td>92%</td><td>85%</td><td>n/a</td><td><strong>90%</strong></td></tr>
+            <tr><td>Audit / Logging</td><td>98%</td><td>95%</td><td>90%</td><td>97%</td><td>n/a</td><td>n/a</td><td><strong>95%</strong></td></tr>
+            <tr><td>Accessibility (all intake UI)</td><td>n/a</td><td>n/a</td><td>84%</td><td>n/a</td><td>n/a</td><td>84%</td><td><strong>84%</strong></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout warn"><span class="callout-label">Below the 85% coverage bar</span><p>Fraud Signals (81%) and Accessibility (84%) sit below Meridian's standing 85% coverage threshold for non-Low-risk modules. Both are named as explicit conditions in the <a href="#doc-summary">Test Summary Report</a>'s ship recommendation rather than absorbed silently into an "overall coverage looks fine" average.</p></div>
+        <div class="doc-signoff">
+          <h3>Sign-off</h3>
+          <div class="signoff-grid">
+            <div class="signoff-box"><div class="so-role">Prepared By</div><div class="so-name">Devon Park</div><div class="so-meta">Senior SDET &middot; 2026-08-23</div><div class="so-sig">D. Park</div></div>
+            <div class="signoff-box"><div class="so-role">Reviewed By</div><div class="so-name">Maya Torres</div><div class="so-meta">QA Lead, ClaimsIQ Squad &middot; 2026-08-24</div><div class="so-sig">M. Torres</div></div>
+            <div class="signoff-box"><div class="so-role">Approved By</div><div class="so-name">Priya Nandakumar</div><div class="so-meta">AI Solution Architect, Claims Platform &middot; 2026-08-24</div><div class="so-sig">P. Nandakumar</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-toolbar no-print">
+        <button class="btn btn-primary" onclick="downloadDoc('docCard-coverage','QA_CoverageMatrix_ClaimsIQ_R3.2.html')">Download HTML</button>
+        <button class="btn" onclick="printDoc('doc-coverage')">Save as PDF</button>
+        <button class="btn" onclick="downloadCSV(coverageData,'QA_CoverageMatrix_ClaimsIQ_R3.2.csv')">Download CSV</button>
+      </div>
+      <div class="doc-footer">
+        <span>QA-COV-CLQ-R3.2 &middot; v1.0 &middot; Meridian Mutual Insurance &mdash; Confidential</span>
+        <span>2 modules below the 85% coverage bar</span>
+      </div>
+    </article>
+    </section>
+
+    <!-- ============ ASK THE GUIDE ============ -->
+    <section id="askSection" data-searchable data-title="Ask the guide FAQ assistant">
+      <h2>Ask the guide</h2>
+      <p class="lede">Type a question in plain language. This runs entirely offline &mdash; it matches your question against the guide's own content and shows you the relevant answer, with a link to the full section. No external API, no network call.</p>
+      <div class="ask-panel">
+        <form class="ask-form" id="askForm">
+          <input class="ask-input" id="askInput" type="text" placeholder="e.g. What's the difference between severity and priority?" autocomplete="off">
+          <button type="submit" class="btn btn-primary">Ask</button>
+        </form>
+        <div class="ask-suggest" id="askSuggest"></div>
+        <div class="ask-log" id="askLog"></div>
+      </div>
+    </section>
+
+    <div class="site-footer">
+      <span>QA Engineer Field Guide &middot; Colaberry Enterprise AI Leadership Accelerator</span>
+      <span>Generated for the AI Solution Architect track, Week 6 Deep Dive</span>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script type="application/json" id="deepdive-metadata">
+{
+  "guide_type": "QA Engineer Field Guide",
+  "curriculum_type": "deep_dive",
+  "week": 6,
+  "discipline": "QA Engineer",
+  "student_id": "regina.asafor@gmail.com",
+  "project_id": "claimsiq-fnol-triage",
+  "repository": "Rasafor/AI-Project",
+  "generated_by": "Claude Code",
+  "generated_date": "2026-08-26",
+  "version": "1.0.0",
+  "build_number": "2026.08.26-1"
+}
+</script>
+
+<script>
+/* ============================================================
+   LOGO INJECTION (single base64 source, applied to every img)
+   ============================================================ */
+const LOGO_DATA_URI = "data:image/png;base64,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";
+document.querySelectorAll('[data-logo]').forEach(img => { img.src = LOGO_DATA_URI; });
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+(function(){
+  const root = document.documentElement;
+  const saved = localStorage.getItem('qafg-theme');
+  if (saved === 'dark') root.classList.add('theme-dark');
+  if (saved === 'light') root.classList.add('theme-light');
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const isDark = root.classList.contains('theme-dark') ||
+      (!root.classList.contains('theme-light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    root.classList.remove('theme-dark','theme-light');
+    if (isDark) { root.classList.add('theme-light'); localStorage.setItem('qafg-theme','light'); }
+    else { root.classList.add('theme-dark'); localStorage.setItem('qafg-theme','dark'); }
+  });
+})();
+
+/* ============================================================
+   PYRAMID DIAGRAM (small inline reuse inside Foundations)
+   ============================================================ */
+document.getElementById('pyramidDiagram').innerHTML = `
+<svg viewBox="0 0 300 190" role="img" aria-label="Testing pyramid: 70% unit, 20% integration, 10% end-to-end" style="max-width:340px;">
+  <polygon points="150,12 224,74 76,74" fill="var(--leaf)"></polygon>
+  <polygon points="76,80 224,80 250,140 50,140" fill="var(--berry)"></polygon>
+  <polygon points="50,146 250,146 274,180 26,180" fill="var(--cherry)"></polygon>
+  <text x="150" y="48" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Unit (70%)</text>
+  <text x="150" y="114" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Integration (20%)</text>
+  <text x="150" y="167" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">End-to-End (10%)</text>
+</svg>`;
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+const searchIndex = Array.from(document.querySelectorAll('[data-searchable]')).map(el => {
+  const heading = el.querySelector('h1,h2,h3');
+  return {
+    id: el.id || '',
+    title: el.dataset.title || (heading ? heading.textContent.trim() : 'Untitled section'),
+    text: (el.textContent || '').replace(/\s+/g,' ').trim().toLowerCase()
+  };
+}).filter(s => s.id);
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+function renderSearchResults(matches, query){
+  if (!matches.length){
+    searchResults.innerHTML = `<div class="search-empty">No matches for "${query}". Try Ask the guide instead.</div>`;
+    searchResults.hidden = false;
+    return;
+  }
+  searchResults.innerHTML = matches.map(m => {
+    const idx = m.text.indexOf(query);
+    let snippet = '';
+    if (idx >= 0){
+      const start = Math.max(0, idx - 40);
+      snippet = (start > 0 ? '…' : '') + m.text.slice(start, idx + 80) + '…';
+    }
+    return `<a class="search-result-item" href="#${m.id}" data-jump="${m.id}"><div class="srt">${m.title}</div><div class="srs">${snippet}</div></a>`;
+  }).join('');
+  searchResults.hidden = false;
+}
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q){ searchResults.hidden = true; return; }
+  const matches = searchIndex.filter(s => s.text.includes(q)).slice(0, 8);
+  renderSearchResults(matches, q);
+});
+searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) searchResults.hidden = false; });
+document.addEventListener('click', (e) => {
+  if (!searchResults.contains(e.target) && e.target !== searchInput){ searchResults.hidden = true; }
+});
+searchResults.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-jump]');
+  if (a){ searchResults.hidden = true; searchInput.value = ''; }
+});
+
+function jumpToSection(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+window.addEventListener('hashchange', () => jumpToSection(location.hash.replace('#','')));
+
+/* ============================================================
+   ASK THE GUIDE (offline keyword-matched Q&A)
+   ============================================================ */
+const askKB = [
+  {q:"What is the difference between test strategy, test plan, and test cases?", kw:["strategy","plan","cases","difference","altitude"], a:"Test Strategy is program-level and rarely changes (what quality means for the product). Test Plan is release-level and changes every cycle (what's in scope this release). Test Cases are feature-level and change continuously (the literal steps proving one requirement).", link:"#f-pyramid"},
+  {q:"What is the testing pyramid?", kw:["pyramid","unit","integration","end-to-end","e2e","tiers"], a:"Roughly 70% unit tests, 20% integration tests, 10% end-to-end tests. Heaviest investment at the fast, cheap, deterministic base; lightest at the slow, expensive top.", link:"#f-pyramid"},
+  {q:"What is Given When Then?", kw:["given","when","then","gwt","acceptance","behavior"], a:"A three-part grammar for acceptance tests: Given the starting state, When an action happens, Then an observable outcome is checked. Used throughout the Test Cases document.", link:"#f-gwt"},
+  {q:"What are positive negative boundary and idempotency test cases?", kw:["positive","negative","boundary","idempotency","idempotent","case","types"], a:"Positive = happy path with valid input. Negative = invalid input or missing dependency, proving safe failure. Boundary = values exactly at, just below, and just above a threshold. Idempotency = the same operation run twice produces the same end state with no duplicate side effect.", link:"#f-casetypes"},
+  {q:"What is traceability and coverage?", kw:["traceability","coverage","trace","orphan","requirement"], a:"Traceability is the explicit link from a requirement to its proving test(s). Coverage is the resulting percentage of requirements with at least one passing test. The rule enforced in this guide: every requirement has a test, and every test traces to a requirement.", link:"#f-traceability"},
+  {q:"What is the difference between severity and priority?", kw:["severity","priority","critical","p1","p2"], a:"Severity measures how badly the system is broken (technical impact). Priority measures how soon it must be fixed (business urgency). They are independent axes — a Low-severity typo can be P1 if it ships to 40,000 letters tomorrow.", link:"#f-severity"},
+  {q:"What is regression testing versus exploratory testing?", kw:["regression","exploratory","retest"], a:"Regression testing automatically re-runs previously-passing tests after a change. Exploratory testing is structured, time-boxed, human-driven investigation with no fixed script, actively trying to break the system in ways written tests didn't anticipate. Both are required.", link:"#f-regression"},
+  {q:"What does shift-left mean?", kw:["shift-left","shift","left","early"], a:"Moving quality activities earlier in the lifecycle — writing acceptance tests before the code, validating testability at design time — because the later a defect is caught, the more it costs to fix.", link:"#f-shiftleft"},
+  {q:"What separates good testing from bad testing?", kw:["good","bad","quality","testing"], a:"Good testing traces to requirements, covers positive/negative/boundary/idempotency, gives non-functional targets real numbers, and issues a ship recommendation backed by evidence. Bad testing is happy-path-only, uses vague failure messages, and labels every defect Critical.", link:"#f-goodbad"},
+  {q:"What QA KPIs should I track?", kw:["kpi","kpis","metrics","pass rate","defect density","mttr","escape rate","automation rate"], a:"Test pass rate, requirements coverage, defect density, defect escape rate, mean time to resolution (MTTR), and automation rate. See the Foundations KPI table for what each one tells you and its failure signal.", link:"#f-kpis"},
+  {q:"What is the architect review lens checklist?", kw:["architect","review","lens","checklist","approve"], a:"Seven questions: (1) does every requirement trace to a test, (2) are negative/boundary/idempotency cases present, (3) do NFRs carry real numbers, (4) is severity independent of priority, (5) could this pass while the feature is broken, (6) is the ship call evidence-backed, (7) are risks stated out loud.", link:"#f-lens"},
+  {q:"What is ClaimsIQ?", kw:["claimsiq","initiative","meridian","fnol","project"], a:"ClaimsIQ is Meridian Mutual Insurance's AI layer for First Notice of Loss (FNOL) intake and triage — it extracts structured claim data, classifies severity, screens for fraud, and straight-through processes small glass-only auto claims.", link:"#overview"},
+  {q:"What is the ship no-ship recommendation?", kw:["ship","no-ship","recommendation","release","go live"], a:"Conditional Ship. Ship the $1,500 auto-approval threshold, fraud model v2.3, and phone-transcript channel, gated on raising fraud-signal module coverage from 81% to 85% and keeping DEF-0031 tracked as an accepted risk with a committed R3.3 fix date.", link:"#doc-summary"},
+  {q:"What is the P95 latency target?", kw:["p95","latency","performance","speed","seconds"], a:"P95 end-to-end FNOL-to-triage latency must be under 12 seconds (REQ-11). Release 3.2 measured 9.4 seconds under 500 concurrent submissions — 22% under target.", link:"#doc-summary"},
+  {q:"What is the auto-approval threshold?", kw:["auto-approval","threshold","1500","1000","glass","straight-through"], a:"Release 3.2 raises the straight-through auto-approval ceiling for glass-only claims from $1,000 to $1,500. The $1,500.00 boundary itself is inclusive — TC-013 confirms exactly $1,500.00 is approved, TC-014 confirms $1,500.01 is not.", link:"#doc-cases"},
+  {q:"How is idempotency tested for payments?", kw:["idempotency key","payment","duplicate","webhook","retry"], a:"TC-021 simulates a client-side timeout followed by a retry using the same idempotency key. The system must issue exactly one payment. This exact scenario is illustrated in the sequence diagram and was the root cause of DEF-0042, a TOCTOU race condition that was fixed with an atomic upsert.", link:"#doc-defect"},
+  {q:"What was defect DEF-0042?", kw:["def-0042","duplicate payment","race condition","toctou"], a:"A Critical/P1 defect: a check-then-insert race condition let two concurrent payment retries within a 400ms window both pass the idempotency check, causing a duplicate payment. Fixed with an atomic upsert (unique constraint + INSERT ... ON CONFLICT) and verified with a 500-iteration concurrent-retry load test.", link:"#doc-defect"},
+  {q:"How many requirements does ClaimsIQ Release 3.2 have?", kw:["how many requirements","requirement count","15"], a:"15 requirements, all Fully Covered by 27 test cases. See the Requirements Traceability Matrix for the full requirement-by-requirement mapping.", link:"#doc-rtm"},
+  {q:"What is the WCAG accessibility target?", kw:["wcag","accessibility","aa","screen reader"], a:"WCAG 2.1 AA on all FNOL web and mobile intake surfaces (REQ-13), verified with an axe-core automated scan (TC-024). Release 3.2 measured zero violations after fixing two minor issues found on the new phone-transcript review UI.", link:"#doc-cases"},
+  {q:"What environments and test data does ClaimsIQ use?", kw:["environment","test data","staging","pii","synthetic"], a:"All testing runs against an isolated ClaimsIQ staging environment using 100% synthetic or de-identified test data. No production PII enters the test environment — this is a hard gate.", link:"#doc-plan"},
+  {q:"Who approves the ClaimsIQ QA documents?", kw:["approve","sign-off","owner","who"], a:"Maya Torres (QA Lead) prepares, Devon Park (Senior SDET) reviews, and Priya Nandakumar (AI Solution Architect) gives final approval on all seven ClaimsIQ deliverables.", link:"#doc-strategy"},
+  {q:"What is the coverage matrix and why does it matter?", kw:["coverage matrix","module","gap"], a:"It shows coverage by module across every test type (unit, integration, E2E, security, performance, accessibility) — not just whether a requirement has a test, but how thoroughly. Fraud Signals (81%) and Accessibility (84%) sit below Meridian's 85% bar and are named as ship conditions.", link:"#doc-coverage"},
+  {q:"What non-functional targets does ClaimsIQ have?", kw:["non-functional","nfr","numeric","target"], a:"P95 latency under 12s, 99.5% availability during business hours, WCAG 2.1 AA accessibility, 100% PII redaction in exports, and zero duplicate payments under retry. Every one carries a measured, numeric result in the Test Summary Report.", link:"#f-functional"},
+  {q:"How many defects were found in Release 3.2?", kw:["how many defects","defect count","33"], a:"33 defects total across the cycle: 3 Critical, 7 High, 14 Medium, 9 Low. Zero Critical defects remain open at ship time; see the Defect Report and Test Summary Report for the breakdown.", link:"#doc-summary"}
+];
+
+const STOP_WORDS = new Set(["what","is","the","a","an","of","to","in","on","for","and","or","does","do","how","are","we","our","should","it","this","that","with","as","be","i","you","your","can","did","was"]);
+function tokenize(s){
+  return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w => w.length > 1 && !STOP_WORDS.has(w));
+}
+function askAssistant(query){
+  const qTokens = new Set(tokenize(query));
+  let best = null, bestScore = 0;
+  askKB.forEach(entry => {
+    const entryTokens = tokenize(entry.q + ' ' + entry.kw.join(' '));
+    let score = 0;
+    entryTokens.forEach(t => { if (qTokens.has(t)) score++; });
+    if (score > bestScore){ bestScore = score; best = entry; }
+  });
+  return bestScore > 0 ? best : null;
+}
+
+const askForm = document.getElementById('askForm');
+const askInput = document.getElementById('askInput');
+const askLog = document.getElementById('askLog');
+const askSuggest = document.getElementById('askSuggest');
+const SUGGESTED = [askKB[5].q, askKB[3].q, askKB[12].q, askKB[15].q, askKB[9].q];
+askSuggest.innerHTML = SUGGESTED.map(q => `<span class="ask-chip" data-q="${q.replace(/"/g,'&quot;')}">${q}</span>`).join('');
+askSuggest.addEventListener('click', (e) => {
+  const chip = e.target.closest('.ask-chip');
+  if (chip){ askInput.value = chip.dataset.q; askForm.dispatchEvent(new Event('submit', {cancelable:true})); }
+});
+
+function addAskExchange(question, result){
+  const qBubble = document.createElement('div');
+  qBubble.className = 'ask-bubble-q';
+  qBubble.textContent = question;
+  askLog.appendChild(qBubble);
+
+  const aBubble = document.createElement('div');
+  aBubble.className = 'ask-bubble-a';
+  if (result){
+    aBubble.innerHTML = `${result.a}<div class="aa-src"><a href="${result.link}" onclick="jumpToSection('${result.link.replace('#','')}')" class="mono" style="color:var(--berry);">Jump to source section &rarr;</a></div>`;
+  } else {
+    aBubble.innerHTML = `I couldn't confidently match that to a section of the guide. Try the search box above, or rephrase — try a term like "idempotency," "severity," "ship recommendation," or "testing pyramid."`;
+  }
+  askLog.appendChild(aBubble);
+  askLog.scrollTop = askLog.scrollHeight;
+}
+
+askForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const q = askInput.value.trim();
+  if (!q) return;
+  addAskExchange(q, askAssistant(q));
+  askInput.value = '';
+});
+
+/* ============================================================
+   CSV EXPORT DATA
+   ============================================================ */
+const testCasesData = [
+  ["TC ID","Requirement","Type","Given","When","Then","Priority"],
+  ["TC-001","REQ-01","Positive","a policyholder completes all required FNOL fields on the web portal","they submit the form","a claim record is created with a unique claim ID and channel = web","P2"],
+  ["TC-002","REQ-01","Positive","a policyholder completes FNOL in the mobile app while offline-then-reconnected","connectivity resumes and the form syncs","a claim record is created with channel = mobile-app, no data loss","P2"],
+  ["TC-003","REQ-01","Positive","a policyholder reports a loss by phone and the call is transcribed","the transcript is submitted to ClaimsIQ","a claim record is created with channel = phone-transcript","P2"],
+  ["TC-004","REQ-02","Positive","a narrative contains policy #, VIN, loss date, and loss location","the extraction service processes it","all four fields extracted correctly, matching >=95% accuracy vs golden set","P1"],
+  ["TC-005","REQ-02","Negative","a narrative omits the VIN entirely","the extraction service processes it","VIN flagged missing, claim routed to manual review, no auto-approval attempted","P1"],
+  ["TC-006","REQ-02","Boundary","a narrative is exactly the 5000-character maximum input length","the extraction service processes it","extraction completes without truncation or timeout error","P3"],
+  ["TC-007","REQ-03","Positive","the 400-item golden set of adjuster-confirmed severity labels","severity classification runs against it","agreement with adjuster labels is >=90%","P1"],
+  ["TC-008","REQ-03","Negative","a narrative is ambiguous or internally contradictory","severity classification runs","confidence score falls below threshold, routes to manual review","P2"],
+  ["TC-009","REQ-04","Positive","a claim narrative matches a known staged-accident pattern","fraud-signal screening runs","claim is flagged and routed to SIU review","P1"],
+  ["TC-010","REQ-04","Negative","a claim has no fraud indicators present","fraud-signal screening runs","claim proceeds without SIU flag (no false positive)","P2"],
+  ["TC-011","REQ-04","Boundary","claims velocity is exactly 3 claims in trailing 12 months","fraud-signal screening runs","claim is flagged - threshold is inclusive","P2"],
+  ["TC-012","REQ-05","Positive","a glass-only claim of $1,499.99 on a policy in good standing","triage completes","claim is auto-approved and a single payment is issued","P1"],
+  ["TC-013","REQ-05","Boundary","a glass-only claim of exactly $1,500.00","triage completes","claim is auto-approved - the $1,500 ceiling is inclusive","P1"],
+  ["TC-014","REQ-05","Boundary","a glass-only claim of $1,500.01","triage completes","claim is routed to an adjuster and is NOT auto-approved","P1"],
+  ["TC-015","REQ-05","Negative","a glass-only claim under $1,500 on a lapsed policy","triage completes","auto-approval blocked, claim routes to manual review","P1"],
+  ["TC-016","REQ-06","Positive","three open claims of varying severity across two regions, uneven workload","queue assignment runs","each claim routes to correct region and lowest-workload adjuster","P2"],
+  ["TC-017","REQ-07","Idempotency","identical FNOL (same policy+loss date+VIN+channel) submitted twice within 60s","both submissions are processed","only one claim record exists; second returns existing claim ID","P1"],
+  ["TC-018","REQ-07","Idempotency","mobile client retries FNOL after network timeout, same idempotency key","retried request reaches the server","no duplicate claim created; original claim ID returned","P1"],
+  ["TC-019","REQ-08","Security","claim record with PII queued for analytics export","the export job runs","all PII fields redacted/tokenized, zero plaintext PII present","P1"],
+  ["TC-020","REQ-09","Positive","an adjuster disagrees with an AI-assigned severity tier","they submit an override","override captured with before/after values and correlation ID","P2"],
+  ["TC-021","REQ-12","Idempotency","auto-approval payment request times out client-side after 5s","client retries with same idempotency key","exactly one payment issued; retry returns original result","P1"],
+  ["TC-022","REQ-11","Performance","500 concurrent FNOL submissions at production-equivalent load","load test runs for 15 minutes","P95 end-to-end latency under 12 seconds","P1"],
+  ["TC-023","REQ-10","Availability","AI severity-classification service is forced offline","policyholder submits FNOL during business hours","claim captured and routed to manual-intake fallback queue","P1"],
+  ["TC-024","REQ-13","Accessibility","the FNOL web and mobile-web intake forms","an axe-core automated scan runs","zero WCAG 2.1 AA violations are reported","P2"],
+  ["TC-025","REQ-14","Positive","any AI decision is made (extraction, severity, fraud, auto-approval)","the decision completes","audit entry written with correlation ID, model version, reason code","P1"],
+  ["TC-026","REQ-15","Security","an adjuster is assigned to Region A only","they query a claim assigned to Region B","access denied (403), no Region B claim data returned","P1"],
+  ["TC-027","REQ-15","Security","a commercial-lines adjuster account","they query a personal-lines claim record","access denied, no cross-tenant data returned","P1"]
+];
+
+const rtmData = [
+  ["Req ID","Requirement","Type","Test Cases","Coverage"],
+  ["REQ-01","Capture FNOL via web, mobile app, and phone transcript in one data model","Functional","TC-001, TC-002, TC-003","Full"],
+  ["REQ-02","Extract structured claim fields from unstructured narrative, >=95% field accuracy","Functional / AI","TC-004, TC-005, TC-006","Full"],
+  ["REQ-03","Classify severity into 4 tiers, >=90% agreement vs adjuster","Functional / AI","TC-007, TC-008","Full"],
+  ["REQ-04","Detect fraud-signal indicators and flag for SIU review","Functional / AI","TC-009, TC-010, TC-011","Full"],
+  ["REQ-05","Auto-approve straight-through payment for glass claims < $1,500 in good standing","Functional","TC-012, TC-013, TC-014, TC-015","Full"],
+  ["REQ-06","Assign non-auto-approved claims by severity + geography + workload","Functional","TC-016","Full"],
+  ["REQ-07","Idempotent claim creation - duplicate FNOL never creates duplicate record","Functional / Idempotency","TC-017, TC-018","Full"],
+  ["REQ-08","PII/PHI redaction in logs and downstream analytics exports","Security","TC-019","Full"],
+  ["REQ-09","AI severity classification is human-overridable; override captured for feedback","Functional / AI","TC-020","Full"],
+  ["REQ-10","99.5% availability during business hours; graceful manual fallback on AI outage","Availability","TC-023","Full"],
+  ["REQ-11","P95 end-to-end FNOL-to-triage under 12 seconds","Performance","TC-022","Full"],
+  ["REQ-12","Straight-through payment fires exactly once per approved claim, even under retry","Idempotency","TC-021","Full"],
+  ["REQ-13","WCAG 2.1 AA on FNOL web / mobile intake forms","Accessibility","TC-024","Full"],
+  ["REQ-14","Audit trail for every AI decision, retained 7 years","Compliance","TC-025","Full"],
+  ["REQ-15","Role-based access - adjusters scoped to their queue/region; no cross-tenant leakage","Security","TC-026, TC-027","Full"]
+];
+
+const defectData = [
+  ["Defect ID","Title","Severity","Priority","Status","Related Req"],
+  ["DEF-0042","Duplicate payment on webhook retry within 400ms window","Critical","P1","Closed","REQ-12"],
+  ["DEF-0038","Fraud-signal false positive on legitimate multi-vehicle household claims","High","P2","Closed","REQ-04"],
+  ["DEF-0035","Phone-transcript channel drops loss-location field with cross-street references","High","P2","Closed","REQ-02"],
+  ["DEF-0031","Adjuster queue rebalancing lags up to 90s under burst load","Medium","P3","Deferred (R3.3)","REQ-06"],
+  ["DEF-0029","Auto-approval boundary off-by-one: $1,500.00 exactly was rejected instead of approved","Critical","P1","Closed","REQ-05"],
+  ["DEF-0024","Screen-reader focus order skips the loss-date field on mobile-web intake form","Medium","P2","Closed","REQ-13"],
+  ["DEF-0019","Audit log missing model_version field for severity decisions during canary rollout","High","P2","Closed","REQ-14"],
+  ["DEF-0012","Footer copyright year on the adjuster dashboard is hardcoded to 2025","Low","P4","Open","-"]
+];
+
+const coverageData = [
+  ["Module","Unit","Integration","E2E","Security","Performance","Accessibility","Overall"],
+  ["FNOL Intake","98%","96%","92%","90%","88%","92%","96%"],
+  ["Extraction / NLP","95%","92%","88%","85%","n/a","n/a","92%"],
+  ["Severity Triage","94%","88%","84%","n/a","n/a","n/a","88%"],
+  ["Fraud Signals","90%","78%","72%","80%","n/a","n/a","81%"],
+  ["Auto-Approval Payment","100%","100%","100%","100%","100%","n/a","100%"],
+  ["Adjuster Assignment","92%","90%","88%","92%","85%","n/a","90%"],
+  ["Audit / Logging","98%","95%","90%","97%","n/a","n/a","95%"],
+  ["Accessibility (all intake UI)","n/a","n/a","84%","n/a","n/a","84%","84%"]
+];
+
+function csvEscape(cell){
+  const s = String(cell);
+  if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+function downloadCSV(rows, filename){
+  const csv = rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ============================================================
+   PER-DOCUMENT DOWNLOAD (standalone styled HTML)
+   ============================================================ */
+function downloadDoc(cardId, filename){
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const headAssets = Array.from(document.querySelectorAll('head link[rel="stylesheet"], head link[rel="preconnect"], head style'))
+    .map(el => el.outerHTML).join('\n');
+  const clone = card.cloneNode(true);
+  clone.querySelectorAll('.doc-toolbar').forEach(el => el.remove());
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${filename.replace(/\.html$/,'').replace(/_/g,' ')}</title>
+${headAssets}
+<style>body{padding:32px 16px;background:var(--surface-alt);} .doc-card{max-width:900px;margin:0 auto;}</style>
+</head>
+<body>
+${clone.outerHTML}
+</body>
+</html>`;
+  const blob = new Blob([html], {type:'text/html;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ============================================================
+   PER-DOCUMENT PRINT / SAVE AS PDF
+   ============================================================ */
+function printDoc(sectionId){
+  document.querySelectorAll('section.print-target').forEach(el => el.classList.remove('print-target'));
+  const el = document.getElementById(sectionId);
+  if (!el) return;
+  el.classList.add('print-target');
+  window.print();
+}
+window.addEventListener('afterprint', () => {
+  document.querySelectorAll('section.print-target').forEach(el => el.classList.remove('print-target'));
+});
+
+/* ============================================================
+   ACTIVE NAV HIGHLIGHT ON SCROLL
+   ============================================================ */
+const navLinks = Array.from(document.querySelectorAll('.sidebar .nav-link'));
+const observedSections = Array.from(document.querySelectorAll('section[id]'));
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting){
+      const id = entry.target.id;
+      navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id));
+    }
+  });
+}, {rootMargin: '-20% 0px -70% 0px'});
+observedSections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>

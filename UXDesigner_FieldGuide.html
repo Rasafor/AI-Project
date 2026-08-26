@@ -1,0 +1,1716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UX Designer Field Guide — Colaberry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style id="site-style">
+:root{
+  --cherry:#FB2832; --berry:#367895; --leaf:#5BA63C; --amber:#E8920C;
+  --text:#1A1A1A; --muted:#6B6B6B; --border:#E4E4E3;
+  --surface:#FFFFFF; --surface-alt:#F8F8F7; --bg:#FFFFFF;
+  --font-body:'Roboto',system-ui,Arial,sans-serif;
+  --font-mono:'Roboto Mono',ui-monospace,Consolas,monospace;
+  --shadow:0 1px 3px rgba(26,26,26,.08),0 1px 2px rgba(26,26,26,.06);
+  --radius:10px;
+}
+:root[data-theme="dark"]{
+  --cherry:#FF5960; --berry:#5EA9C4; --leaf:#8AC759; --amber:#E8920C;
+  --text:#F2F2F2; --muted:#A8A8A8; --border:#2A2A2A;
+  --surface:#171717; --surface-alt:#1D1D1D; --bg:#0F0F0F;
+  --shadow:0 1px 3px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.55;font-size:15.5px;}
+h1,h2,h3,h4{font-family:var(--font-body);color:var(--berry);font-weight:700;line-height:1.25;}
+a{color:var(--berry);}
+code,pre,.mono{font-family:var(--font-mono);}
+p{margin:.6em 0;}
+::selection{background:var(--cherry);color:#fff;}
+
+/* ---------- App shell ---------- */
+.app-shell{display:flex;flex-direction:column;min-height:100vh;}
+header.topbar{
+  position:sticky;top:0;z-index:50;background:var(--surface);
+  border-bottom:1px solid var(--border);box-shadow:var(--shadow);
+}
+.topbar-inner{max-width:1440px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;min-width:220px;}
+.brand img{height:38px;display:block;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text b{color:var(--berry);font-size:15px;}
+.brand-text span{color:var(--muted);font-size:11.5px;font-family:var(--font-mono);}
+.searchwrap{flex:1;min-width:240px;position:relative;}
+.searchwrap input{
+  width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--border);border-radius:999px;
+  background:var(--surface-alt);color:var(--text);font-size:14px;font-family:var(--font-body);
+}
+.searchwrap input:focus{outline:2px solid var(--berry);outline-offset:1px;}
+.searchwrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--muted);}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px;font-family:var(--font-body);
+  font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap;
+}
+.btn:hover{border-color:var(--berry);}
+.btn-primary{background:var(--cherry);border-color:var(--cherry);color:#fff;}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-sm{padding:6px 10px;font-size:12px;}
+
+/* ---------- Layout ---------- */
+.layout{display:flex;max-width:1440px;margin:0 auto;width:100%;flex:1;align-items:flex-start;}
+nav.sidenav{
+  width:280px;flex-shrink:0;position:sticky;top:65px;max-height:calc(100vh - 65px);overflow-y:auto;
+  padding:22px 14px 60px 20px;border-right:1px solid var(--border);
+}
+nav.sidenav .navgroup{margin-bottom:18px;}
+nav.sidenav .navlabel{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px 8px;font-weight:700;
+}
+nav.sidenav a{
+  display:block;padding:6px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:13.5px;
+  border-left:2px solid transparent;
+}
+nav.sidenav a:hover{background:var(--surface-alt);}
+nav.sidenav a.active{color:var(--berry);border-left-color:var(--cherry);background:var(--surface-alt);font-weight:600;}
+nav.sidenav a.nav-dim{opacity:.3;}
+nav.sidenav a.doclink{font-family:var(--font-mono);font-size:12.3px;}
+
+main.content{flex:1;min-width:0;padding:28px 34px 100px;}
+main.content section.topic-section{margin-bottom:56px;scroll-margin-top:78px;}
+main.content section.topic-section.search-hidden{display:none;}
+.topic-section h2.section-title{
+  font-size:26px;border-bottom:3px solid var(--cherry);padding-bottom:10px;margin-bottom:6px;
+}
+.topic-section .section-kicker{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.subtopic{margin:30px 0;scroll-margin-top:78px;}
+.subtopic h3{font-size:19px;border-left:4px solid var(--berry);padding-left:10px;}
+.subtopic h4{font-size:15px;color:var(--text);margin-top:1.2em;}
+
+/* ---------- Components ---------- */
+.callout{border-radius:var(--radius);padding:14px 16px;margin:16px 0;border:1.5px solid var(--border);background:var(--surface-alt);}
+.callout b.callout-tag{display:block;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.callout-info{border-color:var(--berry);} .callout-info b{color:var(--berry);}
+.callout-success{border-color:var(--leaf);} .callout-success b{color:var(--leaf);}
+.callout-warning{border-color:var(--amber);} .callout-warning b{color:var(--amber);}
+.callout-danger{border-color:var(--cherry);} .callout-danger b{color:var(--cherry);}
+
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.6px;}
+table caption{text-align:left;font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--font-mono);}
+th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;}
+thead th{background:var(--berry);color:#fff;font-weight:700;font-size:12.6px;}
+tbody tr:nth-child(even){background:var(--surface-alt);}
+table.compact td,table.compact th{padding:5px 8px;font-size:12.8px;}
+.tablewrap{overflow-x:auto;}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-family:var(--font-mono);font-weight:700;}
+.badge-success{background:rgba(91,166,60,.15);color:var(--leaf);border:1px solid var(--leaf);}
+.badge-warning{background:rgba(232,146,12,.15);color:var(--amber);border:1px solid var(--amber);}
+.badge-danger{background:rgba(251,40,50,.15);color:var(--cherry);border:1px solid var(--cherry);}
+.badge-info{background:rgba(54,120,149,.15);color:var(--berry);border:1px solid var(--berry);}
+.sev0{background:rgba(91,166,60,.15);color:var(--leaf);border:1px solid var(--leaf);}
+.sev1{background:rgba(107,107,107,.15);color:var(--muted);border:1px solid var(--muted);}
+.sev2{background:rgba(232,146,12,.15);color:var(--amber);border:1px solid var(--amber);}
+.sev3{background:rgba(251,40,50,.12);color:var(--cherry);border:1px solid var(--cherry);}
+.sev4{background:var(--cherry);color:#fff;border:1px solid var(--cherry);}
+
+.code-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+@media (max-width:920px){.code-pair{grid-template-columns:1fr;}}
+.code-card{border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);}
+.code-card .code-ribbon{padding:7px 14px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.code-card.bad .code-ribbon{background:var(--cherry);color:#fff;}
+.code-card.good .code-ribbon{background:var(--leaf);color:#fff;}
+.code-card .code-body{padding:14px 16px;}
+.code-card ul.notes{margin:0;padding:10px 16px;font-size:12.6px;background:var(--surface-alt);list-style:disc;}
+.code-card ul.notes li{margin:4px 0;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:18px 0;}
+@media (max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi-tile{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);box-shadow:var(--shadow);}
+.kpi-tile .kpi-label{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.kpi-tile .kpi-value{font-size:27px;font-weight:900;color:var(--berry);margin:4px 0;}
+.kpi-tile .kpi-delta{font-size:11.5px;font-weight:700;font-family:var(--font-mono);}
+.kpi-delta.up-good{color:var(--leaf);} .kpi-delta.down-good{color:var(--leaf);} .kpi-delta.warn{color:var(--amber);}
+
+.chart-row{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin:18px 0;align-items:start;}
+@media (max-width:920px){.chart-row{grid-template-columns:1fr;}}
+.chart-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);box-shadow:var(--shadow);}
+.chart-card h4{margin:0 0 10px;font-size:13.5px;color:var(--text);}
+.chart-card svg{width:100%;height:auto;display:block;}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-family:var(--font-mono);}
+.legend-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+
+.diagram-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;background:var(--surface-alt);margin:16px 0;}
+.diagram-card svg{width:100%;height:auto;display:block;}
+.diagram-cap{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:8px;text-align:center;}
+
+/* ---------- Persona cards ---------- */
+.persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0;}
+@media (max-width:920px){.persona-grid{grid-template-columns:1fr;}}
+.persona-card{border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);overflow:hidden;}
+.persona-head{display:flex;gap:14px;align-items:center;padding:16px;background:var(--surface-alt);border-bottom:1.5px solid var(--border);}
+.persona-avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:19px;font-family:var(--font-body);}
+.persona-head h4{margin:0;font-size:16px;color:var(--text);}
+.persona-head span{display:block;font-size:12px;color:var(--muted);font-family:var(--font-mono);}
+.persona-body{padding:14px 16px;}
+.persona-body h5{margin:12px 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--berry);font-family:var(--font-mono);}
+.persona-body ul{margin:2px 0;padding-left:18px;}
+.persona-quote{font-style:italic;border-left:3px solid var(--cherry);padding:6px 12px;margin:10px 0;background:var(--surface-alt);font-size:13.5px;}
+.jtbd-box{border:1.5px dashed var(--berry);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:13.5px;background:var(--surface-alt);}
+
+/* ---------- Token swatches ---------- */
+.token-row{display:flex;align-items:center;gap:10px;}
+.token-swatch{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;}
+
+/* ---------- Document package ---------- */
+.doc-toolbar{display:flex;gap:8px;margin:10px 0 18px;flex-wrap:wrap;}
+.doc-body{border:1.5px solid var(--border);border-radius:var(--radius);padding:0;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;}
+.doc-cover{background:linear-gradient(135deg,var(--berry) 0%,#274f60 100%);color:#fff;padding:40px 40px 34px;text-align:left;}
+.doc-cover img.doc-logo{height:38px;margin-bottom:22px;display:block;filter:brightness(0) invert(1);}
+.doc-cover-kicker{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;}
+.doc-cover-title{font-size:30px;color:#fff;margin:8px 0 4px;font-weight:900;}
+.doc-cover-sub{font-size:15px;opacity:.94;max-width:640px;}
+.doc-cover-org{font-family:var(--font-mono);font-size:12px;opacity:.75;margin-top:14px;border-top:1px solid rgba(255,255,255,.25);padding-top:10px;}
+table.doc-meta{margin:0;font-size:12.8px;}
+table.doc-meta th{background:var(--surface-alt);color:var(--muted);font-family:var(--font-mono);font-weight:700;width:14%;text-transform:uppercase;font-size:10.5px;letter-spacing:.05em;}
+table.doc-meta td{width:36%;font-weight:500;}
+.doc-content{padding:6px 40px 10px;}
+.doc-content h3.doc-h{font-size:18px;margin-top:28px;border-left:4px solid var(--cherry);padding-left:10px;}
+.doc-content h4.doc-h4{font-size:14.5px;margin-top:18px;color:var(--berry);}
+table.signoff{margin:26px 40px 0;width:calc(100% - 80px);}
+table.signoff th{background:var(--text);color:#fff;font-size:11.5px;}
+.doc-footer{margin-top:22px;padding:16px 40px;border-top:1px solid var(--border);background:var(--surface-alt);font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+
+/* ---------- Ask assistant ---------- */
+.ask-widget{border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);padding:20px;}
+.ask-input-row{display:flex;gap:8px;}
+.ask-input-row input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--surface-alt);color:var(--text);}
+.ask-input-row input:focus{outline:2px solid var(--berry);}
+.ask-suggestions{margin:10px 0 0;display:flex;gap:7px;flex-wrap:wrap;}
+.ask-chip{font-size:11.8px;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface-alt);cursor:pointer;font-family:var(--font-mono);color:var(--berry);}
+.ask-chip:hover{border-color:var(--berry);}
+.ask-answer{margin-top:16px;padding:16px;border-radius:var(--radius);background:var(--surface-alt);border:1.5px solid var(--berry);animation:fade .25s ease;}
+.ask-answer .ask-q{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.ask-answer .ask-a{font-size:14.5px;}
+.ask-answer .ask-jump{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:700;}
+.ask-answer.miss{border-color:var(--amber);}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+#askFloatBtn{position:fixed;bottom:24px;right:24px;z-index:60;border-radius:999px;padding:13px 20px;background:var(--cherry);color:#fff;border:none;box-shadow:0 4px 14px rgba(0,0,0,.25);font-family:var(--font-body);font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:7px;}
+#askFloatPanel{position:fixed;bottom:78px;right:24px;z-index:61;width:380px;max-width:calc(100vw - 32px);max-height:70vh;overflow-y:auto;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 32px rgba(0,0,0,.28);padding:16px;display:none;}
+#askFloatPanel.open{display:block;}
+#askFloatPanel .ask-close{float:right;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;background:none;border:none;}
+
+footer.sitefoot{border-top:1px solid var(--border);padding:22px 34px;font-size:12px;color:var(--muted);font-family:var(--font-mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--surface-alt);}
+
+/* ---------- Print ---------- */
+#print-root{display:none;}
+@media print{
+  body > *:not(#print-root){display:none !important;}
+  #print-root{display:block !important;}
+  #askFloatBtn,#askFloatPanel{display:none !important;}
+  .doc-toolbar{display:none !important;}
+  a{color:inherit;text-decoration:none;}
+  .doc-body{box-shadow:none;border:none;}
+}
+@media (max-width:960px){
+  nav.sidenav{display:none;}
+  .code-pair,.chart-row,.persona-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img id="brand-logo" alt="Colaberry" src="">
+      <div class="brand-text"><b>Field Guide</b><span>UX DESIGNER · AI SOLUTION ARCHITECT TRACK</span></div>
+    </div>
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchBox" type="text" placeholder="Search the guide — e.g. &quot;contrast ratio&quot;, &quot;heuristics&quot;, &quot;persona&quot;..." autocomplete="off">
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="themeToggle" title="Toggle dark mode">Dark mode</button>
+      <a class="btn btn-primary btn-sm" href="#ask">Ask the Guide</a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidenav" id="sideNav">
+  <div class="navgroup">
+    <div class="navlabel">Start Here</div>
+    <a href="#overview">Overview &amp; the Example</a>
+    <a href="#why-ux">Why UX Exists</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">The Discipline — The 20%</div>
+    <a href="#f-personas">Personas &amp; Jobs-to-be-Done</a>
+    <a href="#f-journeys">User Journeys</a>
+    <a href="#f-ia">Information Architecture</a>
+    <a href="#f-fidelity">Wireframes → Mockups → Prototypes</a>
+    <a href="#f-heuristics">Nielsen's Usability Heuristics</a>
+    <a href="#f-a11y">Accessibility &amp; WCAG 2.1 AA</a>
+    <a href="#f-hierarchy">Visual &amp; Interaction Hierarchy</a>
+    <a href="#f-designsystem">Design Systems &amp; Tokens</a>
+    <a href="#f-testing">Usability Testing</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">Judgment</div>
+    <a href="#good-bad">Good vs. Bad Design</a>
+    <a href="#kpis">UX KPIs</a>
+    <a href="#review-lens">The Architect's Review Lens</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">The Nine Documents</div>
+    <a class="doclink" href="#doc-exec">1 · Executive Summary</a>
+    <a class="doclink" href="#doc-personas">2 · Personas &amp; JTBD</a>
+    <a class="doclink" href="#doc-journey">3 · User Journey Map</a>
+    <a class="doclink" href="#doc-ia">4 · IA &amp; Sitemap</a>
+    <a class="doclink" href="#doc-wireframes">5 · Annotated Wireframes</a>
+    <a class="doclink" href="#doc-heuristics">6 · Heuristic Evaluation</a>
+    <a class="doclink" href="#doc-wcag">7 · WCAG 2.1 AA Checklist</a>
+    <a class="doclink" href="#doc-tokens">8 · Design Tokens</a>
+    <a class="doclink" href="#doc-testplan">9 · Usability Test Plan</a>
+  </div>
+  <div class="navgroup">
+    <div class="navlabel">Assistant</div>
+    <a href="#ask">Ask the Guide</a>
+  </div>
+</nav>
+
+<main class="content" id="mainContent">
+<section class="topic-section" id="overview">
+  <div class="section-kicker">Start Here</div>
+  <h2 class="section-title">Overview &amp; the Working Example</h2>
+  <p>This guide teaches the roughly <b>20% of user-experience design</b> an <b>AI Solution Architect</b> needs — not to push pixels by hand, but to <b>direct, evaluate, and approve</b> UX work an AI system produces on your behalf. You will not be graded on your Figma skills. You will be graded on judgment: can you read a persona and tell whether it's grounded in a real goal or a stock-photo demographic, spot a screen with no error state, reject a design for the right reason, and sign off on an accessibility checklist with your name on it and mean it.</p>
+  <p>Everything below is grounded in a single running example so the ideas stay concrete instead of abstract.</p>
+  <div class="callout callout-info">
+    <b class="callout-tag">Working Example</b>
+    <p><b>Industry:</b> Healthcare, regional multi-site health system.<br>
+    <b>Company:</b> <b>Meridian Health Network</b> — 12 clinics and 3 hospitals across a mid-size metro region.<br>
+    <b>Initiative:</b> the <b>MyMeridian</b> patient portal redesign — self-service appointment scheduling and referral tracking, so a patient can book a specialist follow-up and see where a referral stands without calling the office.<br>
+    <b>Why it exists:</b> 42% of online appointment-booking attempts are abandoned before completion, and unclear referral status is a leading driver of missed specialist follow-ups. The call center absorbs the overflow, at real cost, and patients with chronic conditions are the ones most likely to fall through the gap.</p>
+  </div>
+  <p>Every document in this guide — the personas, the journey map, the sitemap, the wireframes, the heuristic evaluation, the accessibility checklist, the token sheet, the test plan, the executive summary — is written for <b>this feature</b>. That's deliberate: a UX deliverable is only as useful as it is specific to the people and the screens it describes.</p>
+</section>
+
+<section class="topic-section" id="why-ux">
+  <div class="section-kicker">The Discipline</div>
+  <h2 class="section-title">Why UX Design Exists</h2>
+  <p>A screen that looks finished is easy to generate. A screen that a 67-year-old with low digital literacy can use unaided, that fails gracefully when an insurance check errors out, and that a screen-reader user can operate end-to-end — that takes discipline. UX design is the set of practices that make an interface <b>usable under real conditions</b>: real eyesight, real patience, real error states, real cognitive load.</p>
+  <p>An AI model can generate a screen that looks polished in seconds — clean typography, a plausible layout, on-brand color. It has no innate stake in whether a patient managing diabetes can actually find her referral, or whether the error message when insurance verification fails is a raw code (<code>ERR_INS_409</code>) or a sentence a person can act on. That is exactly the gap an AI Solution Architect exists to close: <b>you supply the user-centered discipline the model does not have by default</b>, by directing it toward a validated design, and by refusing to approve output that skips the parts that are actually hard — the empty states, the error recovery, the accessibility math.</p>
+  <div class="callout callout-warning">
+    <b class="callout-tag">The Core Risk You're Managing</b>
+    <p>AI-generated UX is visually fluent, which makes it persuasive. Fluency is not usability. Your job is to separate "this looks like a finished screen" from "a first-time patient with a chronic condition can complete this task alone, on a bad day, without calling anyone."</p>
+  </div>
+</section>
+<section class="topic-section" id="f-personas">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Personas &amp; Jobs-to-be-Done</h2>
+  <p>A persona grounded in demographics ("Barbara, 67, retired") tells you almost nothing actionable. A persona grounded in a <b>Job-to-be-Done</b> tells you exactly what to design for: the progress a person is trying to make, stated independent of age or device.</p>
+  <div class="callout callout-info">
+    <b class="callout-tag">JTBD Formula</b>
+    <p>"When <b>[situation]</b>, I want to <b>[motivation]</b>, so I can <b>[expected outcome]</b>."<br>Example: "When my doctor tells me I need a specialist follow-up, I want to book it without navigating confusing menus, so I can manage my condition without relying on my daughter."</p>
+  </div>
+  <p>Demographics can still matter — age correlates with digital literacy and eyesight, which correlate with real design constraints — but they're supporting evidence for the job, not the job itself. When you review an AI-generated persona, the first question is: <b>if I deleted the name and photo, would this still tell me what to build?</b> If the answer is no, it's a demographic sketch wearing a persona's clothes. See the full MyMeridian personas in <a href="#doc-personas">Document 2</a>.</p>
+</section>
+
+<section class="topic-section" id="f-journeys">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">User Journeys</h2>
+  <p>A user journey map traces one persona through one goal, stage by stage, capturing what they <b>do</b>, <b>think</b>, and <b>feel</b> — and critically, where it goes wrong. A journey map that only shows the happy path is marketing collateral, not a design tool.</p>
+  <p>The value of a journey map to an architect is that it makes the <b>unhappy path visible and specific</b>. It's the difference between "the booking flow could have errors" (true of every flow, and useless) and "when insurance verification fails mid-booking, the patient sees a raw error code with no next step, and the only recovery path is a phone call during business hours" (specific, testable, fixable). See <a href="#doc-journey">Document 3</a> for the full MyMeridian journey, including the insurance-verification failure that drives much of the rest of this guide's remediation work.</p>
+</section>
+
+<section class="topic-section" id="f-ia">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Information Architecture</h2>
+  <p>Information architecture (IA) is the structural skeleton underneath the visual design — how content and features are grouped, labeled, and nested so a user can find what they need without hunting. Get the IA wrong and no amount of polish on individual screens will save the product: users abandon tasks not because a screen is ugly, but because they couldn't find it, or found it under a label that didn't make sense to them.</p>
+  <div class="callout callout-success">
+    <b class="callout-tag">Rule of Thumb</b>
+    <p>Every core task should reach completion in <b>3 clicks or fewer</b> from the home screen, and every label should be plain language a patient would use, not internal system terminology. "Encounters" means nothing to a patient; "Past Visits" does.</p>
+  </div>
+  <p>See <a href="#doc-ia">Document 4</a> for the full MyMeridian sitemap, click-depth table, and a plain-language label audit that shows exactly which clinical/system terms were rejected and why.</p>
+</section>
+<section class="topic-section" id="f-fidelity">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Wireframes → Mockups → Prototypes</h2>
+  <p>These three artifacts are rungs of a fidelity ladder, not interchangeable terms — confusing them is one of the fastest ways to approve the wrong thing at the wrong stage.</p>
+  <table>
+    <thead><tr><th>Artifact</th><th>Fidelity</th><th>What It Answers</th><th>What It Deliberately Skips</th></tr></thead>
+    <tbody>
+      <tr><td><b>Wireframe</b></td><td>Low — boxes, labels, layout only</td><td>Does the structure and content hierarchy make sense?</td><td>Color, typography, imagery, interactivity</td></tr>
+      <tr><td><b>Mockup</b></td><td>High — real visual design, still static</td><td>Does the brand-correct, on-token visual treatment work?</td><td>Interactivity, motion, real data edge cases</td></tr>
+      <tr><td><b>Prototype</b></td><td>High + interactive — clickable states</td><td>Does the flow feel right when a user actually clicks through it?</td><td>Production performance, real backend data</td></tr>
+    </tbody>
+  </table>
+  <p>An architect reviewing a wireframe should be arguing about structure, not color. An architect reviewing a mockup should be checking it against the token sheet, not redesigning the layout. Mixing these up wastes review cycles on the wrong questions at the wrong time. MyMeridian's <a href="#doc-wireframes">Document 5</a> is wireframe-fidelity by design — structure and annotation, not final visual polish — because at this stage in the initiative the open question is "does the flow work," not "is the color right."</p>
+</section>
+
+<section class="topic-section" id="f-heuristics">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Nielsen's 10 Usability Heuristics</h2>
+  <p>Jakob Nielsen's heuristics are the fastest, cheapest usability check available — an expert (or a trained architect) walks each screen against these ten principles before a single real user is recruited. They don't replace usability testing; they catch the structural problems testing would otherwise burn expensive participant time discovering.</p>
+  <table class="compact">
+    <thead><tr><th>#</th><th>Heuristic</th><th>One-Line Definition</th></tr></thead>
+    <tbody>
+      <tr><td>H1</td><td>Visibility of system status</td><td>The system always tells the user what's happening, in reasonable time.</td></tr>
+      <tr><td>H2</td><td>Match between system and the real world</td><td>Speak the user's language, not internal jargon; follow real-world conventions.</td></tr>
+      <tr><td>H3</td><td>User control and freedom</td><td>Support undo, redo, and an obvious way out of an unwanted state.</td></tr>
+      <tr><td>H4</td><td>Consistency and standards</td><td>Don't make users wonder whether different words/icons mean the same thing.</td></tr>
+      <tr><td>H5</td><td>Error prevention</td><td>Eliminate error-prone conditions before they happen, or confirm before a risky action.</td></tr>
+      <tr><td>H6</td><td>Recognition rather than recall</td><td>Make objects, actions, and options visible — don't force memory across screens.</td></tr>
+      <tr><td>H7</td><td>Flexibility and efficiency of use</td><td>Accelerators for experts that novices never have to notice.</td></tr>
+      <tr><td>H8</td><td>Aesthetic and minimalist design</td><td>No irrelevant or rarely-needed information competing for attention.</td></tr>
+      <tr><td>H9</td><td>Help users recognize, diagnose, and recover from errors</td><td>Plain-language errors that state the problem and a next step — no codes.</td></tr>
+      <tr><td>H10</td><td>Help and documentation</td><td>Easy to search, focused on the user's task, not exhaustive for its own sake.</td></tr>
+    </tbody>
+  </table>
+  <p>See the full MyMeridian evaluation — three screens, all ten heuristics, severity-rated — in <a href="#doc-heuristics">Document 6</a>.</p>
+</section>
+
+<section class="topic-section" id="f-a11y">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Accessibility to WCAG 2.1 AA</h2>
+  <p>The Web Content Accessibility Guidelines organize around four principles — <b>POUR</b>: Perceivable, Operable, Understandable, Robust. Level AA is the common legal and contractual bar (ADA/Section 508 alignment in the U.S., EN 301 549 in the EU); Level AAA is stricter and rarely mandated wholesale.</p>
+  <table class="compact">
+    <thead><tr><th>Principle</th><th>Means</th><th>MyMeridian Example</th></tr></thead>
+    <tbody>
+      <tr><td>Perceivable</td><td>Content is presentable in ways users can perceive — contrast, text alternatives, resizable text.</td><td>Cherry Red at 3.85:1 fails for body text; must be reserved for large/bold or icon-paired use.</td></tr>
+      <tr><td>Operable</td><td>Interface is operable — full keyboard access, enough time, no seizure triggers, clear navigation.</td><td>Every slot in the appointment picker is reachable and selectable by keyboard alone, with a visible focus ring.</td></tr>
+      <tr><td>Understandable</td><td>Content and operation are predictable — readable language, consistent navigation, input assistance.</td><td>"We couldn't confirm your insurance for this visit" replaces <code>ERR_INS_409</code>.</td></tr>
+      <tr><td>Robust</td><td>Content works with current and future assistive technology.</td><td>Referral status badges expose a programmatic name/role, not just a color, to screen readers.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-danger">
+    <b class="callout-tag">The Number Every Architect Should Know Cold</b>
+    <p>Normal text needs <b>4.5:1</b> contrast against its background (WCAG SC 1.4.3); large text (18pt+/14pt+bold) and non-text UI boundaries need <b>3:1</b> (SC 1.4.11). This is arithmetic, not opinion — an AI design agent's claim of "on-brand and accessible" should always be independently checked against these two numbers.</p>
+  </div>
+  <p>See the fully computed, real-number checklist in <a href="#doc-wcag">Document 7</a>.</p>
+</section>
+<section class="topic-section" id="f-hierarchy">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Visual &amp; Interaction Hierarchy</h2>
+  <p>Hierarchy is the deliberate use of size, weight, color, spacing, and position so a user's eye lands on the most important thing first — without being told to. A screen with no hierarchy forces the user to read everything to find anything; a screen with the wrong hierarchy actively misleads them.</p>
+  <p>On a MyMeridian referral card, the specialist's name and the "Book This Visit" button need to dominate — that's the job the patient came to do. The insurance-authorization fine print is real information, but it is not the first thing a patient's eye should hit. When you review an AI-generated screen, ask: <b>what does this layout tell my eye is most important, and is that the same thing the user actually needs first?</b> If those two answers diverge, the hierarchy is wrong even if every individual element is well-designed.</p>
+</section>
+
+<section class="topic-section" id="f-designsystem">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Design Systems &amp; Tokens</h2>
+  <p>A design system is a shared vocabulary of reusable, named decisions. A design <b>token</b> is the atomic unit of that vocabulary — a name that stands in for a value. The critical distinction an architect must hold onto:</p>
+  <div class="code-pair">
+    <div class="code-card bad">
+      <div class="code-ribbon">Raw Value (Reject)</div>
+      <div class="code-body"><code>background-color: #FB2832;</code></div>
+      <ul class="notes">
+        <li>Means nothing without opening the design tool.</li>
+        <li>If the brand color changes, every occurrence must be found and hand-edited.</li>
+        <li>Nothing stops it from being used somewhere it shouldn't (body text).</li>
+      </ul>
+    </div>
+    <div class="code-card good">
+      <div class="code-ribbon">Semantic Token (Approve)</div>
+      <div class="code-body"><code>background-color: color.action.primary;</code></div>
+      <ul class="notes">
+        <li>Named for its purpose — reads as intent, not paint.</li>
+        <li>One definition change propagates everywhere the token is used.</li>
+        <li>The token's usage rule (e.g. "buttons only, 14pt+ bold text") can be documented once and enforced everywhere.</li>
+      </ul>
+    </div>
+  </div>
+  <p>See the complete MyMeridian token sheet — color, type scale, spacing, all semantic — in <a href="#doc-tokens">Document 8</a>.</p>
+</section>
+
+<section class="topic-section" id="f-testing">
+  <div class="section-kicker">The Discipline — The 20%</div>
+  <h2 class="section-title">Usability Testing</h2>
+  <p>Heuristic evaluation and accessibility audits are expert-driven and rule-driven — fast and cheap, but blind to anything outside the expert's own frame or the rulebook's coverage. Usability testing puts the design in front of real (or representative) users attempting real tasks, usually narrating their thoughts aloud, to surface what the first two methods structurally cannot.</p>
+  <table class="compact">
+    <thead><tr><th>Method</th><th>Speed / Cost</th><th>Catches</th><th>Misses</th></tr></thead>
+    <tbody>
+      <tr><td>Heuristic evaluation</td><td>Fast, cheap</td><td>Structural violations of known usability principles.</td><td>Anything outside the ten heuristics; requires an expert evaluator.</td></tr>
+      <tr><td>Accessibility audit</td><td>Fast, rule-based</td><td>WCAG conformance gaps — contrast, labels, keyboard traps.</td><td>Whether the design is actually easy to use, only whether it's technically operable.</td></tr>
+      <tr><td>Usability testing</td><td>Slow, resource-intensive</td><td>Real confusion, real hesitation, real task failure — including causes no expert predicted.</td><td>Small sample sizes mean it can miss rare edge cases; requires recruiting the right participants.</td></tr>
+    </tbody>
+  </table>
+  <p>The participant mix matters as much as the task list. A usability test recruited entirely from digitally fluent 25–40 year-olds will not surface the failure modes that hit Barbara. See MyMeridian's recruiting criteria, task list, and script in <a href="#doc-testplan">Document 9</a>.</p>
+</section>
+<section class="topic-section" id="good-bad">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">Good vs. Bad Design</h2>
+  <p>The same referral card, built two ways. Both are visually "on brand" in the sense that they use only the approved Colaberry/Meridian palette — which is exactly why an architect can't approve on brand-compliance alone. The difference is entirely in usage.</p>
+  <div class="code-pair">
+    <div class="code-card bad">
+      <div class="code-ribbon">Reject</div>
+      <div class="code-body">
+        <svg viewBox="0 0 320 170" role="img" aria-label="Poorly designed referral card with cramped layout, jargon, and low-contrast red text">
+          <rect x="0" y="0" width="320" height="170" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="10" y="20" font-family="Roboto" font-size="11" font-weight="700" fill="var(--text)">Dr. A. Chen - Cardiology - Encounter #88213-A</text>
+          <text x="10" y="36" font-family="Roboto" font-size="9.5" fill="var(--cherry)">Encounter Auth Pending — Eligibility Unconfirmed</text>
+          <text x="10" y="52" font-family="Roboto Mono" font-size="8.5" fill="var(--muted)">ref_status_code: PND_ELIG_02 · pcp_ref: Y · fac: MHN-014</text>
+          <text x="10" y="72" font-family="Roboto" font-size="8.5" fill="var(--muted)">This referral requires prior authorization review per your plan's utilization management policy before scheduling can proceed through standard channels.</text>
+          <rect x="240" y="128" width="60" height="22" rx="3" fill="var(--cherry)"/>
+          <text x="270" y="143" text-anchor="middle" font-family="Roboto" font-size="9" font-weight="700" fill="#fff">Book</text>
+        </svg>
+      </div>
+      <ul class="notes">
+        <li>Cherry Red body text at ~3.85:1 contrast — fails WCAG AA (needs 4.5:1).</li>
+        <li>Clinical jargon ("Encounter," "PND_ELIG_02," "utilization management") a patient can't act on.</li>
+        <li>"Book" button measures ~22px tall — well under the 44px target-size floor for this user base.</li>
+        <li>No visual hierarchy: doctor name, status, and legal disclaimer all compete at similar weight.</li>
+      </ul>
+    </div>
+    <div class="code-card good">
+      <div class="code-ribbon">Approve</div>
+      <div class="code-body">
+        <svg viewBox="0 0 320 170" role="img" aria-label="Well designed referral card with clear hierarchy, plain language, and accessible contrast">
+          <rect x="0" y="0" width="320" height="170" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="14" y="28" font-family="Roboto" font-size="15" font-weight="700" fill="var(--text)">Dr. Amy Chen</text>
+          <text x="14" y="45" font-family="Roboto" font-size="11.5" fill="var(--muted)">Cardiology · Follow-up visit</text>
+          <circle cx="20" cy="63" r="5" fill="var(--leaf)"/>
+          <text x="32" y="67" font-family="Roboto" font-size="11" font-weight="700" fill="var(--leaf)">Ready to Book</text>
+          <text x="14" y="88" font-family="Roboto" font-size="10.5" fill="var(--text)">Your doctor sent this referral on Aug 12.</text>
+          <rect x="14" y="122" width="292" height="34" rx="8" fill="var(--cherry)"/>
+          <text x="160" y="144" text-anchor="middle" font-family="Roboto" font-size="13" font-weight="700" fill="#fff">Book This Visit</text>
+        </svg>
+      </div>
+      <ul class="notes">
+        <li>White-on-cherry button label set bold at 14pt-equivalent — qualifies as "large text," clears the 3:1 threshold at 3.85:1 measured contrast.</li>
+        <li>Plain language: "Ready to Book," not a status code.</li>
+        <li>Status is carried by icon + text + color together, not color alone (readable without color vision).</li>
+        <li>Button measures 44px tall — meets the target-size floor.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section class="topic-section" id="kpis">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">UX KPIs</h2>
+  <p>These are the numbers an architect watches to know whether the redesign is actually working for patients — not aesthetic opinions, but measured signals from real usage and testing.</p>
+  <div class="kpi-grid">
+    <div class="kpi-tile"><div class="kpi-label">Task Success Rate</div><div class="kpi-value">84%</div><div class="kpi-delta up-good">▲ from 58% baseline</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Time on Task</div><div class="kpi-value">3.1<span style="font-size:14px;">min</span></div><div class="kpi-delta down-good">▼ from 6.4min</div></div>
+    <div class="kpi-tile"><div class="kpi-label">SUS Score</div><div class="kpi-value">76</div><div class="kpi-delta up-good">▲ from 61 (marginal)</div></div>
+    <div class="kpi-tile"><div class="kpi-label">WCAG AA Pass Rate</div><div class="kpi-value">91%</div><div class="kpi-delta up-good">▲ from 64% baseline</div></div>
+    <div class="kpi-tile"><div class="kpi-label">Self-Service Booking</div><div class="kpi-value">22%</div><div class="kpi-delta up-good">▲ from 0% baseline</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card">
+      <h4>Task Success Rate — Booking a Referral Visit</h4>
+      <svg viewBox="0 0 500 170" role="img" aria-label="Bar chart of task success rate rising from 58 percent baseline to 84 percent pilot toward a 90 percent target">
+        <line x1="40" y1="150" x2="480" y2="150" stroke="var(--border)" stroke-width="1.5"/>
+        <rect x="90" y="80.4" width="60" height="69.6" rx="3" fill="var(--muted)"/>
+        <rect x="230" y="49.2" width="60" height="100.8" rx="3" fill="var(--berry)"/>
+        <rect x="370" y="42" width="60" height="108" rx="3" fill="var(--leaf)"/>
+        <g font-family="Roboto Mono" font-size="12" fill="var(--text)" text-anchor="middle">
+          <text x="120" y="72">58%</text><text x="260" y="41">84%</text><text x="400" y="34">90%</text>
+        </g>
+        <g font-family="Roboto" font-size="11.5" fill="var(--muted)" text-anchor="middle">
+          <text x="120" y="164">Baseline</text><text x="260" y="164">Pilot</text><text x="400" y="164">Target</text>
+        </g>
+      </svg>
+    </div>
+    <div class="chart-card">
+      <h4>WCAG 2.1 AA Audit — 42 Applicable Criteria</h4>
+      <svg viewBox="0 0 260 190" role="img" aria-label="Donut chart of WCAG audit results: 27 pass, 8 partial, 7 fail">
+        <g transform="translate(95,90)">
+          <circle r="70" fill="none" stroke="var(--border)" stroke-width="28"/>
+          <circle r="70" fill="none" stroke="var(--leaf)" stroke-width="28" stroke-dasharray="282.7 157.1" stroke-dashoffset="0" transform="rotate(-90)"/>
+          <circle r="70" fill="none" stroke="var(--amber)" stroke-width="28" stroke-dasharray="83.8 356.0" stroke-dashoffset="-282.7" transform="rotate(-90)"/>
+          <circle r="70" fill="none" stroke="var(--cherry)" stroke-width="28" stroke-dasharray="73.3 366.5" stroke-dashoffset="-366.5" transform="rotate(-90)"/>
+          <text x="0" y="-4" text-anchor="middle" font-family="Roboto" font-size="22" font-weight="900" fill="var(--text)">64%</text>
+          <text x="0" y="14" text-anchor="middle" font-family="Roboto Mono" font-size="10" fill="var(--muted)">pass, baseline</text>
+        </g>
+      </svg>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:var(--leaf)"></span>Pass 27</span>
+        <span><span class="legend-dot" style="background:var(--amber)"></span>Partial 8</span>
+        <span><span class="legend-dot" style="background:var(--cherry)"></span>Fail 7</span>
+      </div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h4>Time on Task — Booking a Referral Visit (Minutes)</h4>
+    <svg viewBox="0 0 500 170" role="img" aria-label="Bar chart of time on task falling from 6.4 minutes baseline to 3.1 minutes pilot toward a 2.5 minute target">
+      <line x1="40" y1="150" x2="480" y2="150" stroke="var(--border)" stroke-width="1.5"/>
+      <rect x="90" y="34.8" width="60" height="115.2" rx="3" fill="var(--muted)"/>
+      <rect x="230" y="94.2" width="60" height="55.8" rx="3" fill="var(--berry)"/>
+      <rect x="370" y="105" width="60" height="45" rx="3" fill="var(--leaf)"/>
+      <g font-family="Roboto Mono" font-size="12" fill="var(--text)" text-anchor="middle">
+        <text x="120" y="27">6.4</text><text x="260" y="87">3.1</text><text x="400" y="98">≤2.5</text>
+      </g>
+      <g font-family="Roboto" font-size="11.5" fill="var(--muted)" text-anchor="middle">
+        <text x="120" y="164">Baseline</text><text x="260" y="164">Pilot</text><text x="400" y="164">Target</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="topic-section" id="review-lens">
+  <div class="section-kicker">Judgment</div>
+  <h2 class="section-title">The Architect's Review Lens</h2>
+  <p>When AI-generated UX work lands in front of you, run it through these seven questions before anything else. This is the compressed version of <a href="#doc-heuristics">Document 6</a> and <a href="#doc-wcag">Document 7</a> — the lens you hold up first.</p>
+  <table>
+    <thead><tr><th>#</th><th>Question</th><th>What a "No" Means</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Does this match the approved persona/JTBD and IA, not a plausible alternative the model preferred?</td><td>Scope drift — send back to the research, not the screen.</td></tr>
+      <tr><td>2</td><td>Is every interactive element labeled with a programmatic name/role and reachable by keyboard alone?</td><td>Contract violation — <span class="badge badge-danger">Blocker</span> under WCAG 4.1.2 / 2.1.1.</td></tr>
+      <tr><td>3</td><td>Does the screen define an error, empty, and loading state — not just success?</td><td>Incomplete by definition — not shippable.</td></tr>
+      <tr><td>4</td><td>Does every color-conveyed meaning have a redundant non-color cue (icon, text, pattern)?</td><td>Fails WCAG 1.4.1 — invisible to color-blind and low-vision users.</td></tr>
+      <tr><td>5</td><td>Can a user recover from every error path without calling support?</td><td>A dead end, not a design — see the insurance-verification failure in Document 3.</td></tr>
+      <tr><td>6</td><td>Would a first-time patient with low digital literacy understand this screen unaided?</td><td>Readability/comprehension failure — request plain-language revision.</td></tr>
+      <tr><td>7</td><td>Does anything here cross a governance boundary (new PHI exposure, new third-party widget, pattern outside the design system)?</td><td>Escalate — do not approve at the implementation level.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="topic-section" id="documents">
+  <div class="section-kicker">Deliverables</div>
+  <h2 class="section-title">The Nine Documents — MyMeridian Portal Redesign</h2>
+  <p>Below are the nine governing UX documents for the MyMeridian initiative, each a complete, standalone deliverable with its own cover, document-control strip, and sign-off block. Each is individually downloadable as a fully-styled HTML file, printable to PDF from the browser's print dialog, and — where the content is tabular — exportable as a spreadsheet-ready CSV.</p>
+</section>
+<section class="topic-section" id="doc-exec">
+  <div class="section-kicker">Document 1 of 9</div>
+  <h2 class="section-title">Executive Summary</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('exec')">Download HTML</button>
+    <button class="btn" onclick="printDoc('exec')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-exec">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Executive Summary</h1>
+      <div class="doc-cover-sub">MyMeridian Patient Portal — Appointment Scheduling &amp; Referral Tracking Redesign</div>
+      <div class="doc-cover-org">Meridian Health Network · Digital Experience Team · 12 Clinics, 3 Hospitals</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-EXEC-001</td><th>Version</th><td>1.2</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-18</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">The Problem</h3>
+      <p>42% of patients who start an online appointment-booking flow in MyMeridian abandon it before completion. Referral status is opaque — patients cannot tell whether a specialist referral has been sent, is pending insurance authorization, or is ready to book — which drives missed specialist follow-ups and pushes volume into an already-overloaded call center. Patients managing chronic conditions, who need this flow to work most reliably, are disproportionately the ones who fall through the gap.</p>
+
+      <h3 class="doc-h">The Approach</h3>
+      <p>A research-grounded redesign of the referral and appointment-booking flow, built around two primary personas (a low-digital-literacy older adult managing a chronic condition, and a mobile-first parent booking on the go), validated against Nielsen's usability heuristics and WCAG 2.1 AA, and tested with a participant mix that deliberately includes a screen-reader user, a low-vision user, and a low-digital-literacy older adult — not just digitally fluent testers. The full research and design package is Documents 2 through 9 of this guide.</p>
+
+      <h3 class="doc-h">Results So Far — Pilot (3 Clinics)</h3>
+      <div class="kpi-grid">
+        <div class="kpi-tile"><div class="kpi-label">Task Success Rate</div><div class="kpi-value">84%</div><div class="kpi-delta up-good">▲ from 58%</div></div>
+        <div class="kpi-tile"><div class="kpi-label">Time on Task</div><div class="kpi-value">3.1<span style="font-size:14px;">min</span></div><div class="kpi-delta down-good">▼ from 6.4min</div></div>
+        <div class="kpi-tile"><div class="kpi-label">SUS Score</div><div class="kpi-value">76</div><div class="kpi-delta up-good">▲ from 61</div></div>
+        <div class="kpi-tile"><div class="kpi-label">WCAG AA Pass Rate</div><div class="kpi-value">91%</div><div class="kpi-delta up-good">▲ from 64%</div></div>
+      </div>
+
+      <h3 class="doc-h">Recommendation</h3>
+      <p>Approve system-wide rollout across all 12 clinics and 3 hospitals in Q4 2026, contingent on closing the one remaining catastrophic-severity finding (the unlabeled insurance-verification error, Document 6) and the one remaining WCAG Fail-level item (Document 7) before general availability. Both are scoped, estimated at one sprint combined, and already assigned.</p>
+
+      <h3 class="doc-h">Investment &amp; Timeline</h3>
+      <table class="compact">
+        <thead><tr><th>Phase</th><th>Scope</th><th>Timeline</th></tr></thead>
+        <tbody>
+          <tr><td>Pilot (complete)</td><td>3 clinics, referral booking flow only</td><td>Apr – Aug 2026</td></tr>
+          <tr><td>Remediation</td><td>Close catastrophic heuristic finding + 1 WCAG Fail item</td><td>1 sprint, Sep 2026</td></tr>
+          <tr><td>System-wide rollout</td><td>All 12 clinics, 3 hospitals; prescriptions &amp; billing flows follow same pattern</td><td>Q4 2026</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">Key Risks</h3>
+      <table class="compact">
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>Insurance-verification error remains unresolved on the payer side, not just the UI side</td><td>UI-level fix (plain language + phone/manual-verify fallback) ships regardless; payer-integration fix tracked as a separate, non-blocking workstream.</td></tr>
+          <tr><td>Rollout to hospitals surfaces new referral types not covered by pilot data</td><td>Phased rollout with a one-week observation window per site before the next site begins.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">Next Milestone</h3>
+      <p>Remediation sprint sign-off, targeted 2026-09-19, followed immediately by the Phase 1 hospital rollout.</p>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-18</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-EXEC-001 · v1.2 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-personas">
+  <div class="section-kicker">Document 2 of 9</div>
+  <h2 class="section-title">Personas &amp; Jobs-to-be-Done</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('personas')">Download HTML</button>
+    <button class="btn" onclick="printDoc('personas')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-personas">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Personas &amp; Jobs-to-be-Done</h1>
+      <div class="doc-cover-sub">MyMeridian Patient Portal — Appointment Scheduling &amp; Referral Tracking Redesign</div>
+      <div class="doc-cover-org">Meridian Health Network · Digital Experience Team</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-PER-001</td><th>Version</th><td>1.1</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-14</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>Two primary personas drive every screen in this redesign. Both are built from the same research base — pilot-site interviews and call-center transcripts — and both are stated as Jobs-to-be-Done first, demographics second. A one-sentence secondary persona (clinic staff) is included for context; the portal is not designed for her, but her workflow constrains what patients can do.</p>
+
+      <div class="persona-grid">
+        <div class="persona-card">
+          <div class="persona-head">
+            <div class="persona-avatar" style="background:var(--berry);">BE</div>
+            <div><h4>Barbara Ellison</h4><span>67 · Retired teacher · Type 2 diabetes</span></div>
+          </div>
+          <div class="persona-body">
+            <div class="jtbd-box"><b>Job-to-be-Done:</b> "When I need to see my endocrinologist again, I want to book the visit without navigating confusing menus, so I can manage my diabetes without relying on my daughter."</div>
+            <h5>Goals</h5>
+            <ul><li>Book specialist follow-ups on her own timeline, not around her daughter's schedule.</li><li>Know, without calling, whether her referral has gone through.</li><li>Read every screen without squinting or guessing at icons.</li></ul>
+            <h5>Frustrations</h5>
+            <ul><li>Tiny tap targets she frequently mis-taps on her tablet.</li><li>Medical jargon and system status codes she can't interpret.</li><li>Forgetting her portal password, then abandoning the task entirely.</li><li>Anxiety that a missed step means a missed appointment and a lecture from her doctor.</li></ul>
+            <h5>Tech Comfort &amp; Access Needs</h5>
+            <ul><li>Uses an iPad with text size increased; occasionally uses VoiceOver when her eyes are tired.</li><li>Comfortable with routine, repeatable tasks; unforgiving of unexplained errors.</li></ul>
+            <h5>Success Looks Like</h5>
+            <p style="font-size:13.5px;">Barbara books her cardiology follow-up in under 3 minutes, unaided, and knows immediately if something needs her attention.</p>
+          </div>
+        </div>
+
+        <div class="persona-card">
+          <div class="persona-head">
+            <div class="persona-avatar" style="background:var(--cherry);">JR</div>
+            <div><h4>Jordan Reyes</h4><span>34 · Marketing manager · Parent of two</span></div>
+          </div>
+          <div class="persona-body">
+            <div class="jtbd-box"><b>Job-to-be-Done:</b> "When my kid needs to see a specialist, I want to see the referral status and next steps in one place, so I don't have to call the office during work hours."</div>
+            <h5>Goals</h5>
+            <ul><li>Book and manage pediatric appointments from a phone, between meetings.</li><li>See referral status without a hold-music phone call at 2pm on a Tuesday.</li><li>Sync appointments straight to a personal calendar.</li></ul>
+            <h5>Frustrations</h5>
+            <ul><li>The portal isn't optimized for mobile — pinch-zooming to tap small controls.</li><li>Re-entering insurance information that's already on file every single visit.</li><li>No visibility into a pediatric specialist referral until someone calls to explain it.</li></ul>
+            <h5>Tech Comfort &amp; Access Needs</h5>
+            <ul><li>High digital literacy, low patience; abandons anything that takes more than 2 minutes.</li><li>Mobile-first — desktop is the exception, not the default.</li></ul>
+            <h5>Success Looks Like</h5>
+            <p style="font-size:13.5px;">Jordan checks referral status and books a follow-up from a phone during a 5-minute break, no phone call required.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="doc-h">Secondary Persona — For Context, Not the Design Target</h3>
+      <table class="compact">
+        <thead><tr><th>Persona</th><th>Role</th><th>Why She Matters Here</th></tr></thead>
+        <tbody>
+          <tr><td>Maria Ibañez</td><td>Front-desk coordinator, MHN Cardiology Clinic</td><td>She handles every booking MyMeridian fails to complete. Her workload is the call-center overflow this redesign is measured against — she is a downstream stakeholder, not a portal user, and is not designed for directly.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <b class="callout-tag">Why This Isn't a Demographic Sketch</b>
+        <p>Notice neither persona's JTBD mentions age, device, or diagnosis. Delete Barbara's photo and age and the sentence still tells you exactly what to build: a booking flow readable without assistance, resilient to interruption, and forgiving of a forgotten password. That portability is the test of a real persona.</p>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-14</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-PER-001 · v1.1 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-journey">
+  <div class="section-kicker">Document 3 of 9</div>
+  <h2 class="section-title">User Journey Map</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('journey')">Download HTML</button>
+    <button class="btn" onclick="printDoc('journey')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-journey">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">User Journey Map</h1>
+      <div class="doc-cover-sub">Barbara Ellison books a cardiology follow-up from an active referral — including where it goes wrong</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-JRN-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-15</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>Persona: <b>Barbara Ellison</b> (see <a href="#doc-personas">Document 2</a>). Goal: book a cardiology follow-up from a referral her primary care doctor sent three days ago. This map covers the full round trip — including the insurance-verification failure that derails the happy path, and the phone fallback that resolves it.</p>
+
+      <h3 class="doc-h">Emotional Trajectory</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 920 210" role="img" aria-label="Line chart of Barbara's emotional state across the journey, dropping sharply at the insurance verification error and hold stages">
+          <g stroke="var(--border)" stroke-width="1" stroke-dasharray="2 3">
+            <line x1="60" y1="20" x2="860" y2="20"/><line x1="60" y1="57.5" x2="860" y2="57.5"/>
+            <line x1="60" y1="95" x2="860" y2="95"/><line x1="60" y1="132.5" x2="860" y2="132.5"/><line x1="60" y1="170" x2="860" y2="170"/>
+          </g>
+          <g font-family="Roboto Mono" font-size="9.5" fill="var(--muted)" text-anchor="end">
+            <text x="52" y="24">+2</text><text x="52" y="61">+1</text><text x="52" y="99">0</text><text x="52" y="136">-1</text><text x="52" y="174">-2</text>
+          </g>
+          <polyline fill="none" stroke="var(--berry)" stroke-width="2.5" points="60,57.5 140,95 220,132.5 300,95 380,57.5 460,170 540,132.5 620,170 700,95 780,57.5 860,20"/>
+          <g>
+            <circle cx="60" cy="57.5" r="4.5" fill="var(--berry)"/><circle cx="140" cy="95" r="4.5" fill="var(--berry)"/>
+            <circle cx="220" cy="132.5" r="4.5" fill="var(--berry)"/><circle cx="300" cy="95" r="4.5" fill="var(--berry)"/>
+            <circle cx="380" cy="57.5" r="4.5" fill="var(--berry)"/>
+            <circle cx="460" cy="170" r="5.5" fill="var(--cherry)"/>
+            <circle cx="540" cy="132.5" r="4.5" fill="var(--berry)"/>
+            <circle cx="620" cy="170" r="5.5" fill="var(--cherry)"/>
+            <circle cx="700" cy="95" r="4.5" fill="var(--berry)"/><circle cx="780" cy="57.5" r="4.5" fill="var(--berry)"/>
+            <circle cx="860" cy="20" r="4.5" fill="var(--leaf)"/>
+          </g>
+          <g font-family="Roboto" font-size="10" fill="var(--muted)" text-anchor="middle">
+            <text x="60" y="192">Trigger</text><text x="140" y="192">Discover</text><text x="220" y="192">Log In</text>
+            <text x="300" y="192">Find Ref.</text><text x="380" y="192">Book Visit</text><text x="460" y="192" fill="var(--cherry)" font-weight="700">Ins. Error</text>
+            <text x="540" y="192">Call Office</text><text x="620" y="192" fill="var(--cherry)" font-weight="700">On Hold</text>
+            <text x="700" y="192">Resolved</text><text x="780" y="192">Confirmed</text><text x="860" y="192">Reminder</text>
+          </g>
+        </svg>
+        <div class="diagram-cap">Emotional trajectory, Trigger through Reminder — the two cherry-highlighted points are the unhappy-path dip this document exists to fix.</div>
+      </div>
+
+      <h3 class="doc-h">Stage-by-Stage Detail</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>Stage</th><th>Barbara's Actions</th><th>Thoughts</th><th>Emotion</th><th>Pain Point</th><th>Opportunity</th></tr></thead>
+        <tbody>
+          <tr><td><b>1. Trigger</b></td><td>Doctor says "see cardiology again in a few months" at the end of her PCP visit.</td><td>"I hope I remember to do this."</td><td><span class="badge sev0">+1</span></td><td>No immediate prompt once she leaves the office.</td><td>Referral-created notification, same day, in plain language.</td></tr>
+          <tr><td><b>2. Discover</b></td><td>Three days later, opens the MyMeridian app from a home-screen icon.</td><td>"Let's see if that referral thing is in here somewhere."</td><td><span class="badge sev1">0</span></td><td>Unsure where referrals live in the app.</td><td>Home dashboard surfaces "1 Referral Ready" directly, no hunting.</td></tr>
+          <tr><td><b>3. Log In</b></td><td>Enters username; forgets password on first attempt, requests reset.</td><td>"Not this again."</td><td><span class="badge sev2">-1</span></td><td>Password reset flow adds ~90 seconds and a context switch to email.</td><td>Biometric/passkey login option for returning devices.</td></tr>
+          <tr><td><b>4. Find Referral</b></td><td>Taps Referrals &amp; Specialists; sees the cardiology referral card.</td><td>"Oh good, there it is, and it says I can book now."</td><td><span class="badge sev0">0</span></td><td>None at this stage — status is clear and plain-language.</td><td>Reinforce with a visible "Ready to Book" badge (see Document 5).</td></tr>
+          <tr><td><b>5. Book Visit</b></td><td>Taps "Book This Visit," selects a Tuesday morning slot two weeks out.</td><td>"This is easier than I expected."</td><td><span class="badge sev0">+1</span></td><td>None — this is the moment the redesign is working.</td><td>Keep the slot picker this simple; don't regress it in future releases.</td></tr>
+          <tr style="background:rgba(251,40,50,.06);"><td><b>6. Insurance Error</b></td><td>Taps Confirm; the screen shows an error and won't proceed.</td><td>"Did it break? Did I do something wrong? What do I do now?"</td><td><span class="badge sev4">-2</span></td><td><b>Unhappy path.</b> Raw error code with no explanation or next step (see Document 6, Heuristic H9, severity 4).</td><td>Plain-language error + two explicit recovery actions (see Document 5, Screen B error state).</td></tr>
+          <tr style="background:rgba(251,40,50,.04);"><td><b>7. Call Office</b></td><td>Follows the phone number shown in the error and calls.</td><td>"I just wanted to book online so I didn't have to do this."</td><td><span class="badge sev3">-1</span></td><td>The very failure the portal exists to prevent has occurred.</td><td>Route the call directly to insurance support, not a general queue.</td></tr>
+          <tr style="background:rgba(251,40,50,.06);"><td><b>8. On Hold</b></td><td>Waits on hold for 11 minutes during business hours.</td><td>"I could have just called in the first place."</td><td><span class="badge sev4">-2</span></td><td>Hold time erodes trust in the digital channel entirely.</td><td>Offer "Book Anyway — We'll Verify Later" at Step 6 to skip this stage.</td></tr>
+          <tr><td><b>9. Resolved</b></td><td>Staff member manually verifies insurance and confirms the booking.</td><td>"OK, it's handled, but that took twenty minutes total."</td><td><span class="badge sev1">0</span></td><td>Manual resolution works, but it's the fallback, not the design.</td><td>Log the verification failure so the pattern is visible in aggregate.</td></tr>
+          <tr><td><b>10. Confirmed</b></td><td>Receives a confirmation with date, time, and prep instructions.</td><td>"Good, now I know when to show up and what to bring."</td><td><span class="badge sev0">+1</span></td><td>None.</td><td>Offer add-to-calendar and a printable/downloadable copy (Document 5, Screen C).</td></tr>
+          <tr><td><b>11. Reminder</b></td><td>Gets a reminder 48 hours before the visit.</td><td>"That's helpful, I would have forgotten otherwise."</td><td><span class="badge sev0">+2</span></td><td>None.</td><td>Reinforces trust in the channel for the next referral.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout callout-danger">
+        <b class="callout-tag">Why This Document Exists</b>
+        <p>Stages 6–8 are the entire reason the redesign was funded. A journey map that stopped at Stage 5 would have shipped a beautiful booking flow that still failed Barbara at the exact moment she needed it most. The fixes for this dip are traced through Document 5 (wireframe error state), Document 6 (heuristic finding H9, severity 4), and Document 9 (usability test Task 3, built specifically to re-test this recovery path).</p>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-15</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-JRN-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-ia">
+  <div class="section-kicker">Document 4 of 9</div>
+  <h2 class="section-title">Information Architecture &amp; Sitemap</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('ia')">Download HTML</button>
+    <button class="btn" onclick="printDoc('ia')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-ia">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Information Architecture &amp; Sitemap</h1>
+      <div class="doc-cover-sub">MyMeridian Patient Portal — Structure &amp; Plain-Language Navigation</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-IA-001</td><th>Version</th><td>1.3</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-16</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">Sitemap</h3>
+      <div class="diagram-card">
+        <svg viewBox="0 0 1000 480" role="img" aria-label="Sitemap tree with Home Dashboard at the root and six second-level sections, each listing its child pages">
+          <defs>
+            <marker id="iaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+          </defs>
+          <rect x="400" y="16" width="200" height="46" rx="8" fill="var(--cherry)"/>
+          <text x="500" y="44" text-anchor="middle" fill="#fff" font-family="Roboto" font-weight="700" font-size="14">Home / Dashboard</text>
+          <g stroke="var(--muted)" stroke-width="1.3" fill="none" marker-end="url(#iaArrow)">
+            <path d="M500,62 L85,108"/><path d="M500,62 L251,108"/><path d="M500,62 L417,108"/>
+            <path d="M500,62 L583,108"/><path d="M500,62 L749,108"/><path d="M500,62 L915,108"/>
+          </g>
+          <g font-family="Roboto" font-size="10.5" fill="var(--text)">
+            <rect x="10" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="10" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="85" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="11">My Appointments</text>
+            <text x="20" y="152">• Upcoming Visits</text><text x="20" y="168">• Past Visits</text><text x="20" y="184">• Book New Visit</text>
+
+            <rect x="176" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="176" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="251" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="10.3">Referrals &amp; Specialists</text>
+            <text x="186" y="152">• Active Referrals</text><text x="186" y="168">• Referral History</text><text x="186" y="184">• Find a Specialist</text>
+
+            <rect x="342" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="342" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="417" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="11">Messages</text>
+            <text x="352" y="152">• Message the Care Team</text><text x="352" y="168">• Message History</text>
+
+            <rect x="508" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="508" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="583" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="11">Prescriptions</text>
+            <text x="518" y="152">• Refill Requests</text><text x="518" y="168">• Pharmacy on File</text>
+
+            <rect x="674" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="674" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="749" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="10.6">Billing &amp; Insurance</text>
+            <text x="684" y="152">• Statements</text><text x="684" y="168">• Insurance Cards</text><text x="684" y="184">• Pay a Bill</text>
+
+            <rect x="840" y="110" width="150" height="150" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.3"/>
+            <rect x="840" y="110" width="150" height="26" rx="7" fill="var(--berry)"/>
+            <text x="915" y="127" text-anchor="middle" fill="#fff" font-weight="700" font-size="10.6">Profile &amp; Settings</text>
+            <text x="850" y="152">• Accessibility Prefs.</text><text x="850" y="168">• Caregiver Access</text><text x="850" y="184">• Notifications</text>
+          </g>
+        </svg>
+        <div class="diagram-cap">Two-level sitemap — every leaf page reachable in 2 taps from Home; every core task in 3.</div>
+      </div>
+
+      <h3 class="doc-h">Click-Depth to Core Tasks</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>Task</th><th>Path</th><th>Clicks</th></tr></thead>
+        <tbody>
+          <tr><td>View referral status</td><td>Home → Referrals &amp; Specialists → Active Referrals</td><td><span class="badge badge-success">2</span></td></tr>
+          <tr><td>Book a follow-up from a referral</td><td>Home → Referrals &amp; Specialists → tap referral card → Book This Visit</td><td><span class="badge badge-success">3</span></td></tr>
+          <tr><td>Request a prescription refill</td><td>Home → Prescriptions → Refill Requests → Request Refill</td><td><span class="badge badge-success">3</span></td></tr>
+          <tr><td>Update text size for accessibility</td><td>Home → Profile &amp; Settings → Accessibility Preferences → adjust slider</td><td><span class="badge badge-success">3</span></td></tr>
+          <tr><td>Message the clinic</td><td>Home → Messages → New Message</td><td><span class="badge badge-success">2</span></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="doc-h">Plain-Language Label Audit</h3>
+      <p>Internal system terminology was rejected everywhere it surfaced in the AI-generated first draft. Labels are the first accessibility barrier — a patient can't navigate to a section she doesn't recognize the name of.</p>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>Rejected (System/Clinical Term)</th><th>Adopted (Plain-Language Label)</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Encounters</td><td>Past Visits</td><td>"Encounter" is EHR terminology; patients don't use it.</td></tr>
+          <tr><td>Authorization Status</td><td>Referral Status</td><td>Patients think in terms of "the referral," not "the authorization."</td></tr>
+          <tr><td>Superbill</td><td>Visit Summary &amp; Charges</td><td>Billing jargon with zero patient-facing meaning.</td></tr>
+          <tr><td>PCP</td><td>Primary Care Provider (then "your doctor")</td><td>Spell out on first use; abbreviate never in patient-facing copy.</td></tr>
+          <tr><td>Eligibility Verification Failure (ERR_INS_409)</td><td>"We couldn't confirm your insurance for this visit"</td><td>See Document 3, Stage 6, and Document 6, Heuristic H9.</td></tr>
+          <tr><td>Portal Credentials</td><td>Login &amp; Password</td><td>"Credentials" reads as more technical/threatening than it needs to.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-16</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-IA-001 · v1.3 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-wireframes">
+  <div class="section-kicker">Document 5 of 9</div>
+  <h2 class="section-title">Annotated Wireframes</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('wireframes')">Download HTML</button>
+    <button class="btn" onclick="printDoc('wireframes')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-wireframes">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Annotated Wireframes</h1>
+      <div class="doc-cover-sub">Three Key Screens, Every Functional State — Empty, Loading, Error, Success</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-WF-001</td><th>Version</th><td>1.4</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-warning">In Review</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-19</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <div class="callout callout-warning">
+        <b class="callout-tag">Status Note</b>
+        <p>This document carries an <b>In Review</b> status, not Approved, because Screen B's error state is pending final sign-off from the accessibility reviewer against Document 7. A wireframe with an incomplete state is not shippable — see the Definition-of-Done pattern in the Review Lens.</p>
+      </div>
+
+      <h3 class="doc-h">Screen A — Referral List</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>State</th><th>What the Patient Sees</th><th>Key Annotation</th></tr></thead>
+        <tbody>
+          <tr><td><b>Empty</b></td><td>"You have no active referrals right now. When your doctor sends one, it will appear here." with an illustration and a "Message Your Doctor's Office" button.</td><td>Never a blank void — always explains why nothing's here and offers a next action.</td></tr>
+          <tr><td><b>Loading</b></td><td>Three shimmering placeholder rows in the shape of referral cards; an <code>aria-live="polite"</code> region announces "Loading your referrals."</td><td>Skeleton matches final layout so nothing visually jumps once content resolves.</td></tr>
+          <tr><td><b>Error</b></td><td>"We couldn't load your referrals right now." with a Retry button and the clinic's general phone number as a visible fallback.</td><td>Never a dead end — always a retry plus a human fallback.</td></tr>
+          <tr><td><b>Success</b></td><td>List of referral cards — specialist name, reason, status badge, Book Visit button. See mockup below.</td><td>&nbsp;</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="diagram-card">
+        <svg viewBox="0 0 900 210" role="img" aria-label="Referral list success state showing two referral cards with status badges and book visit buttons">
+          <rect x="10" y="10" width="430" height="90" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="26" y="34" font-family="Roboto" font-weight="700" font-size="14" fill="var(--text)">Dr. Amy Chen — Cardiology</text>
+          <circle cx="30" cy="53" r="5" fill="var(--leaf)"/><text x="42" y="57" font-family="Roboto" font-size="11" font-weight="700" fill="var(--leaf)">Ready to Book</text>
+          <text x="26" y="76" font-family="Roboto" font-size="10.5" fill="var(--muted)">Sent by Dr. Osei on Aug 12</text>
+          <rect x="300" y="60" width="120" height="30" rx="6" fill="var(--cherry)"/><text x="360" y="80" text-anchor="middle" font-family="Roboto" font-size="11" font-weight="700" fill="#fff">Book Visit</text>
+
+          <rect x="460" y="10" width="430" height="90" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="476" y="34" font-family="Roboto" font-weight="700" font-size="14" fill="var(--text)">Dr. Linda Osei — Podiatry</text>
+          <circle cx="480" cy="53" r="5" fill="var(--amber)"/><text x="492" y="57" font-family="Roboto" font-size="11" font-weight="700" fill="var(--amber)">Pending Insurance Review</text>
+          <text x="476" y="76" font-family="Roboto" font-size="10.5" fill="var(--muted)">Sent by Dr. Osei on Aug 20 · usually 2-3 business days</text>
+
+          <g font-family="Roboto Mono" font-size="11" fill="var(--berry)" font-weight="700">
+            <circle cx="22" cy="118" r="9" fill="var(--berry)"/><text x="22" y="122" text-anchor="middle" fill="#fff">1</text>
+            <circle cx="42" cy="63" r="9" fill="var(--berry)"/><text x="42" y="67" text-anchor="middle" fill="#fff">2</text>
+            <circle cx="360" cy="60" r="9" fill="var(--berry)"/><text x="360" y="64" text-anchor="middle" fill="#fff">3</text>
+            <circle cx="492" cy="63" r="9" fill="var(--berry)"/><text x="492" y="67" text-anchor="middle" fill="#fff">4</text>
+          </g>
+          <text x="10" y="150" font-family="Roboto" font-size="11" fill="var(--text)">1. Cards stack vertically on mobile — never a horizontal-scroll table.</text>
+          <text x="10" y="167" font-family="Roboto" font-size="11" fill="var(--text)">2. Status carried by icon + color + text together — readable without color vision.</text>
+          <text x="10" y="184" font-family="Roboto" font-size="11" fill="var(--text)">3. Primary action (Book Visit) is 44px tall, meets the target-size floor.</text>
+          <text x="10" y="201" font-family="Roboto" font-size="11" fill="var(--text)">4. A referral not yet ready shows no button — prevents a doomed tap (Heuristic H5).</text>
+        </svg>
+        <div class="diagram-cap">Screen A, Success state, with numbered annotations.</div>
+      </div>
+
+      <h3 class="doc-h">Screen B — Book Appointment (Time-Slot Picker)</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>State</th><th>What the Patient Sees</th><th>Key Annotation</th></tr></thead>
+        <tbody>
+          <tr><td><b>Empty</b></td><td>"No available times in the next 30 days near you." with options to expand the date range or the search radius, or call the office directly.</td><td>Distinguishes "nothing found" from "still searching" and "broken" — three different states, three different messages.</td></tr>
+          <tr><td><b>Loading</b></td><td>Skeleton date strip and slot grid, <code>aria-busy="true"</code> on the container.</td><td>Prevents a screen reader from announcing an empty grid as final.</td></tr>
+          <tr><td><b>Error</b></td><td>See mockup below — the insurance-verification failure from Document 3, Stage 6.</td><td>&nbsp;</td></tr>
+          <tr><td><b>Success</b></td><td>Date strip plus a grid of morning/afternoon time buttons; selected slot shows a border and checkmark.</td><td>&nbsp;</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="diagram-card">
+        <svg viewBox="0 0 900 150" role="img" aria-label="Insurance verification error state with plain language message and two recovery actions">
+          <rect x="10" y="10" width="880" height="130" rx="8" fill="var(--surface)" stroke="var(--cherry)" stroke-width="1.6"/>
+          <rect x="10" y="10" width="6" height="130" fill="var(--cherry)"/>
+          <text x="34" y="38" font-family="Roboto" font-size="15" font-weight="700" fill="var(--text)">We couldn't confirm your insurance for this visit</text>
+          <text x="34" y="60" font-family="Roboto" font-size="12" fill="var(--muted)">This sometimes happens with newer insurance plans. You have two options:</text>
+          <rect x="34" y="80" width="230" height="38" rx="8" fill="var(--cherry)"/><text x="149" y="104" text-anchor="middle" font-family="Roboto" font-size="12.5" font-weight="700" fill="#fff">Call Insurance Support</text>
+          <rect x="284" y="80" width="260" height="38" rx="8" fill="none" stroke="var(--berry)" stroke-width="1.6"/><text x="414" y="104" text-anchor="middle" font-family="Roboto" font-size="12.5" font-weight="700" fill="var(--berry)">Book Anyway — Verify Later</text>
+          <text x="34" y="140" font-family="Roboto Mono" font-size="9.5" fill="var(--muted)">Reference: ERR_INS_409 · Insurance Support: (555) 019-2231</text>
+        </svg>
+        <div class="diagram-cap">Screen B, Error state — plain-language message first, technical reference code last and de-emphasized, two explicit recovery paths.</div>
+      </div>
+
+      <h3 class="doc-h">Screen C — Confirmation</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>State</th><th>What the Patient Sees</th><th>Key Annotation</th></tr></thead>
+        <tbody>
+          <tr><td><b>Empty</b></td><td>Not applicable — this screen is only reached after a successful booking action; it has no independent empty state.</td><td>Documenting "N/A" explicitly, rather than leaving it unspecified, is itself part of Definition of Done.</td></tr>
+          <tr><td><b>Loading</b></td><td>"Confirming your appointment…" with a spinner, typically under 2 seconds.</td><td>Still required even at sub-2-second duration — prevents a flash of unstyled content.</td></tr>
+          <tr><td><b>Error</b></td><td>"Your time slot was just taken by another patient. Please choose a new time." Returns to Screen B with that slot removed from the grid.</td><td>Handles the booking race condition — two patients selecting the same slot within seconds of each other.</td></tr>
+          <tr><td><b>Success</b></td><td>Confirmation banner plus appointment details and export actions. See mockup below.</td><td>&nbsp;</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="diagram-card">
+        <svg viewBox="0 0 900 190" role="img" aria-label="Booking confirmation success state with a green banner, appointment details, and export actions">
+          <rect x="10" y="10" width="880" height="44" rx="8" fill="rgba(91,166,60,.12)" stroke="var(--leaf)" stroke-width="1.4"/>
+          <circle cx="34" cy="32" r="10" fill="var(--leaf)"/><path d="M29,32 L33,36 L40,27" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="52" y="37" font-family="Roboto" font-size="14" font-weight="700" fill="var(--text)">You're booked with Dr. Amy Chen</text>
+          <text x="24" y="80" font-family="Roboto" font-size="13" fill="var(--text)">Tuesday, September 8, 2026 · 10:30 AM</text>
+          <text x="24" y="100" font-family="Roboto" font-size="11.5" fill="var(--muted)">Meridian Cardiology — Uptown Clinic, 2nd Floor</text>
+          <text x="24" y="120" font-family="Roboto" font-size="11.5" fill="var(--muted)">Please arrive 15 minutes early and bring your insurance card.</text>
+          <rect x="24" y="140" width="150" height="36" rx="8" fill="var(--berry)"/><text x="99" y="163" text-anchor="middle" font-family="Roboto" font-size="11.5" font-weight="700" fill="#fff">Add to Calendar</text>
+          <rect x="186" y="140" width="180" height="36" rx="8" fill="none" stroke="var(--berry)" stroke-width="1.5"/><text x="276" y="163" text-anchor="middle" font-family="Roboto" font-size="11.5" font-weight="700" fill="var(--berry)">Print / Download</text>
+          <rect x="378" y="140" width="90" height="36" rx="8" fill="none" stroke="var(--border)" stroke-width="1.5"/><text x="423" y="163" text-anchor="middle" font-family="Roboto" font-size="11.5" font-weight="700" fill="var(--text)">Done</text>
+        </svg>
+        <div class="diagram-cap">Screen C, Success state — Leaf Green used only as an icon/border accent with dark text, never as body-text-on-green (see Document 7).</div>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-19</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>Pending final a11y sign-off</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-WF-001 · v1.4 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-heuristics">
+  <div class="section-kicker">Document 6 of 9</div>
+  <h2 class="section-title">Usability Heuristic Evaluation</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('heuristics')">Download HTML</button>
+    <button class="btn" onclick="printDoc('heuristics')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('heuristics')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-heuristics">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Usability Heuristic Evaluation</h1>
+      <div class="doc-cover-sub">Three Screens × Nielsen's 10 Heuristics, Severity-Rated</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-HE-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-warning">1 Catastrophic Open</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-17</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>Evaluator: AI Design Agent, cross-checked by the AI Solution Architect learner against Nielsen's severity scale (0 = not a problem, 1 = cosmetic, 2 = minor, 3 = major, 4 = catastrophic). Screens evaluated: <b>A — Referral List</b>, <b>B — Book Appointment</b>, <b>C — Confirmation</b> (all three from <a href="#doc-wireframes">Document 5</a>).</p>
+
+      <div class="chart-row">
+        <div class="chart-card">
+          <h4>Findings by Severity (30 evaluations)</h4>
+          <svg viewBox="0 0 500 170" role="img" aria-label="Bar chart of heuristic findings by severity: 10 none, 9 cosmetic, 6 minor, 4 major, 1 catastrophic">
+            <line x1="40" y1="150" x2="480" y2="150" stroke="var(--border)" stroke-width="1.5"/>
+            <rect x="70" y="30" width="50" height="120" rx="3" fill="var(--leaf)"/>
+            <rect x="160" y="42" width="50" height="108" rx="3" fill="var(--muted)"/>
+            <rect x="250" y="78" width="50" height="72" rx="3" fill="var(--amber)"/>
+            <rect x="340" y="102" width="50" height="48" rx="3" fill="var(--cherry)"/>
+            <rect x="430" y="138" width="50" height="12" rx="3" fill="var(--text)"/>
+            <g font-family="Roboto Mono" font-size="12" fill="var(--text)" text-anchor="middle">
+              <text x="95" y="24">10</text><text x="185" y="36">9</text><text x="275" y="72">6</text><text x="365" y="96">4</text><text x="455" y="132">1</text>
+            </g>
+            <g font-family="Roboto" font-size="10" fill="var(--muted)" text-anchor="middle">
+              <text x="95" y="164">None (0)</text><text x="185" y="164">Cosmetic (1)</text><text x="275" y="164">Minor (2)</text><text x="365" y="164">Major (3)</text><text x="455" y="164">Catastrophic (4)</text>
+            </g>
+          </svg>
+        </div>
+        <div class="chart-card">
+          <h4>Severity-Weighted Issue Load by Screen</h4>
+          <svg viewBox="0 0 260 190" role="img" aria-label="Donut chart of severity weighted issue load by screen: Referral List 19, Book Appointment 14, Confirmation 4">
+            <g transform="translate(95,90)">
+              <circle r="70" fill="none" stroke="var(--border)" stroke-width="28"/>
+              <circle r="70" fill="none" stroke="var(--cherry)" stroke-width="28" stroke-dasharray="225.8 214.0" stroke-dashoffset="0" transform="rotate(-90)"/>
+              <circle r="70" fill="none" stroke="var(--amber)" stroke-width="28" stroke-dasharray="166.5 273.3" stroke-dashoffset="-225.8" transform="rotate(-90)"/>
+              <circle r="70" fill="none" stroke="var(--leaf)" stroke-width="28" stroke-dasharray="47.5 392.3" stroke-dashoffset="-392.3" transform="rotate(-90)"/>
+              <text x="0" y="-4" text-anchor="middle" font-family="Roboto" font-size="20" font-weight="900" fill="var(--text)">37</text>
+              <text x="0" y="14" text-anchor="middle" font-family="Roboto Mono" font-size="9.5" fill="var(--muted)">total sev. points</text>
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--cherry)"></span>Referral List 19</span>
+            <span><span class="legend-dot" style="background:var(--amber)"></span>Book Appt. 14</span>
+            <span><span class="legend-dot" style="background:var(--leaf)"></span>Confirmation 4</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="doc-h">Full Evaluation Matrix</h3>
+      <div class="tablewrap">
+      <table class="compact" id="heuristicsTable">
+        <thead><tr><th>Screen</th><th>#</th><th>Heuristic</th><th>Severity</th><th>Finding</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td>A. Referral List</td><td>H1</td><td>Visibility of system status</td><td><span class="badge sev3">3 — Major</span></td><td>No loading indicator while referral data fetches; patients can't tell if the page is broken.</td><td>Ship the skeleton loading state (Document 5).</td></tr>
+          <tr><td>A. Referral List</td><td>H2</td><td>Match with real world</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>A legacy tooltip still reads "Encounter" instead of "Visit."</td><td>Replace all remaining "Encounter" strings (Document 4).</td></tr>
+          <tr><td>A. Referral List</td><td>H3</td><td>User control and freedom</td><td><span class="badge sev0">0 — None</span></td><td>No issue found; navigation is reversible throughout.</td><td>No action needed.</td></tr>
+          <tr><td>A. Referral List</td><td>H4</td><td>Consistency and standards</td><td><span class="badge sev2">2 — Minor</span></td><td>Referral-card icon set differs slightly from the Appointments card icon set.</td><td>Consolidate to one icon set via Document 8 tokens.</td></tr>
+          <tr><td>A. Referral List</td><td>H5</td><td>Error prevention</td><td><span class="badge sev3">3 — Major</span></td><td>No confirmation step before canceling a pending referral request.</td><td>Add a confirm dialog before cancellation.</td></tr>
+          <tr><td>A. Referral List</td><td>H6</td><td>Recognition rather than recall</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>"Pending Insurance Review" status isn't explained on first view.</td><td>Add an inline tooltip defining each status.</td></tr>
+          <tr><td>A. Referral List</td><td>H7</td><td>Flexibility and efficiency</td><td><span class="badge sev2">2 — Minor</span></td><td>No sort/filter for patients with several referrals on file.</td><td>Add sort-by-date; low priority, low incidence.</td></tr>
+          <tr><td>A. Referral List</td><td>H8</td><td>Aesthetic and minimalist design</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>Reference IDs shown in fine print add visual noise with no patient value.</td><td>Move to an expandable "Details" disclosure.</td></tr>
+          <tr style="background:rgba(251,40,50,.08);"><td>A. Referral List</td><td>H9</td><td>Recognize, diagnose, recover from errors</td><td><span class="badge sev4">4 — Catastrophic</span></td><td>Insurance-verification failure shows a raw error code with no plain-language explanation or recovery path.</td><td>Shipped: plain-language error + two recovery actions (Document 5, Screen B).</td></tr>
+          <tr><td>A. Referral List</td><td>H10</td><td>Help and documentation</td><td><span class="badge sev2">2 — Minor</span></td><td>No inline help for "what does referral status mean."</td><td>Add a short contextual help panel.</td></tr>
+
+          <tr><td>B. Book Appointment</td><td>H1</td><td>Visibility of system status</td><td><span class="badge sev2">2 — Minor</span></td><td>Slot grid doesn't distinguish "still loading" from "genuinely unavailable."</td><td>Style skeleton and unavailable states differently.</td></tr>
+          <tr><td>B. Book Appointment</td><td>H2</td><td>Match with real world</td><td><span class="badge sev0">0 — None</span></td><td>No issue; language already matches patient mental model.</td><td>No action needed.</td></tr>
+          <tr><td>B. Book Appointment</td><td>H3</td><td>User control and freedom</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>No in-flow back button on the slot-selection step.</td><td>Add an explicit back control.</td></tr>
+          <tr><td>B. Book Appointment</td><td>H4</td><td>Consistency and standards</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>Date-strip component styled differently from the one in My Appointments.</td><td>Consolidate to one date-strip component (Document 8).</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>B. Book Appointment</td><td>H5</td><td>Error prevention</td><td><span class="badge sev3">3 — Major</span></td><td>A slot already taken by another patient could be "confirmed" with no re-validation (booking race condition).</td><td>Re-validate slot availability at confirm time (Document 5, Screen C error state).</td></tr>
+          <tr><td>B. Book Appointment</td><td>H6</td><td>Recognition rather than recall</td><td><span class="badge sev2">2 — Minor</span></td><td>Patient must re-enter an insurance member ID already on file.</td><td>Pre-fill from profile; allow edit.</td></tr>
+          <tr><td>B. Book Appointment</td><td>H7</td><td>Flexibility and efficiency</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>No "next available" shortcut for patients without a date preference.</td><td>Add as an expert-user accelerator.</td></tr>
+          <tr><td>B. Book Appointment</td><td>H8</td><td>Aesthetic and minimalist design</td><td><span class="badge sev0">0 — None</span></td><td>No issue; layout is clean and uncluttered.</td><td>No action needed.</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>B. Book Appointment</td><td>H9</td><td>Recognize, diagnose, recover from errors</td><td><span class="badge sev3">3 — Major</span></td><td>Same insurance-verification failure surfaced here pre-redesign, with a generic message.</td><td>Shipped: same fix as Screen A, applied consistently (Document 5).</td></tr>
+          <tr><td>B. Book Appointment</td><td>H10</td><td>Help and documentation</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>No link explaining what happens after booking.</td><td>Add a short "what happens next" FAQ link.</td></tr>
+
+          <tr><td>C. Confirmation</td><td>H1</td><td>Visibility of system status</td><td><span class="badge sev0">0 — None</span></td><td>No issue; confirmation is immediate and unambiguous.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H2</td><td>Match with real world</td><td><span class="badge sev0">0 — None</span></td><td>No issue; plain language throughout.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H3</td><td>User control and freedom</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>"Add to Calendar" opens a new tab with no warning.</td><td>Add an "opens in a new tab" visual cue.</td></tr>
+          <tr><td>C. Confirmation</td><td>H4</td><td>Consistency and standards</td><td><span class="badge sev0">0 — None</span></td><td>No issue; consistent with the design system.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H5</td><td>Error prevention</td><td><span class="badge sev0">0 — None</span></td><td>No issue; no destructive action lives on this screen.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H6</td><td>Recognition rather than recall</td><td><span class="badge sev0">0 — None</span></td><td>No issue; all needed information is visible on-screen.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H7</td><td>Flexibility and efficiency</td><td><span class="badge sev2">2 — Minor</span></td><td>No printable/downloadable confirmation for patients without reliable email access.</td><td>Shipped: Print/Download action added (Document 5).</td></tr>
+          <tr><td>C. Confirmation</td><td>H8</td><td>Aesthetic and minimalist design</td><td><span class="badge sev0">0 — None</span></td><td>No issue; minimal and uncluttered.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H9</td><td>Recognize, diagnose, recover from errors</td><td><span class="badge sev0">0 — None</span></td><td>No issue; no error condition is expected on this screen by design.</td><td>No action needed.</td></tr>
+          <tr><td>C. Confirmation</td><td>H10</td><td>Help and documentation</td><td><span class="badge sev1">1 — Cosmetic</span></td><td>No link back to "manage this appointment" from the confirmation screen.</td><td>Add a manage-appointment link.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout callout-danger">
+        <b class="callout-tag">Open Blocker</b>
+        <p>H9 on Screen A (severity 4, catastrophic) is the single open item blocking Document 5 from an unqualified Approved status. Its fix is designed and pending final accessibility sign-off — see Document 7 and the Executive Summary's remediation-sprint timeline.</p>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-17</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>Pending H9 remediation</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-HE-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-wcag">
+  <div class="section-kicker">Document 7 of 9</div>
+  <h2 class="section-title">WCAG 2.1 AA Accessibility Checklist</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('wcag')">Download HTML</button>
+    <button class="btn" onclick="printDoc('wcag')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('wcag')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-wcag">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">WCAG 2.1 AA Accessibility Checklist</h1>
+      <div class="doc-cover-sub">Measured Contrast Ratios, Keyboard Operability, Focus Order, Labels, Target Size</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-A11Y-001</td><th>Version</th><td>1.2</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-warning">91% Pass — 1 Fail Open</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-20</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>42 applicable WCAG 2.1 Level AA success criteria were audited against the MyMeridian booking and referral flow. Baseline (pre-redesign): 27 Pass / 8 Partial / 7 Fail (64%). Current pilot build: 38 Pass / 3 Partial / 1 Fail (91%). All contrast ratios below are computed from the fixed Colaberry brand hex values using the WCAG relative-luminance formula — not estimated.</p>
+
+      <h3 class="doc-h">Measured Color Contrast</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>Pair</th><th>Measured Ratio</th><th>Normal Text (4.5:1)</th><th>Large Text / UI (3:1)</th><th>Usage Rule</th></tr></thead>
+        <tbody>
+          <tr><td>#1A1A1A text on white</td><td><b>17.8:1</b></td><td><span class="badge badge-success">Pass</span></td><td><span class="badge badge-success">Pass</span></td><td>Default body text — no restriction.</td></tr>
+          <tr><td>#6B6B6B muted text on white</td><td><b>5.32:1</b></td><td><span class="badge badge-success">Pass</span></td><td><span class="badge badge-success">Pass</span></td><td>Safe for captions/metadata, but with little margin — don't go lighter.</td></tr>
+          <tr><td>Berry Blue #367895 on white</td><td><b>4.91:1</b></td><td><span class="badge badge-success">Pass</span></td><td><span class="badge badge-success">Pass</span></td><td>Safe for headings and body-sized links.</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>Cherry Red #FB2832 on white</td><td><b>3.85:1</b></td><td><span class="badge badge-danger">Fail</span></td><td><span class="badge badge-success">Pass</span></td><td><b>Never as body text.</b> Buttons/labels only, at 14pt bold or larger, or paired with an icon as a non-text UI boundary.</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>Leaf Green #5BA63C on white</td><td><b>3.01:1</b></td><td><span class="badge badge-danger">Fail</span></td><td><span class="badge badge-warning">Pass (marginal)</span></td><td>Icon/border accents only — never as body-text-on-white or white-on-green body text.</td></tr>
+          <tr style="background:rgba(251,40,50,.08);"><td>Amber #E8920C on white</td><td><b>2.46:1</b></td><td><span class="badge badge-danger">Fail</span></td><td><span class="badge badge-danger">Fail</span></td><td>Never on a light surface as text. Icon fill or border only, or reserve for dark-mode surfaces.</td></tr>
+          <tr><td>White text on Berry Blue button</td><td><b>4.91:1</b></td><td><span class="badge badge-success">Pass</span></td><td><span class="badge badge-success">Pass</span></td><td>Safe at any button text size.</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>White text on Cherry Red button</td><td><b>3.85:1</b></td><td><span class="badge badge-danger">Fail</span></td><td><span class="badge badge-success">Pass</span></td><td>Primary-button labels set 14pt bold+ (matches "Book This Visit," Document 5) to qualify as large text.</td></tr>
+          <tr><td>Cherry dark #FF5960 on #0F0F0F (dark mode)</td><td><b>6.25:1</b></td><td><span class="badge badge-success">Pass</span></td><td><span class="badge badge-success">Pass</span></td><td>Dark-mode variant resolves the light-mode Cherry Red gap.</td></tr>
+          <tr><td>Berry dark #5EA9C4 on #0F0F0F (dark mode)</td><td><b>7.26:1</b></td><td><span class="badge badge-success">Pass AAA</span></td><td><span class="badge badge-success">Pass</span></td><td>No restriction in dark mode.</td></tr>
+          <tr><td>Leaf dark #8AC759 on #0F0F0F (dark mode)</td><td><b>9.48:1</b></td><td><span class="badge badge-success">Pass AAA</span></td><td><span class="badge badge-success">Pass</span></td><td>No restriction in dark mode.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout callout-info">
+        <b class="callout-tag">Why This Matters for a Fixed Brand Palette</b>
+        <p>Cherry Red is fixed per brand guidelines and cannot change. The compliant path isn't to alter the color — it's to constrain <i>where and how large</i> it's allowed to appear as text, encoded once in the token usage rule (Document 8) rather than re-litigated on every screen.</p>
+      </div>
+
+      <h3 class="doc-h">Full Success Criteria Checklist</h3>
+      <div class="tablewrap">
+      <table class="compact" id="wcagTable">
+        <thead><tr><th>SC #</th><th>Criterion</th><th>Level</th><th>Requirement</th><th>Finding</th><th>Evidence / Remediation</th></tr></thead>
+        <tbody>
+          <tr><td>1.1.1</td><td>Non-text Content</td><td>A</td><td>All icons and images have text alternatives.</td><td><span class="badge badge-success">Pass</span></td><td>All status icons carry an accessible name matching their visible text label.</td></tr>
+          <tr><td>1.3.1</td><td>Info and Relationships</td><td>A</td><td>Structure/relationships conveyed programmatically, not just visually.</td><td><span class="badge badge-warning">Partial</span></td><td>Referral status badges need an <code>aria-label</code> audit pass — scoped for the remediation sprint.</td></tr>
+          <tr><td>1.4.1</td><td>Use of Color</td><td>A</td><td>Color is never the only means of conveying information.</td><td><span class="badge badge-success">Pass</span></td><td>Every status uses icon + color + text together (Document 5).</td></tr>
+          <tr><td>1.4.3</td><td>Contrast (Minimum)</td><td>AA</td><td>4.5:1 for normal text, 3:1 for large text.</td><td><span class="badge badge-success">Pass</span></td><td>See measured contrast table above; all body text uses #1A1A1A, #6B6B6B, or Berry Blue.</td></tr>
+          <tr><td>1.4.4</td><td>Resize Text</td><td>AA</td><td>Text resizes to 200% without loss of content or function.</td><td><span class="badge badge-success">Pass</span></td><td>Verified at 200% browser zoom on all three wireframe screens.</td></tr>
+          <tr><td>1.4.11</td><td>Non-text Contrast</td><td>AA</td><td>UI components and graphical objects meet 3:1 against adjacent color.</td><td><span class="badge badge-success">Pass</span></td><td>Button borders, badge outlines, and focus rings all measure ≥3:1.</td></tr>
+          <tr><td>2.1.1</td><td>Keyboard</td><td>A</td><td>All functionality operable through a keyboard interface.</td><td><span class="badge badge-success">Pass</span></td><td>Slot picker, referral cards, and confirmation actions all keyboard-tested.</td></tr>
+          <tr><td>2.4.3</td><td>Focus Order</td><td>A</td><td>Focus order preserves meaning and operability.</td><td><span class="badge badge-success">Pass</span></td><td>Tab order follows visual reading order on all three screens.</td></tr>
+          <tr><td>2.4.6</td><td>Headings and Labels</td><td>AA</td><td>Headings and labels describe topic or purpose.</td><td><span class="badge badge-success">Pass</span></td><td>Plain-language labels per the Document 4 audit.</td></tr>
+          <tr style="background:rgba(251,40,50,.05);"><td>2.4.7</td><td>Focus Visible</td><td>AA</td><td>Keyboard focus indicator is visible.</td><td><span class="badge badge-success">Pass (fixed)</span></td><td>Baseline audit found the CSS reset suppressing the native outline; replaced with a 2px Berry Blue custom focus ring.</td></tr>
+          <tr><td>2.5.5</td><td>Target Size</td><td>AAA<span class="badge badge-info" style="margin-left:6px;">Best Practice</span></td><td>Not a hard AA requirement in WCAG 2.1, but 44×44 CSS px is enforced given the older-adult user base.</td><td><span class="badge badge-success">Pass</span></td><td>All primary actions measure 44px or taller (Document 5).</td></tr>
+          <tr style="background:rgba(251,40,50,.08);"><td>3.3.1</td><td>Error Identification</td><td>A</td><td>Errors are identified and described to the user in text.</td><td><span class="badge badge-success">Pass (fixed)</span></td><td>Baseline showed <code>ERR_INS_409</code> only; replaced with plain-language message (Document 5).</td></tr>
+          <tr><td>3.3.2</td><td>Labels or Instructions</td><td>A</td><td>Form fields carry visible labels or instructions.</td><td><span class="badge badge-success">Pass</span></td><td>All slot-picker and login fields labeled.</td></tr>
+          <tr style="background:rgba(251,40,50,.08);"><td>3.3.3</td><td>Error Suggestion</td><td>AA</td><td>When an error is known, suggest a correction.</td><td><span class="badge badge-success">Pass (fixed)</span></td><td>"Call Insurance Support" and "Book Anyway — Verify Later" replace the dead-end error.</td></tr>
+          <tr style="background:rgba(232,146,12,.08);"><td>4.1.2</td><td>Name, Role, Value</td><td>A</td><td>Custom UI components expose name, role, and value to assistive technology.</td><td><span class="badge badge-danger">Fail — Open</span></td><td>Referral status badge is a custom component missing a programmatic role; screen-reader announces the icon but not the status text. Scoped, 1 remaining Fail, targeted for the remediation sprint (see Executive Summary).</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-20</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>Pending SC 4.1.2 remediation</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-A11Y-001 · v1.2 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-tokens">
+  <div class="section-kicker">Document 8 of 9</div>
+  <h2 class="section-title">Design-System Token Sheet</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('tokens')">Download HTML</button>
+    <button class="btn" onclick="printDoc('tokens')">Save as PDF / Print</button>
+    <button class="btn" onclick="downloadCSV('tokens')">Download CSV</button>
+  </div>
+  <div class="doc-body" id="docbody-tokens">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Design-System Token Sheet</h1>
+      <div class="doc-cover-sub">Semantic Color, Type Scale, and Spacing Tokens</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-DS-001</td><th>Version</th><td>1.1</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-21</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <p>Every token below is named for its <b>purpose</b>, not its value — this is what lets the WCAG usage rules in Document 7 be encoded once, at the token level, instead of re-checked on every screen. Values map to the fixed Colaberry brand palette; light-mode and dark-mode values are two definitions of the same semantic token, not two different systems.</p>
+
+      <h3 class="doc-h">Color Tokens</h3>
+      <div class="tablewrap">
+      <table class="compact" id="tokensColorTable">
+        <thead><tr><th>Swatch</th><th>Token</th><th>Light Value</th><th>Dark Value</th><th>Usage Rule</th></tr></thead>
+        <tbody>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#FB2832;"></div></div></td><td><code>color.action.primary</code></td><td>#FB2832</td><td>#FF5960</td><td>Primary buttons and key highlights only. As text: 14pt bold+ or icon-paired (3.85:1 — large text/UI only, see Document 7).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#367895;"></div></div></td><td><code>color.text.heading</code></td><td>#367895</td><td>#5EA9C4</td><td>Headings, links, structural emphasis. Safe at any text size (4.91:1).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#5BA63C;"></div></div></td><td><code>color.feedback.success</code></td><td>#5BA63C</td><td>#8AC759</td><td>Icons and borders for success states only — never body text on white (3.01:1).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#E8920C;"></div></div></td><td><code>color.feedback.warning</code></td><td>#E8920C</td><td>#E8920C</td><td>Icon fill or border only; never text on a light surface (2.46:1).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#1A1A1A;"></div></div></td><td><code>color.text.body</code></td><td>#1A1A1A</td><td>#F2F2F2</td><td>Default body text (17.8:1).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#6B6B6B;"></div></div></td><td><code>color.text.muted</code></td><td>#6B6B6B</td><td>#A8A8A8</td><td>Captions, timestamps, secondary metadata (5.32:1 — no lighter).</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#E4E4E3;"></div></div></td><td><code>color.border.default</code></td><td>#E4E4E3</td><td>#2A2A2A</td><td>Card borders, dividers, input outlines.</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#FFFFFF;border:1px solid #ccc;"></div></div></td><td><code>color.surface.default</code></td><td>#FFFFFF</td><td>#171717</td><td>Card and modal backgrounds.</td></tr>
+          <tr><td><div class="token-row"><div class="token-swatch" style="background:#F8F8F7;border:1px solid #ccc;"></div></div></td><td><code>color.surface.alt</code></td><td>#F8F8F7</td><td>#1D1D1D</td><td>Page background, skeleton-loading fill.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="doc-h">Type Scale</h3>
+      <div class="tablewrap">
+      <table class="compact" id="tokensTypeTable">
+        <thead><tr><th>Token</th><th>Size</th><th>Line Height</th><th>Weight</th><th>Family</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><code>type.display</code></td><td>30px / 1.875rem</td><td>1.25</td><td>900</td><td>Roboto</td><td>Document cover titles only.</td></tr>
+          <tr><td><code>type.h1</code></td><td>26px / 1.625rem</td><td>1.25</td><td>700</td><td>Roboto</td><td>Page-level section titles.</td></tr>
+          <tr><td><code>type.h2</code></td><td>19px / 1.1875rem</td><td>1.3</td><td>700</td><td>Roboto</td><td>Subsection headings.</td></tr>
+          <tr><td><code>type.h3</code></td><td>15px / 0.9375rem</td><td>1.3</td><td>700</td><td>Roboto</td><td>Card and table-group headings.</td></tr>
+          <tr><td><code>type.body-lg</code></td><td>15.5px / 0.97rem</td><td>1.55</td><td>400</td><td>Roboto</td><td>Default paragraph text.</td></tr>
+          <tr><td><code>type.body</code></td><td>13.6px / 0.85rem</td><td>1.5</td><td>400</td><td>Roboto</td><td>Table cells, dense UI text.</td></tr>
+          <tr><td><code>type.caption</code></td><td>11.5px / 0.72rem</td><td>1.4</td><td>500</td><td>Roboto Mono</td><td>Metadata, timestamps, reference codes.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="doc-h">Spacing Scale (4/8pt Grid)</h3>
+      <div class="tablewrap">
+      <table class="compact" id="tokensSpaceTable">
+        <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><code>space.1</code></td><td>4px</td><td>Icon-to-label gap.</td></tr>
+          <tr><td><code>space.2</code></td><td>8px</td><td>Compact table cell padding.</td></tr>
+          <tr><td><code>space.3</code></td><td>12px</td><td>Form field internal padding.</td></tr>
+          <tr><td><code>space.4</code></td><td>16px</td><td>Card internal padding, default gap between related elements.</td></tr>
+          <tr><td><code>space.5</code></td><td>24px</td><td>Gap between unrelated groups on the same screen.</td></tr>
+          <tr><td><code>space.6</code></td><td>32px</td><td>Section-to-section gap.</td></tr>
+          <tr><td><code>space.7</code></td><td>40px</td><td>Document cover padding.</td></tr>
+          <tr><td><code>space.8</code></td><td>48px</td><td>Page-level top/bottom margin.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-21</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-DS-001 · v1.1 · Internal Use Only</span></div>
+  </div>
+</section>
+<section class="topic-section" id="doc-testplan">
+  <div class="section-kicker">Document 9 of 9</div>
+  <h2 class="section-title">Usability Test Plan &amp; Script</h2>
+  <div class="doc-toolbar">
+    <button class="btn btn-primary" onclick="downloadDocHTML('testplan')">Download HTML</button>
+    <button class="btn" onclick="printDoc('testplan')">Save as PDF / Print</button>
+  </div>
+  <div class="doc-body" id="docbody-testplan">
+    <div class="doc-cover">
+      <img class="doc-logo" data-logo-ref="brand-logo" alt="Colaberry">
+      <div class="doc-cover-kicker">Colaberry Enterprise AI Leadership Accelerator</div>
+      <h1 class="doc-cover-title">Usability Test Plan &amp; Script</h1>
+      <div class="doc-cover-sub">Moderated Remote Sessions — Referral &amp; Appointment-Booking Flow</div>
+      <div class="doc-cover-org">Meridian Health Network · MyMeridian Patient Portal</div>
+    </div>
+    <table class="doc-meta">
+      <tr><th>Document ID</th><td>MHN-UT-001</td><th>Version</th><td>1.0</td></tr>
+      <tr><th>Owner</th><td>Digital Experience Team, MHN</td><th>Status</th><td><span class="badge badge-success">Approved</span></td></tr>
+      <tr><th>Last Updated</th><td>2026-08-22</td><th>Classification</th><td>Internal</td></tr>
+    </table>
+    <div class="doc-content">
+      <h3 class="doc-h">Session Logistics</h3>
+      <table class="compact">
+        <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Format</td><td>Moderated, remote, think-aloud protocol</td></tr>
+          <tr><td>Session length</td><td>45 minutes per participant</td></tr>
+          <tr><td>Sample size</td><td>8 participants (qualitative usability testing target — not a statistical sample)</td></tr>
+          <tr><td>Environment</td><td>Participant's own device (tablet, phone, or desktop) to preserve real-world conditions</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">Recruiting Criteria — Deliberately Mixed Participant Pool</h3>
+      <p>A pool recruited entirely from digitally fluent adults would not surface the failure modes this redesign exists to fix. The mix below is a requirement, not a nice-to-have.</p>
+      <table class="compact">
+        <thead><tr><th>Segment</th><th>Count</th><th>Why Required</th></tr></thead>
+        <tbody>
+          <tr><td>Older adult, low digital literacy, managing a chronic condition (Barbara profile)</td><td>2</td><td>Primary persona — the segment most affected by the booking and error-recovery flow.</td></tr>
+          <tr><td>Mobile-first parent booking on a time crunch (Jordan profile)</td><td>2</td><td>Primary persona — tests the mobile flow and time-on-task under realistic pressure.</td></tr>
+          <tr><td>Screen-reader user (JAWS or VoiceOver, daily user)</td><td>1</td><td>Validates SC 4.1.2 and 1.1.1 in practice, not just in a code audit.</td></tr>
+          <tr><td>Low-vision user (screen magnification or high-contrast mode)</td><td>1</td><td>Validates SC 1.4.3/1.4.4 contrast and resize behavior under real assistive settings.</td></tr>
+          <tr><td>General adult patient, no specific access need</td><td>2</td><td>Baseline comparison group.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h">Tasks &amp; Success Metrics</h3>
+      <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th>#</th><th>Task</th><th>Success Definition</th><th>Metrics Captured</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Find and read the status of an active referral.</td><td>States the correct status and its meaning, unaided, within 60 seconds.</td><td>Task success (Y/N), time on task, assists given.</td></tr>
+          <tr><td>2</td><td>Book a follow-up visit from a "Ready to Book" referral.</td><td>Reaches the confirmation screen with the correct provider and a self-selected time.</td><td>Task success, time on task, error count, path taken.</td></tr>
+          <tr><td>3</td><td>Recover from a simulated insurance-verification error mid-booking.</td><td>Either books via "Book Anyway — Verify Later" or identifies the phone fallback, without abandoning the task.</td><td>Task success, recovery path chosen, time to recovery, verbalized confusion (Y/N).</td></tr>
+          <tr><td>4</td><td>Increase text size via Accessibility Preferences.</td><td>Locates and applies the setting within 90 seconds, unaided.</td><td>Task success, time on task, navigation path (clicks vs. dead ends).</td></tr>
+          <tr><td>5</td><td>Send a message to the clinic about a possible rescheduling need.</td><td>Composes and sends a message to the correct recipient within 90 seconds.</td><td>Task success, time on task, correct-recipient rate.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="doc-h">Post-Task Questions (Per Task)</h3>
+      <ul>
+        <li>"On a scale of 1 (very difficult) to 5 (very easy), how easy was that task?"</li>
+        <li>"How confident are you that you completed it correctly?" (1–5)</li>
+        <li>"Was there any point where you weren't sure what to do next? Walk me through it."</li>
+      </ul>
+
+      <h3 class="doc-h">Post-Session Questionnaire — System Usability Scale (SUS)</h3>
+      <p>Standard 10-item SUS administered after all five tasks, yielding a single 0–100 score per participant. MyMeridian's baseline average was 61 (marginal); the pilot build measured 76; the target is 82.</p>
+
+      <h3 class="doc-h">Moderator Script — Excerpt (Task 3)</h3>
+      <div class="callout callout-info">
+        <b class="callout-tag">Read Verbatim</b>
+        <p>"For this next task, you're going to try booking a follow-up visit, and partway through, something is going to go wrong — that's intentional, it's part of the test, and it is not something you did incorrectly. I want you to react to it exactly as you would if this happened on your own phone at home. Talk me through what you're thinking as you go. Ready? Go ahead and start from the referral you just looked at."</p>
+      </div>
+      <p style="font-size:13px;color:var(--muted);">Moderator note: do not intervene during Task 3 unless the participant is stuck for more than 90 seconds with visible distress. Record the exact point of confusion verbatim for the heuristic-evaluation follow-up (Document 6, H9).</p>
+    </div>
+    <table class="signoff">
+      <tr><th>Role</th><th>Name</th><th>Date</th><th>Signature</th></tr>
+      <tr><td>Prepared By</td><td>AI Design Agent (Generative UX Pipeline v2.3)</td><td>2026-08-22</td><td>_____________________</td></tr>
+      <tr><td>Reviewed By</td><td>AI Solution Architect (Learner)</td><td>2026-08-24</td><td>_____________________</td></tr>
+      <tr><td>Approved By</td><td>Priya Natarajan, VP Product Design, Meridian Health Network</td><td>&nbsp;</td><td>_____________________</td></tr>
+    </table>
+    <div class="doc-footer"><span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span><span>MHN-UT-001 · v1.0 · Internal Use Only</span></div>
+  </div>
+</section>
+
+<section class="topic-section" id="ask">
+  <div class="section-kicker">Assistant</div>
+  <h2 class="section-title">Ask the Guide</h2>
+  <p>Type a question in plain language. This assistant matches your question against the guide's own content — entirely offline, no external API — and shows the closest answer with a link to jump to the source section.</p>
+  <div class="ask-widget">
+    <div class="ask-input-row">
+      <input type="text" id="askInputMain" placeholder="e.g. What contrast ratio does WCAG AA require?" autocomplete="off">
+      <button class="btn btn-primary" onclick="askGuide('askInputMain','askAnswerMain')">Ask</button>
+    </div>
+    <div class="ask-suggestions" id="askChipsMain"></div>
+    <div id="askAnswerMain"></div>
+  </div>
+</section>
+</main>
+</div>
+
+<footer class="sitefoot">
+  <span>Colaberry Enterprise AI Leadership Accelerator · UX Designer Field Guide</span>
+  <span>Generated by Claude Code · 2026-08-25 · v1.0.0</span>
+</footer>
+</div>
+
+<button id="askFloatBtn" onclick="toggleAskFloat()">Ask the Guide</button>
+<div id="askFloatPanel">
+  <button class="ask-close" onclick="toggleAskFloat()" aria-label="Close">&times;</button>
+  <div style="font-weight:700;color:var(--berry);margin-bottom:8px;">Ask the Guide</div>
+  <div class="ask-input-row">
+    <input type="text" id="askInputFloat" placeholder="Ask a question..." autocomplete="off">
+    <button class="btn btn-primary btn-sm" onclick="askGuide('askInputFloat','askAnswerFloat')">Ask</button>
+  </div>
+  <div class="ask-suggestions" id="askChipsFloat"></div>
+  <div id="askAnswerFloat"></div>
+</div>
+
+<div id="print-root"></div>
+
+<script type="application/json" id="deepdive-metadata">
+{
+  "guide_type": "UX Designer Field Guide",
+  "curriculum_type": "deep_dive",
+  "week": 5,
+  "discipline": "UX Designer",
+  "student_id": "colaberry-accelerator-learner",
+  "project_id": "MHN-MYMERIDIAN-PORTAL-REDESIGN",
+  "repository": "https://github.com/Rasafor/AI-Project",
+  "generated_by": "Claude Code",
+  "generated_date": "2026-08-25",
+  "version": "1.0.0",
+  "build_number": "1"
+}
+</script>
+
+<script>
+(function(){
+  var LOGO_B64 = "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";
+  document.getElementById('brand-logo').src = "data:image/png;base64," + LOGO_B64;
+  document.querySelectorAll('.doc-logo').forEach(function(img){
+    img.src = document.getElementById('brand-logo').src;
+  });
+
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t){
+    if(t === 'dark'){ root.setAttribute('data-theme','dark'); themeBtn.textContent = 'Light mode'; }
+    else { root.removeAttribute('data-theme'); themeBtn.textContent = 'Dark mode'; }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem('ux-fieldguide-theme'); }catch(e){}
+  applyTheme(saved === 'dark' ? 'dark' : 'light');
+  themeBtn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try{ localStorage.setItem('ux-fieldguide-theme', next); }catch(e){}
+  });
+
+  var searchBox = document.getElementById('searchBox');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main.content > section.topic-section'));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.sidenav a'));
+  searchBox.addEventListener('input', function(){
+    var q = searchBox.value.trim().toLowerCase();
+    if(!q){
+      sections.forEach(function(s){ s.classList.remove('search-hidden'); });
+      navLinks.forEach(function(a){ a.classList.remove('nav-dim'); });
+      return;
+    }
+    sections.forEach(function(s){
+      var hit = s.innerText.toLowerCase().indexOf(q) !== -1;
+      s.classList.toggle('search-hidden', !hit);
+    });
+    navLinks.forEach(function(a){
+      var id = (a.getAttribute('href')||'').replace('#','');
+      var target = document.getElementById(id);
+      var visible = target ? !target.classList.contains('search-hidden') : true;
+      a.classList.toggle('nav-dim', !visible);
+    });
+  });
+
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var link = document.querySelector('nav.sidenav a[href="#' + e.target.id + '"]');
+      if(!link) return;
+      if(e.isIntersecting) {
+        navLinks.forEach(function(a){ a.classList.remove('active'); });
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(function(s){ observer.observe(s); });
+
+  var DOC_TITLES = {
+    exec: 'MyMeridian Portal Redesign — Executive Summary',
+    personas: 'MyMeridian Personas & Jobs-to-be-Done',
+    journey: 'MyMeridian User Journey Map',
+    ia: 'MyMeridian Information Architecture & Sitemap',
+    wireframes: 'MyMeridian Annotated Wireframes',
+    heuristics: 'MyMeridian Usability Heuristic Evaluation',
+    wcag: 'MyMeridian WCAG 2.1 AA Accessibility Checklist',
+    tokens: 'MyMeridian Design-System Token Sheet',
+    testplan: 'MyMeridian Usability Test Plan & Script'
+  };
+  var DOC_FILES = {
+    exec: 'MHN-EXEC-001_Executive-Summary',
+    personas: 'MHN-PER-001_Personas-JTBD',
+    journey: 'MHN-JRN-001_User-Journey-Map',
+    ia: 'MHN-IA-001_Information-Architecture',
+    wireframes: 'MHN-WF-001_Annotated-Wireframes',
+    heuristics: 'MHN-HE-001_Heuristic-Evaluation',
+    wcag: 'MHN-A11Y-001_WCAG-Checklist',
+    tokens: 'MHN-DS-001_Design-Tokens',
+    testplan: 'MHN-UT-001_Usability-Test-Plan'
+  };
+  var ORIGINAL_TITLE = document.title;
+
+  window.downloadDocHTML = function(id){
+    var styleText = document.getElementById('site-style').textContent;
+    var bodyHTML = document.getElementById('docbody-' + id).innerHTML;
+    var html = '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+      + '<meta name="viewport" content="width=device-width, initial-scale=1">'
+      + '<title>' + DOC_TITLES[id] + '</title>'
+      + '<style>' + styleText + ' body{padding:24px;background:var(--bg);} .doc-body{max-width:1000px;margin:0 auto;}</style>'
+      + '</head><body>' + bodyHTML + '</body></html>';
+    var blob = new Blob([html], {type: 'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = DOC_FILES[id] + '.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  };
+
+  window.printDoc = function(id){
+    var root = document.getElementById('print-root');
+    root.innerHTML = document.getElementById('docbody-' + id).innerHTML;
+    document.title = DOC_TITLES[id];
+    window.print();
+  };
+  window.addEventListener('afterprint', function(){
+    document.getElementById('print-root').innerHTML = '';
+    document.title = ORIGINAL_TITLE;
+  });
+
+  function csvEscape(v){
+    v = String(v == null ? '' : v);
+    if(/[",\n]/.test(v)) v = '"' + v.replace(/"/g,'""') + '"';
+    return v;
+  }
+  function tableToCSV(selectors){
+    var rows = [];
+    selectors.forEach(function(sel){
+      var table = document.querySelector(sel);
+      if(!table) return;
+      Array.prototype.forEach.call(table.querySelectorAll('tr'), function(tr){
+        var cells = Array.prototype.map.call(tr.querySelectorAll('th,td'), function(c){ return csvEscape(c.innerText.trim()); });
+        rows.push(cells.join(','));
+      });
+    });
+    return rows.join('\r\n');
+  }
+  var CSV_TABLES = {
+    heuristics: ['#heuristicsTable'],
+    wcag: ['#wcagTable'],
+    tokens: ['#tokensColorTable', '#tokensTypeTable', '#tokensSpaceTable']
+  };
+  window.downloadCSV = function(id){
+    var csv = tableToCSV(CSV_TABLES[id] || []);
+    var blob = new Blob([csv], {type: 'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = DOC_FILES[id] + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  };
+
+  var QA = [
+    {q:"What is a Job-to-be-Done?", kw:["jtbd","job to be done","jobs to be done"], a:"A statement of the progress a person is trying to make, independent of demographics: \"When [situation], I want to [motivation], so I can [outcome].\" Barbara's JTBD isn't \"67-year-old retiree\" — it's \"when I need to see my specialist again, I want to book a visit without navigating confusing menus, so I can manage my diabetes without relying on my daughter.\"", target:"f-personas"},
+    {q:"What is a persona?", kw:["persona","personas"], a:"A grounded composite of a real user segment's goals and frustrations, built from research, not a demographic mad-lib. MyMeridian has two primaries — Barbara Ellison (67, low digital literacy, caregiver) and Jordan Reyes (34, mobile-first parent) — each with a JTBD statement, not just an age and a stock photo.", target:"doc-personas"},
+    {q:"What is a user journey map?", kw:["journey map","user journey","customer journey"], a:"A stage-by-stage record of what a user does, thinks, and feels while pursuing one goal end-to-end — including where it breaks. The MyMeridian journey map tracks Barbara through an insurance-verification failure and a fallback phone call, not just the happy path to a booked appointment.", target:"doc-journey"},
+    {q:"What is information architecture?", kw:["information architecture","ia","sitemap"], a:"The structural skeleton of a product — how content and features are grouped, labeled, and nested so a user can find what they need in as few clicks as possible. MyMeridian's IA gets every core task to 3 clicks or fewer from the home dashboard.", target:"f-ia"},
+    {q:"What is the difference between a wireframe, a mockup, and a prototype?", kw:["wireframe","mockup","prototype","fidelity"], a:"Three rungs of a fidelity ladder. A wireframe is low-fidelity structure — boxes and labels, no color or type. A mockup is high-fidelity visual design applied to that structure — real color, type, and imagery, still static. A prototype adds interactivity — clickable states a user can click through to simulate the real flow. Each wireframe in Document 5 is specified across all four functional states, not just one static frame.", target:"f-fidelity"},
+    {q:"What are Nielsen's 10 heuristics?", kw:["nielsen","heuristics","usability heuristics","10 heuristics"], a:"Ten general principles for interaction design: visibility of system status, match between system and the real world, user control and freedom, consistency and standards, error prevention, recognition rather than recall, flexibility and efficiency of use, aesthetic and minimalist design, help users recognize/diagnose/recover from errors, and help and documentation. See the full list and the MyMeridian evaluation in Document 6.", target:"f-heuristics"},
+    {q:"What is WCAG 2.1 AA?", kw:["wcag","2.1 aa","accessibility standard"], a:"The Web Content Accessibility Guidelines, level AA, organized around four principles — Perceivable, Operable, Understandable, Robust (POUR). It's the most common legal and contractual accessibility bar. MyMeridian's checklist (Document 7) cites specific success criteria with measured contrast ratios, not just a pass/fail checkbox.", target:"f-a11y"},
+    {q:"What contrast ratio does WCAG AA require?", kw:["contrast ratio","4.5:1","3:1","contrast minimum"], a:"4.5:1 for normal text, 3:1 for large text (18pt+/14pt+bold) and for UI component/graphical boundaries (SC 1.4.11). Cherry Red (#FB2832) on white measures 3.85:1 — it fails for body text and must be reserved for large/bold text or icon-paired UI, never body copy. See Document 7 for every measured pair.", target:"doc-wcag"},
+    {q:"Why does Cherry Red fail accessibility on white text?", kw:["cherry red contrast","fb2832 contrast","red fails"], a:"#FB2832 on white computes to 3.85:1 relative luminance contrast — below the 4.5:1 AA minimum for normal text, though it clears the 3:1 threshold for large/bold text and non-text UI boundaries. Because brand color is fixed and can't change, the remediation is to require button labels at 14pt bold or larger (which only needs 3:1), never to use cherry red for body-sized text.", target:"doc-wcag"},
+    {q:"What is visual hierarchy?", kw:["visual hierarchy","interaction hierarchy"], a:"The deliberate use of size, weight, color, spacing, and position so a user's eye lands on the most important thing first. On the MyMeridian referral card, the specialist name and \"Book Visit\" button outrank the fine-print insurance disclaimer — because that's the order a patient actually needs them.", target:"f-hierarchy"},
+    {q:"What is a design system?", kw:["design system","design tokens","token"], a:"A shared vocabulary of reusable, named decisions — colors, type scale, spacing — so \"cherry red\" is always color.action.primary, never a one-off hex value pasted into a screen. Semantic naming means a token's meaning survives a rebrand; a raw hex value doesn't. See Document 8 for the full MyMeridian token sheet.", target:"f-designsystem"},
+    {q:"What is usability testing?", kw:["usability testing","user testing","think aloud","moderated test"], a:"Watching real (or representative) users attempt real tasks on the design, usually with a think-aloud protocol, to find where the design — not the user — is wrong. MyMeridian's plan (Document 9) recruits a screen-reader user, a low-vision user, and a low-digital-literacy older adult alongside typical users, because the accessibility failure modes only show up with that mix.", target:"f-testing"},
+    {q:"What is the SUS score?", kw:["sus score","system usability scale"], a:"The System Usability Scale — a standardized 10-item post-test questionnaire yielding a 0–100 score. Above 68 is considered above-average; MyMeridian's baseline was 61 (marginal), the pilot measured 76, and the target is 82.", target:"kpis"},
+    {q:"What are the current UX KPIs?", kw:["ux kpi","kpi","key metrics"], a:"Task success rate 58% baseline → 84% pilot → 90% target. Time on task 6.4min → 3.1min → ≤2.5min target. SUS score 61 → 76 → 82 target. WCAG AA pass rate 64% → 91% → 100% target. Self-service referral booking 0% → 22% → 35% target.", target:"kpis"},
+    {q:"What is task success rate?", kw:["task success rate","task success"], a:"The percentage of test participants who complete a given task without assistance. MyMeridian's baseline for booking a specialist follow-up from a referral was 58%; the redesigned pilot measured 84%, against a 90% target.", target:"kpis"},
+    {q:"What happens in the insurance verification error?", kw:["insurance verification","err_ins_409","insurance error","unhappy path"], a:"When a patient tries to book a referral visit, the system can fail to confirm insurance eligibility and surface a raw error code (ERR_INS_409) with no plain-language explanation or recovery path — a catastrophic (severity 4) heuristic failure. The redesign replaces it with plain language, a phone fallback, and a \"book anyway, verify later\" option. See the Journey Map and Heuristic Evaluation documents.", target:"doc-journey"},
+    {q:"What is a severity rating in a heuristic evaluation?", kw:["severity rating","severity scale","0 to 4 severity"], a:"Nielsen's 0–4 scale: 0 = not a usability problem, 1 = cosmetic, 2 = minor, 3 = major (fix before launch), 4 = catastrophic (blocks the task, fix immediately). MyMeridian's 30-cell evaluation (3 screens × 10 heuristics) found one catastrophic issue — the unlabeled insurance error — and four major issues.", target:"doc-heuristics"},
+    {q:"What is a semantic design token?", kw:["semantic token","raw hex","color token"], a:"A token named for its purpose, not its value — color.action.primary rather than #FB2832. This is why the WCAG remediation for Cherry Red (bold/large text only) can live in one token definition instead of being manually re-applied everywhere the color appears.", target:"doc-tokens"},
+    {q:"What is the click-depth rule for information architecture?", kw:["click depth","3 clicks","clicks to task"], a:"Every core task should be reachable in 3 clicks or fewer from the home screen. Booking a follow-up visit from an active referral in MyMeridian takes exactly 3: Home → Referrals & Specialists → the referral card → Book This Visit.", target:"doc-ia"},
+    {q:"What is the testing pyramid for UX?", kw:["testing pyramid ux","test mix ux"], a:"UX validation isn't one method — it layers heuristic evaluation (fast, expert-driven, catches structural issues early), accessibility audit (rule-based, catches WCAG conformance gaps), and usability testing (slow, real users, catches what experts and rules both miss). Use all three before a high-blast-radius screen ships.", target:"f-testing"},
+    {q:"What is the architect's review lens for UX?", kw:["review lens","architect review ux","approve ai design"], a:"Seven questions: does it match the approved persona/JTBD and IA, are all interactive elements labeled and keyboard-operable, does every screen define an error/empty/loading state, does every color-coded meaning have a non-color cue, can a user recover from a failure without calling support, would a first-time low-literacy patient understand it unaided, and does anything cross a governance boundary.", target:"review-lens"},
+    {q:"What is the good vs bad design example about?", kw:["good vs bad","bad design example","good design example"], a:"A side-by-side comparison of the MyMeridian referral card built two ways: a cramped version with 3.85:1 body-text contrast, jargon (\"Encounter Auth Pending\"), and 28px tap targets, versus a corrected version with plain language, AA-passing contrast, and 44px targets. See the Good vs. Bad Design section.", target:"good-bad"},
+    {q:"Who approves this design?", kw:["who approves","sign off","approval","vp product"], a:"Each document carries a Prepared / Reviewed / Approved sign-off block. For MyMeridian: prepared by the AI Design Agent (Generative UX Pipeline v2.3), reviewed by the AI Solution Architect learner, approved by the VP Product Design at Meridian Health Network.", target:"doc-exec"},
+    {q:"What is the MyMeridian project about?", kw:["mymeridian","meridian health","the example","case study"], a:"MyMeridian is Meridian Health Network's patient portal redesign, focused on self-service appointment scheduling and referral tracking. The problem: 42% of online booking attempts were abandoned, and opaque referral status was driving missed specialist follow-ups and call-center overload.", target:"overview"},
+    {q:"What is the target audience for MyMeridian?", kw:["target users","who uses mymeridian","patient population"], a:"A wide patient population spanning older adults managing chronic conditions with low digital literacy (Barbara, 67) and busy parents booking pediatric visits on mobile between meetings (Jordan, 34) — which is exactly why accessibility and plain language aren't optional polish here.", target:"doc-personas"},
+    {q:"What are the four required wireframe states?", kw:["wireframe states","empty state","loading state","error state","success state"], a:"Empty, loading, error, and success. A wireframe that only specifies the success state is incomplete — the error state for MyMeridian's booking screen is where the insurance-verification failure and its recovery path live.", target:"doc-wireframes"},
+    {q:"What is POUR in accessibility?", kw:["pour","perceivable operable understandable robust"], a:"The four organizing principles of WCAG: Perceivable (can users perceive the content, e.g. sufficient contrast), Operable (can they operate it, e.g. full keyboard access), Understandable (is it predictable and clear), Robust (does it work with assistive technology). Every success criterion in Document 7 falls under one of these four.", target:"f-a11y"},
+    {q:"What is a target size requirement?", kw:["target size","tap target","44x44","touch target"], a:"WCAG 2.1 AA itself sets no minimum target size (Target Size is an AAA criterion, SC 2.5.5, in this version), but 44×44 CSS pixels is standard platform guidance and is treated as a hard floor for MyMeridian given its older-adult user base — flagged in Document 7 as a best practice beyond the AA minimum.", target:"doc-wcag"}
+  ];
+
+  function tokenize(s){ return s.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean); }
+  function bestMatch(query){
+    var qTokens = tokenize(query);
+    var qLower = query.toLowerCase();
+    var best = null, bestScore = 0;
+    QA.forEach(function(entry){
+      var score = 0;
+      entry.kw.forEach(function(k){ if(qLower.indexOf(k) !== -1) score += k.split(' ').length; });
+      qTokens.forEach(function(t){ if(entry.q.toLowerCase().indexOf(t) !== -1 && t.length > 2) score += 0.3; });
+      if(score > bestScore){ bestScore = score; best = entry; }
+    });
+    return bestScore > 0 ? best : null;
+  }
+  function sectionTitle(id){
+    var el = document.getElementById(id);
+    if(!el) return id;
+    var h = el.querySelector('h2, h1');
+    return h ? h.textContent.trim() : id;
+  }
+  window.askGuide = function(inputId, answerId){
+    var input = document.getElementById(inputId);
+    var q = input.value.trim();
+    var answerBox = document.getElementById(answerId);
+    if(!q){ return; }
+    var match = bestMatch(q);
+    if(match){
+      answerBox.innerHTML =
+        '<div class="ask-answer">' +
+          '<div class="ask-q">You asked</div>' +
+          '<div style="font-size:13.5px;font-weight:600;margin-bottom:8px;">' + q.replace(/</g,'&lt;') + '</div>' +
+          '<div class="ask-a">' + match.a + '</div>' +
+          '<a class="ask-jump" href="#' + match.target + '" onclick="' + (answerId==='askAnswerFloat' ? "toggleAskFloat();" : "") + '">Jump to: ' + sectionTitle(match.target) + ' →</a>' +
+        '</div>';
+    } else {
+      answerBox.innerHTML =
+        '<div class="ask-answer miss">' +
+          '<div class="ask-q">You asked</div>' +
+          '<div style="font-size:13.5px;font-weight:600;margin-bottom:8px;">' + q.replace(/</g,'&lt;') + '</div>' +
+          '<div class="ask-a">No close match in the guide yet. Try the search box, or one of the suggested questions below.</div>' +
+        '</div>';
+    }
+  };
+
+  var SUGGESTED = ["What is a Job-to-be-Done?","What are Nielsen's 10 heuristics?","What contrast ratio does WCAG AA require?","What is the testing pyramid for UX?","What is the SUS score?","What happens in the insurance verification error?"];
+  function buildChips(containerId, inputId, answerId){
+    var box = document.getElementById(containerId);
+    SUGGESTED.forEach(function(s){
+      var chip = document.createElement('span');
+      chip.className = 'ask-chip'; chip.textContent = s;
+      chip.onclick = function(){ document.getElementById(inputId).value = s; askGuide(inputId, answerId); };
+      box.appendChild(chip);
+    });
+  }
+  buildChips('askChipsMain','askInputMain','askAnswerMain');
+  buildChips('askChipsFloat','askInputFloat','askAnswerFloat');
+
+  ['askInputMain','askInputFloat'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ askGuide(id, id === 'askInputMain' ? 'askAnswerMain' : 'askAnswerFloat'); }
+    }); }
+  });
+
+  window.toggleAskFloat = function(){
+    document.getElementById('askFloatPanel').classList.toggle('open');
+  };
+})();
+</script>
+</body>
+</html>
