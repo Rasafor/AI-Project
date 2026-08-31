@@ -126,7 +126,10 @@ without opening a browser each time.
 ## Folders
 
 - `src/` — the server code (`server.py`) and its connection test
-  (`test_connection.py`).
+  (`test_connection.py`). This is the primary, maintained version.
+- `nodejs/` — the same server rebuilt with the Node.js/TypeScript MCP SDK,
+  kept as a side-by-side learning reference. See
+  [`nodejs/README.md`](nodejs/README.md) for its own setup and test steps.
 - `artifacts/week-05/` — empty for now. This is where your Inspector
   recording/screenshots go later. (Note: an empty folder doesn't get saved
   by git on its own — once you put a file in here, it'll show up normally.)
