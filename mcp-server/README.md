@@ -1,12 +1,26 @@
 # mcp-server
 
-This is an MCP (Model Context Protocol) server. Right now it does nothing —
-it has no tools, no resources, and no prompts. It's just the empty shell,
-started and confirmed working before anything is added to it.
+This is an MCP (Model Context Protocol) server. It started as an empty
+shell (no tools, no resources, no prompts) to confirm the connection works,
+and now implements a small "notes" example:
 
-**Language: Python.** The rest of this repo has no Node.js project (no
-`package.json`), just a couple of standalone Python scripts and notebooks —
-so Python is what's already here, and it's what this server is written in.
+- **Tool** `add_note(title, content)` — the model calls this to save a note.
+- **Resource** `notes://all` — exposes the current list of notes as JSON.
+- **Prompt** `capture_note(raw_text)` — a reusable template that guides the
+  model to turn unstructured text into a title + body and call `add_note`.
+
+**Language: Python** (`src/`) is the primary, maintained version — the rest
+of this repo has no other Node.js project, so Python is what's already
+here.
+
+A second copy of the *same design* — same `add_note` tool, `notes://all`
+resource, `capture_note` prompt — also exists in **[`nodejs/`](nodejs/)**,
+written against the official Node.js/TypeScript MCP SDK. It's not a
+competing implementation to maintain in parallel; it's a side-by-side
+learning reference for comparing how two different official SDKs express
+the same tool/resource/prompt concepts. If you only care about running the
+project, use `src/`. If you want to see the same server built a second way,
+see `nodejs/README` below.
 
 ---
 
@@ -77,17 +91,42 @@ Inspector. If it doesn't open by itself, copy the full `http://127.0.0.1:...`
 link from the terminal and paste it into your browser.
 
 In the browser tab, click **Connect**. Once connected, the status should
-turn green. The "Tools," "Resources," and "Prompts" tabs will all be
-**empty** — that's expected, since none have been built yet. Seeing a green
-"Connected" status with empty tabs means the server is working correctly.
+turn green. You should now see one entry in each of the "Tools,"
+"Resources," and "Prompts" tabs — `add_note`, `notes://all`, and
+`capture_note`.
+
+Try it: open the Tools tab, run `add_note` with a title and content, then
+open the Resources tab and read `notes://all` — your new note should be in
+the returned JSON, proving the tool and resource share the same store.
+Empty title should be rejected with a validation error, not silently
+accepted.
 
 To stop the server, go back to the terminal and press `Ctrl+C`.
 
 ---
 
+## Automated connection test (no browser needed)
+
+`src/test_connection.py` spawns the server the same way the Inspector does
+(over stdio) and exercises every primitive with assertions: discovery, the
+tool's happy path, the tool's rejection of an empty title, the resource
+reflecting the tool's write, and the prompt's argument interpolation. Run
+it from this folder:
+
+```
+python src/test_connection.py
+```
+
+It prints `PASS: ...` and exits `0` on success, or `FAIL: ...` with a
+non-zero exit on any regression — useful for catching a broken server
+without opening a browser each time.
+
+---
+
 ## Folders
 
-- `src/` — the server code (`server.py`).
+- `src/` — the server code (`server.py`) and its connection test
+  (`test_connection.py`).
 - `artifacts/week-05/` — empty for now. This is where your Inspector
   recording/screenshots go later. (Note: an empty folder doesn't get saved
   by git on its own — once you put a file in here, it'll show up normally.)
