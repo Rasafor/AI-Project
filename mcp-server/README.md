@@ -1,13 +1,15 @@
 # mcp-server
 
-![The server running a data-pipeline incident investigation end to end: six run_sql_query calls trace a revenue drop back to a partial orders_load run and confirm the data-quality root cause, null amounts and duplicate orders.](artifacts/week-06/data-pipeline-incident-investigation.gif)
+**▶ Walkthrough recording:**
+[`artifacts/week-06/data-pipeline-incident-investigation.mp4`](artifacts/week-06/data-pipeline-incident-investigation.mp4)
+(click through — GitHub plays it on the file page)
 
-The recording above is the server handling one real task end to end — an
-agent calls `run_sql_query` six times to trace a revenue drop back to a
-partial `orders_load` run and confirm the data-quality root cause (null
-`amount`s + duplicate orders). It was rendered frame-for-frame from an actual
-stdio run against a 119k-row SQLite warehouse; every query, wait time, and
-result shown is what really came back.
+The recording is the server handling one real task end to end — an agent
+calls `run_sql_query` six times to trace a revenue drop back to a partial
+`orders_load` run and confirm the data-quality root cause (null `amount`s +
+duplicate orders). It was rendered frame-for-frame from an actual stdio run
+against a 119k-row SQLite warehouse; every query, wait time, and result shown
+is what really came back.
 
 This is an MCP (Model Context Protocol) server. It started as an empty
 shell (no tools, no resources, no prompts) to confirm the connection works,
