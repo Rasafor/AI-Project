@@ -9,16 +9,19 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-// In-memory store. A real server would back this with a file or DB —
-// state must survive process restarts if the client expects persistence.
-const notes = [
-  {
-    id: randomUUID(),
-    title: "Welcome",
-    content: "This is the first note in the demo store.",
-    createdAt: new Date().toISOString(),
-  },
-];
+import { loadNotes, saveNotes } from "./notesStore.js";
+import { runSqlQuery, SqlAdapterError } from "./sqlAdapter.js";
+
+// Notes are persisted to nodejs/data/notes.json by notesStore, which fences
+// every file access to that one directory (see notesStore.resolveWithin and
+// ADR-0001 Consequences). This array is the in-process working copy; each
+// mutation is written straight back through saveNotes().
+//
+// No lock here (unlike ../src/server.py): the Node SDK runs each tool handler's
+// synchronous body to completion on the one event-loop thread, so two add_note
+// calls cannot interleave their save + push. add_note still writes the file
+// before touching this array, so a failed save never leaves memory ahead of disk.
+const notes = loadNotes();
 
 const server = new McpServer({
   name: "notes-server",
@@ -29,24 +32,63 @@ const server = new McpServer({
 // Tools are actions the MODEL decides to invoke. The schema is the contract
 // the model reads to know what arguments are valid — treat it exactly like
 // an HTTP route's request validation: reject anything that doesn't match.
+
+// Return a note this add would duplicate, or undefined. With an
+// idempotency_key: match that key (it identifies the operation, so the stored
+// note wins even if title/content now differ). Without one: match an exact
+// title+content pair, so a plain retry does not create a second note.
+// Mirrors ../src/server.py's _existing_note.
+function existingNote(title, content, idempotencyKey) {
+  return notes.find((n) =>
+    idempotencyKey != null
+      ? n.idempotencyKey === idempotencyKey
+      : n.title === title && n.content === content,
+  );
+}
+
 server.tool(
   "add_note",
-  "Add a new note to the notes store. Returns the created note's id.",
+  "Add a note to the store, or return the existing one if this add is a duplicate " +
+    "(same idempotency_key, or identical title+content with no key). Returns the note's id.",
   {
     title: z.string().min(1).max(200).describe("Short title for the note"),
     content: z.string().min(1).max(5000).describe("Body text of the note"),
+    idempotency_key: z
+      .string()
+      .max(200)
+      .optional()
+      .describe(
+        "Optional stable id for this add. Passing the same key again returns the note " +
+          "already stored under it instead of creating a duplicate — use it to make retries safe.",
+      ),
   },
-  async ({ title, content }) => {
+  async ({ title, content, idempotency_key }) => {
+    const existing = existingNote(title, content, idempotency_key);
+    if (existing) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Note "${existing.title}" already stored with id ${existing.id} (no duplicate created).`,
+          },
+        ],
+      };
+    }
+
     const note = {
       id: randomUUID(),
       title,
       content,
       createdAt: new Date().toISOString(),
     };
+    if (idempotency_key != null) note.idempotencyKey = idempotency_key;
+
+    // Persist first, then update memory. If saveNotes throws, the call fails
+    // without ever reporting the note as stored, and `notes` still matches the
+    // file. Matches ../src/server.py.
+    saveNotes([...notes, note]);
     notes.push(note);
 
-    // Tool results are returned as "content" blocks — usually text,
-    // but can include images or embedded resources too.
     return {
       content: [
         {
@@ -56,6 +98,78 @@ server.tool(
       ],
     };
   }
+);
+
+// --- TOOL: run_sql_query ----------------------------------------------
+// The adapter for the "SQL" system named in .colaberry/plan.json (REQ-008,
+// STORY-003). Mirror of ../src/server.py's run_sql_query. Implementation is in
+// sqlAdapter.js; this is just the MCP contract. Every argument is declared and
+// bounded here (zod), AND re-validated inside the adapter. A handled failure
+// comes back as SqlAdapterError and is returned to the caller as isError:true
+// with the message — never an unhandled throw.
+server.tool(
+  "run_sql_query",
+  "Run a read-only SQL query against a SQLite data source and return the rows as JSON. " +
+    "Validates every argument, fences the database path, enforces an explicit timeout, and " +
+    "returns a structured error (not a crash) when the database is missing, corrupt, locked, " +
+    "or the query is invalid.",
+  {
+    database: z
+      .string()
+      .min(1)
+      .max(500)
+      .describe(
+        "Path to a SQLite database file, relative to the SQL data root (env " +
+          "MCP_SQL_DATA_ROOT, default nodejs/data/). Paths that resolve outside that " +
+          "directory are rejected.",
+      ),
+    query: z
+      .string()
+      .min(1)
+      .max(20000)
+      .describe(
+        "One read-only SQL statement (SELECT / WITH / EXPLAIN / PRAGMA). Write and DDL " +
+          "statements, multiple statements, and ATTACH are rejected.",
+      ),
+    params: z
+      .array(z.union([z.string(), z.number(), z.boolean(), z.null()]))
+      .max(100)
+      .optional()
+      .describe(
+        "Optional positional values bound to '?' placeholders in the query. Use these " +
+          "instead of formatting values into the SQL.",
+      ),
+    timeout_seconds: z
+      .number()
+      .gt(0)
+      .lte(30)
+      .default(5)
+      .describe("Abort the query if it runs longer than this."),
+    max_rows: z
+      .number()
+      .int()
+      .gte(1)
+      .lte(1000)
+      .default(100)
+      .describe("Max rows returned; extras are dropped and 'truncated' is set true."),
+  },
+  async ({ database, query, params, timeout_seconds, max_rows }) => {
+    try {
+      const result = await runSqlQuery({
+        database,
+        query,
+        params: params ?? null,
+        timeoutSeconds: timeout_seconds,
+        maxRows: max_rows,
+      });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      if (err instanceof SqlAdapterError) {
+        return { content: [{ type: "text", text: err.toString() }], isError: true };
+      }
+      throw err;
+    }
+  },
 );
 
 // --- RESOURCE: notes://all -----------------------------------------------
