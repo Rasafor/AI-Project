@@ -27,8 +27,18 @@ from __future__ import annotations
 
 import os
 import re
+from typing import TYPE_CHECKING
 
-import httpx
+if TYPE_CHECKING:  # annotations only — never imported at runtime
+    import httpx
+
+# `httpx` is imported lazily inside the functions that need it, NOT at module
+# top: the MCP SDK ships `httpx2`, not plain `httpx`, so a minimal environment
+# (e.g. `mcp dev` / `uv run --with "mcp[cli]"`, which the Inspector uses) has no
+# `httpx`. Importing it here would crash server.py on startup — and the Inspector
+# "Connect" with it — even for someone who never calls count_incident_tokens.
+# A missing `httpx` now surfaces only when the tool is actually invoked, as a
+# clean TokenAdapterError, consistent with this module's no-crash contract.
 
 _ENDPOINT = "/v1/messages/count_tokens"  # constant path — never interpolated
 _API_VERSION = "2023-06-01"
@@ -44,8 +54,22 @@ _MODEL_RE = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
 _client: httpx.Client | None = None
 
 
+def _require_httpx():
+    """Import httpx on demand; raise a tagged, caller-safe error if it's absent."""
+    try:
+        import httpx
+
+        return httpx
+    except ImportError as exc:
+        raise TokenAdapterError(
+            "Unavailable",
+            "the token-count tool requires the 'httpx' package (pip install httpx).",
+        ) from exc
+
+
 def _pool() -> httpx.Client:
     global _client
+    httpx = _require_httpx()
     if _client is None or _client.is_closed:
         _client = httpx.Client(
             limits=httpx.Limits(max_keepalive_connections=4, max_connections=8),
@@ -95,6 +119,8 @@ def count_tokens(text: str, *, model: str, timeout_s: float = DEFAULT_TIMEOUT_S)
         raise TokenAdapterError(
             "Unavailable", f"the token-count service is not configured ({missing} unset)."
         )
+
+    httpx = _require_httpx()  # lazy — see module note
 
     # `text` and `model` are model-influenced values. They go in the JSON body,
     # which httpx serialises — they are never concatenated into the URL or a
