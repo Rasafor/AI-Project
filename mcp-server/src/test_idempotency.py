@@ -17,9 +17,11 @@ import json
 import os
 import sys
 import tempfile
+from pathlib import Path
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from mcp.types import ListRootsResult, Root
 
 
 def _params(data_root: str) -> StdioServerParameters:
@@ -28,6 +30,16 @@ def _params(data_root: str) -> StdioServerParameters:
         args=["src/server.py"],
         env={**os.environ, "MCP_NOTES_DATA_ROOT": data_root},
     )
+
+
+def _roots_cb(data_root: str):
+    """add_note now requires the client to declare a root covering the store."""
+    roots = [Root(uri=Path(data_root).resolve().as_uri())]
+
+    async def cb(context) -> ListRootsResult:
+        return ListRootsResult(roots=roots)
+
+    return cb
 
 
 async def _notes(session: ClientSession) -> list[dict]:
@@ -42,7 +54,7 @@ def _text(result) -> str:
 async def main() -> None:
     with tempfile.TemporaryDirectory() as data_root:
         async with stdio_client(_params(data_root)) as (read, write):
-            async with ClientSession(read, write) as session:
+            async with ClientSession(read, write, list_roots_callback=_roots_cb(data_root)) as session:
                 await session.initialize()
                 start = len(await _notes(session))
 
@@ -73,7 +85,7 @@ async def main() -> None:
 
         # 4. Survives a restart: the keyed note is still deduped by a fresh process.
         async with stdio_client(_params(data_root)) as (read, write):
-            async with ClientSession(read, write) as session:
+            async with ClientSession(read, write, list_roots_callback=_roots_cb(data_root)) as session:
                 await session.initialize()
                 before = len(await _notes(session))
                 r6 = await session.call_tool(

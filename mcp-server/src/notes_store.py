@@ -66,6 +66,16 @@ def _seed_notes() -> list[dict]:
 # this module (`from notes_store import resolve_within`) for existing callers.
 
 
+def notes_path(root: Path = DATA_ROOT) -> Path:
+    """The absolute, fully-resolved path this store reads and writes.
+
+    Exposed so server.py can route it through the roots containment check
+    before add_note writes — even though the filename is hardcoded here, the
+    roots gate has to see every path the server touches.
+    """
+    return resolve_within(root, NOTES_FILENAME)
+
+
 def load_notes(root: Path = DATA_ROOT) -> list[dict]:
     """Return the persisted notes list, creating a seeded store on first run.
 
