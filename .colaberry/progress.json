@@ -5,10 +5,10 @@
     "stories_total": 11,
     "stories_verified": 1,
     "stories_submitted": 0,
-    "stories_in_progress": 10,
-    "stories_not_started": 0,
+    "stories_in_progress": 0,
+    "stories_not_started": 10,
     "criteria_total": 35,
-    "criteria_passed": 5,
+    "criteria_passed": 8,
     "points_awarded": 73
   },
   "stories": [
@@ -34,7 +34,7 @@
           "passed": true
         },
         {
-          "text": "Trust — no tab shows a number, a connection or a result the project has not actually produced.",
+          "text": "Trust \u2014 no tab shows a number, a connection or a result the project has not actually produced.",
           "passed": true
         }
       ],
@@ -52,7 +52,8 @@
         "commit_at": "2026-08-24T00:23:32Z",
         "points_awarded": 73,
         "outstanding": []
-      }
+      },
+      "points_awarded": 0
     },
     {
       "id": "STORY-001",
@@ -61,36 +62,37 @@
       "criteria": [
         {
           "text": "Given a pipeline incident, when logs are analyzed, then a recommendation is generated.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a log with no common patterns, when analyzed, then no recommendation is generated.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: All log analysis activities are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given a pipeline incident, when logs are analyzed, then a recommendation is generated.",
-          "Given a log with no common patterns, when analyzed, then no recommendation is generated.",
-          "Trust: All log analysis activities are logged for audit."
-        ]
-      }
+      "files_touched": [
+        "pipeline_incident_investigator/__init__.py",
+        "pipeline_incident_investigator/log_source.py",
+        "pipeline_incident_investigator/pattern_matcher.py",
+        "pipeline_incident_investigator/recommendation.py",
+        "pipeline_incident_investigator/audit_log.py",
+        "pipeline_incident_investigator/investigator.py",
+        "data_engineering_incident_test_3.json",
+        ".gitignore"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_log_source.py",
+        "pipeline_incident_investigator/tests/test_pattern_matcher.py",
+        "pipeline_incident_investigator/tests/test_recommendation.py",
+        "pipeline_incident_investigator/tests/test_audit_log.py",
+        "pipeline_incident_investigator/tests/test_investigator.py"
+      ],
+      "notes": "Pattern catalog covers schema-mismatch and resource-exhaustion signatures only (the two fixtures provided). A log with a real but uncataloged failure (data_engineering_incident_test_3.json) correctly yields no recommendation -- broadening the catalog is follow-on work, not a gap in this story's contract.",
+      "updated_at": "2026-09-14T02:41:27.267789+00:00",
+      "verification": null
     },
     {
       "id": "STORY-002",
@@ -114,21 +116,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given an investigation, when it is conducted, then all activities are logged.",
-          "Given a failed investigation, when it is logged, then failure details are included.",
-          "Trust: Logs are immutable and timestamped."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-003",
@@ -152,21 +140,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given a SQL query, when analyzed, then potential issues are identified.",
-          "Given a SQL query with no issues, when analyzed, then no issues are reported.",
-          "Trust: SQL analysis results are logged for audit."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-004",
@@ -190,21 +164,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given data-quality metrics, when analyzed, then root causes are identified.",
-          "Given data with no quality issues, when analyzed, then no root causes are reported.",
-          "Trust: Data-quality analysis results are logged for audit."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-005",
@@ -228,21 +188,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given a recommendation, when it is major, then it requires human approval.",
-          "Given a minor recommendation, when generated, then it is auto-approved.",
-          "Trust: All recommendations and approvals are logged."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-006",
@@ -266,21 +212,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given an uncertain root cause, when identified, then a notification is sent.",
-          "Given a certain root cause, when identified, then no notification is sent.",
-          "Trust: Notifications are logged for audit."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-007",
@@ -304,21 +236,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given an ops team member, when accessing the dashboard, then the primary action completes in three clicks or fewer.",
-          "Given an ops team member, when using the interface, then response times are under 2 seconds for any action.",
-          "Trust: Given any user action, when logged, then the audit trail records the action with a timestamp."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-008",
@@ -342,21 +260,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given an investigation, when completed, then a detailed report is generated.",
-          "Given a failed investigation, when reported, then failure details are included.",
-          "Trust: Reports are logged for audit."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-009",
@@ -380,21 +284,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given a pilot test, when conducted, then error rates are low.",
-          "Given a pilot test, when completed, then investigation time is reduced to 1 hour.",
-          "Trust: Pilot test results are logged for audit."
-        ]
-      }
+      "verification": null
     },
     {
       "id": "STORY-010",
@@ -418,21 +308,7 @@
       "tests_added": [],
       "notes": null,
       "updated_at": null,
-      "verification": {
-        "state": "in_progress",
-        "criteria_passed": 0,
-        "criteria_total": 3,
-        "verified_at": null,
-        "commit_sha": null,
-        "commit_url": null,
-        "commit_at": null,
-        "points_awarded": null,
-        "outstanding": [
-          "Given a set of pipeline dependencies, when agents are coordinated, then the analysis completes successfully.",
-          "Given a failure in agent coordination, when retried, then the system recovers without data loss.",
-          "Trust: Given any coordination task, when executed, then the audit trail logs the task with a timestamp."
-        ]
-      }
+      "verification": null
     }
   ]
 }

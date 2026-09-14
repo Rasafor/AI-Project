@@ -1,8 +1,18 @@
 {
   "schema_version": 1,
-  "publish": {
-    "portfolio_visible": false
+  "disclosure": "private",
+  "headline": null,
+  "summary": null,
+  "challenge": null,
+  "highlight_story_ids": [],
+  "links": {
+    "repo": null,
+    "command_center": null
   },
-  "headline": "",
-  "summary": ""
+  "include": {
+    "requirement_statements": false,
+    "measures": false,
+    "systems": false,
+    "narrative": false
+  }
 }

@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 nodejs/node_modules/
+
+# Runtime notes store written by src/notes_store.py — not source.
+data/

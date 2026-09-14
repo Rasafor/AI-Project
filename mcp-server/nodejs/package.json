@@ -6,7 +6,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node test-connection.js",
+    "test": "node test-connection.js && node test-notesStore.js && node test-sqlAdapter.js && node test-idempotency.js",
+    "test:store": "node test-notesStore.js",
+    "test:sql": "node test-sqlAdapter.js",
+    "test:idempotency": "node test-idempotency.js",
     "inspect": "npx @modelcontextprotocol/inspector node server.js"
   },
   "dependencies": {
