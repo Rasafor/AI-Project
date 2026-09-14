@@ -8,7 +8,7 @@
     "stories_in_progress": 0,
     "stories_not_started": 10,
     "criteria_total": 35,
-    "criteria_passed": 11,
+    "criteria_passed": 14,
     "points_awarded": 73
   },
   "stories": [
@@ -129,21 +129,29 @@
       "criteria": [
         {
           "text": "Given a SQL query, when analyzed, then potential issues are identified.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a SQL query with no issues, when analyzed, then no issues are reported.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: SQL analysis results are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/sql_source.py",
+        "pipeline_incident_investigator/sql_analyzer.py",
+        "pipeline_incident_investigator/sql_investigation.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_sql_source.py",
+        "pipeline_incident_investigator/tests/test_sql_analyzer.py",
+        "pipeline_incident_investigator/tests/test_sql_investigation.py"
+      ],
+      "notes": "Issue catalog: select_star, missing_where_on_mutation, cartesian_join, undefined_column (checked against schema_history.current_schema when the incident has one). The undefined_column check independently rediscovers fixture one's actual root cause (customer_type vs customer_category) from the SQL alone; fixture two's real, clean query is the 'no issues' case -- no synthetic fixture needed for either acceptance criterion. Reuses STORY-002's hash-chained audit_log.record_activity rather than a second logging path. 'Performance degradation' (a listed failure path) is not addressed -- no real SQL engine exists to benchmark against in this walking skeleton; noted rather than silently skipped.",
+      "updated_at": "2026-09-14T04:35:35.466190+00:00",
       "verification": null
     },
     {
