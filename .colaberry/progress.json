@@ -8,7 +8,7 @@
     "stories_in_progress": 0,
     "stories_not_started": 10,
     "criteria_total": 35,
-    "criteria_passed": 14,
+    "criteria_passed": 17,
     "points_awarded": 73
   },
   "stories": [
@@ -161,21 +161,29 @@
       "criteria": [
         {
           "text": "Given data-quality metrics, when analyzed, then root causes are identified.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given data with no quality issues, when analyzed, then no root causes are reported.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Data-quality analysis results are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/data_quality_source.py",
+        "pipeline_incident_investigator/data_quality_analyzer.py",
+        "pipeline_incident_investigator/data_quality_investigation.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_data_quality_source.py",
+        "pipeline_incident_investigator/tests/test_data_quality_analyzer.py",
+        "pipeline_incident_investigator/tests/test_data_quality_investigation.py"
+      ],
+      "notes": "Issue catalog: row_count_shortfall (between adjacent pipeline layers), null_rate_high, duplicate_rate_high, schema_drift (unexpected/missing columns), freshness_violation. No synthetic fixture needed: fixture one's real metrics independently flag both the silver-layer row collapse and the schema drift (its actual root cause); fixture two's real metrics flag the gold-layer shortfall, high null rate, and staleness (its actual root cause -- resource exhaustion causing a partial, stale write); fixture three's sparse metrics (connection-timeout incident, no data ever extracted) correctly yield zero issues, serving as the 'no quality issues' case. Reuses STORY-002's hash-chained audit_log.record_activity unchanged. 'Performance issues' (a listed failure path) is not addressed, same reasoning as STORY-003's 'performance degradation' -- no real data platform exists here to benchmark against.",
+      "updated_at": "2026-09-14T12:52:21.486409+00:00",
       "verification": null
     },
     {
