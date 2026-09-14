@@ -52,8 +52,7 @@
         "commit_at": "2026-08-24T00:23:32Z",
         "points_awarded": 73,
         "outstanding": []
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-001",
@@ -91,8 +90,7 @@
           "Given a log with no common patterns, when analyzed, then no recommendation is generated.",
           "Trust: All log analysis activities are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-002",
@@ -130,8 +128,7 @@
           "Given a failed investigation, when it is logged, then failure details are included.",
           "Trust: Logs are immutable and timestamped."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-003",
@@ -169,8 +166,7 @@
           "Given a SQL query with no issues, when analyzed, then no issues are reported.",
           "Trust: SQL analysis results are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-004",
@@ -208,8 +204,7 @@
           "Given data with no quality issues, when analyzed, then no root causes are reported.",
           "Trust: Data-quality analysis results are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-005",
@@ -247,8 +242,7 @@
           "Given a minor recommendation, when generated, then it is auto-approved.",
           "Trust: All recommendations and approvals are logged."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-006",
@@ -286,8 +280,7 @@
           "Given a certain root cause, when identified, then no notification is sent.",
           "Trust: Notifications are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-007",
@@ -325,8 +318,7 @@
           "Given an ops team member, when using the interface, then response times are under 2 seconds for any action.",
           "Trust: Given any user action, when logged, then the audit trail records the action with a timestamp."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-008",
@@ -364,8 +356,7 @@
           "Given a failed investigation, when reported, then failure details are included.",
           "Trust: Reports are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-009",
@@ -403,8 +394,7 @@
           "Given a pilot test, when completed, then investigation time is reduced to 1 hour.",
           "Trust: Pilot test results are logged for audit."
         ]
-      },
-      "points_awarded": 0
+      }
     },
     {
       "id": "STORY-010",
@@ -442,9 +432,7 @@
           "Given a failure in agent coordination, when retried, then the system recovers without data loss.",
           "Trust: Given any coordination task, when executed, then the audit trail logs the task with a timestamp."
         ]
-      },
-      "points_awarded": 0
+      }
     }
-  ],
-  "_how_to_use": "Start with every criterion false — that is the correct starting state, not an unfinished one. false means \"not claimed\": either not done, or done but not yet checked. Set one to true only after you have read the code and confirmed it is genuinely true today. Nothing is lost by leaving a line false; a story sitting at 3 of 5 reports honestly and the portal shows you which two are left. Do not retype the criterion text — flip the boolean beside it."
+  ]
 }
