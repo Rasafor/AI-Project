@@ -8,7 +8,7 @@
     "stories_in_progress": 0,
     "stories_not_started": 10,
     "criteria_total": 35,
-    "criteria_passed": 8,
+    "criteria_passed": 11,
     "points_awarded": 73
   },
   "stories": [
@@ -101,21 +101,25 @@
       "criteria": [
         {
           "text": "Given an investigation, when it is conducted, then all activities are logged.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a failed investigation, when it is logged, then failure details are included.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Logs are immutable and timestamped.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/audit_log.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_audit_integrity.py"
+      ],
+      "notes": "Immutability is hash-chained (each entry embeds the previous entry's hash); verify_log_integrity() detects edited, deleted, or reordered entries. Known gap, documented in audit_log.py's module docstring: truncating the *most recent* entries and re-chaining from there is not detectable without an external anchor (e.g. publishing the latest hash outside this file) -- out of scope for this walking skeleton. 'Unauthorized access to logs' (a listed failure path) is a filesystem/RBAC concern with no auth system yet in this project (REQ-018 is unfulfilled) -- not addressed by this story, flagged rather than silently skipped.",
+      "updated_at": "2026-09-14T04:29:46.951508+00:00",
       "verification": null
     },
     {
