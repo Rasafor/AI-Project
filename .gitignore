@@ -1,1 +1,4 @@
 .env
+pipeline_incident_investigator/audit_trail.jsonl
+__pycache__/
+*.pyc

@@ -1,0 +1,52 @@
+{
+  "incident_id": "INC-2026-003",
+  "incident_title": "Vendor Feed Ingestion Pipeline Failure",
+  "reported_at": "2026-08-22T04:15:00",
+  "severity": "Medium",
+  "incident_description": "The vendor_feed_ingestion pipeline failed while connecting to the upstream SFTP vendor feed. This does not match any previously cataloged failure signature.",
+  "pipeline_metadata": {
+    "pipeline_name": "vendor_feed_ingestion",
+    "environment": "production",
+    "schedule": "Daily at 04:00",
+    "expected_duration_minutes": 12,
+    "failed_stage": "extract_vendor_feed",
+    "stages": [
+      {
+        "name": "extract_vendor_feed",
+        "layer": "source_to_raw",
+        "status": "FAILED"
+      },
+      {
+        "name": "bronze_vendor_feed",
+        "layer": "raw_to_bronze",
+        "status": "NOT_STARTED"
+      }
+    ],
+    "upstream_dependencies": ["vendor_sftp_feed"],
+    "downstream_dependencies": ["vendor_catalog_sync"]
+  },
+  "execution_logs": [
+    "2026-08-22 04:00:01 INFO Pipeline vendor_feed_ingestion started",
+    "2026-08-22 04:00:03 INFO Connecting to sftp_vendor_feed",
+    "2026-08-22 04:00:33 ERROR ConnectionTimeoutException: Timed out connecting to sftp_vendor_feed after 30000ms",
+    "2026-08-22 04:00:34 INFO Retrying connection to sftp_vendor_feed (attempt 2 of 2)",
+    "2026-08-22 04:01:05 ERROR ConnectionTimeoutException: Timed out connecting to sftp_vendor_feed after 30000ms",
+    "2026-08-22 04:01:06 INFO Pipeline marked FAILED",
+    "2026-08-22 04:01:07 INFO Downstream jobs were not started"
+  ],
+  "data_quality_checks": {
+    "source_row_count": null,
+    "bronze_row_count": 0
+  },
+  "business_context": {
+    "sla": "vendor_catalog_sync must refresh by 05:00",
+    "affected_consumers": ["Merchandising"],
+    "business_impact": "Vendor catalog updates will be stale until the feed is reachable again."
+  },
+  "expected_root_cause_for_testing": {
+    "category": null,
+    "root_cause": null,
+    "recommended_fix": null,
+    "note": "This fixture intentionally has no known pattern in the catalog (a connection timeout, not schema mismatch or resource exhaustion). It exists to exercise the 'no common pattern -> no recommendation' acceptance criterion for STORY-001, and to give a later story (SQL/connectivity analysis) a real gap to fill."
+  }
+}
