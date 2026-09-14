@@ -62,15 +62,15 @@
       "criteria": [
         {
           "text": "Given a pipeline incident, when logs are analyzed, then a recommendation is generated.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a log with no common patterns, when analyzed, then no recommendation is generated.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: All log analysis activities are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
       "files_touched": [],
