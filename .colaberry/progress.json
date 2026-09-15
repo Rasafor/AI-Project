@@ -34,7 +34,7 @@
           "passed": true
         },
         {
-          "text": "Trust \u2014 no tab shows a number, a connection or a result the project has not actually produced.",
+          "text": "Trust — no tab shows a number, a connection or a result the project has not actually produced.",
           "passed": true
         }
       ],
@@ -313,21 +313,25 @@
       "criteria": [
         {
           "text": "Given a set of pipeline dependencies, when agents are coordinated, then the analysis completes successfully.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a failure in agent coordination, when retried, then the system recovers without data loss.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Given any coordination task, when executed, then the audit trail logs the task with a timestamp.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/agent_coordinator.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_agent_coordinator.py"
+      ],
+      "notes": "coordinate_agents() runs the three existing specialists (investigate() / investigate_sql() / investigate_data_quality()) against one incident, catching only each specialist's own typed exceptions so one agent failing does not stop the others -- overall status is success / partial_failure / failure depending on how many of the three succeeded. Two audit activities (coordination_initiated, agent_coordination) reuse STORY-002's hash-chained record_activity unchanged; both are idempotent on (correlation_id, activity), so retrying coordinate_agents with the same correlation_id after a failure is safe and does not duplicate or lose audit entries. Typed CoordinationInitiationError covers the initial audit write failing before any agent runs; typed CoordinationAuditError covers the summary write failing after agents have already run, and carries the computed results on partial_result rather than discarding them. An unexpected (untyped) exception from an agent is deliberately not caught -- it propagates instead of being masked as a generic failure, which is this design's answer to the 'analysis results are incorrect' failure path: the coordinator can't verify correctness itself, but it won't hide a real bug.",
+      "updated_at": "2026-09-15T03:18:49.092491+00:00",
       "verification": null
     }
   ]
