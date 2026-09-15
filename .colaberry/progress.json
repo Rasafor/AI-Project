@@ -193,21 +193,25 @@
       "criteria": [
         {
           "text": "Given a recommendation, when it is major, then it requires human approval.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a minor recommendation, when generated, then it is auto-approved.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: All recommendations and approvals are logged.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/approval_workflow.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_approval_workflow.py"
+      ],
+      "notes": "submit_recommendation_for_approval() classifies by severity (MAJOR_SEVERITIES = {'high'}): major -> pending_approval, minor -> auto_approved. SqlIssue/DataQualityIssue already carry severity; the log-based Recommendation (STORY-001) did not, so a small CATEGORY_SEVERITY map (Schema Change=high, Resource Exhaustion=medium) fills that gap without touching recommendation.py. Each recommendation is audited under its own decision_id, not the parent investigation's correlation_id -- reusing the investigation's correlation_id would collide on record_activity's (correlation_id, activity) dedup the moment one coordinated run produced more than one recommendation, silently dropping all but the first. decide_approval() checks approver_role against a small ALLOWED_APPROVER_ROLES allow-list before anything else (not full RBAC -- REQ-018 is unfulfilled by any story); denied attempts are audited under their own fresh correlation id so they cannot occupy the audit slot a later legitimate decision needs. A second decide_approval() call with the same outcome is idempotent; a conflicting outcome on an already-decided approval raises ApprovalConflictError rather than silently overwriting the original decision. submit_investigation_recommendation() wires STORY-001's real investigate() output into the workflow: fixture 1's 'Schema Change' comes out major/pending, fixture 2's 'Resource Exhaustion' comes out minor/auto-approved, fixture 3's no-match case submits nothing -- all against real fixtures, no synthetic recommendation objects. SQL and data-quality issues (STORY-003/004) are deliberately NOT wired in: they have no recommended_action field, and inventing one now would mean rebuilding modules this story was told to reuse rather than rebuild.",
+      "updated_at": "2026-09-15T04:54:57.944901+00:00",
       "verification": null
     },
     {
