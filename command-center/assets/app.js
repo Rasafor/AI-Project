@@ -14,10 +14,12 @@ const DATA_PATHS = {
   progress: '.colaberry/progress.json',
   manifest: '.colaberry/manifest.json',
   profile: '.colaberry/profile.json',
+  investigations: 'command-center/data/investigations_snapshot.json',
 };
 
 const TABS = [
-  { id: 'overview',   label: 'Overview' },
+  { id: 'overview',       label: 'Overview' },
+  { id: 'investigations', label: 'Investigations' },
   { id: 'outcomes',   label: 'Outcomes' },
   { id: 'users',      label: 'Users & Use Case' },
   { id: 'guardrails', label: 'Guardrails' },
@@ -191,7 +193,12 @@ function renderTabBody() {
   }
   const tabDef = TABS.find(t => t.id === state.activeTab) || TABS[0];
   const entry = TAB_RENDERERS[tabDef.id];
-  const ctx = { plan: state.data.plan, progress: state.data.progress, isSample: state.mode === 'sample' };
+  const ctx = {
+    plan: state.data.plan,
+    progress: state.data.progress,
+    investigations: state.data.investigations,
+    isSample: state.mode === 'sample',
+  };
   const bodyHtml = entry.render(ctx);
   const detailHtml = state.detail ? entry.detail(state.detail, ctx) : '';
   main.innerHTML = bodyHtml + detailHtml;

@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-09-15T13:04:44.799194+00:00",
+  "incidents": [
+    {
+      "incident_id": "INC-2026-001",
+      "title": "Daily Customer Orders Pipeline Failure",
+      "pipeline_name": "daily_customer_orders",
+      "severity": "High",
+      "reported_at": "2026-08-20T06:10:00",
+      "certain": true,
+      "recommendation": {
+        "category": "Schema Change",
+        "severity": "high",
+        "is_major": true,
+        "status": "pending_approval",
+        "recommended_action": "Update the transformation to use the renamed/current column, validate downstream compatibility, then rerun the failed stage."
+      },
+      "notification": null,
+      "audit_entries": [
+        {
+          "activity": "log_analysis",
+          "outcome": "success",
+          "timestamp": "2026-09-15T13:04:44.694654+00:00"
+        },
+        {
+          "activity": "recommendation",
+          "outcome": "success",
+          "timestamp": "2026-09-15T13:04:44.705652+00:00"
+        },
+        {
+          "activity": "recommendation_submitted",
+          "outcome": "pending_approval",
+          "timestamp": "2026-09-15T13:04:44.715652+00:00"
+        }
+      ]
+    },
+    {
+      "incident_id": "INC-2026-002",
+      "title": "Nightly Inventory Reconciliation Pipeline Failure",
+      "pipeline_name": "nightly_inventory_reconciliation",
+      "severity": "Critical",
+      "reported_at": "2026-08-21T03:45:00",
+      "certain": true,
+      "recommendation": {
+        "category": "Resource Exhaustion",
+        "severity": "medium",
+        "is_major": false,
+        "status": "auto_approved",
+        "recommended_action": "Increase executor memory or reduce the shuffle/join size for this stage, clear any partially-written output, then rerun the failed stage."
+      },
+      "notification": null,
+      "audit_entries": [
+        {
+          "activity": "log_analysis",
+          "outcome": "success",
+          "timestamp": "2026-09-15T13:04:44.730200+00:00"
+        },
+        {
+          "activity": "recommendation",
+          "outcome": "success",
+          "timestamp": "2026-09-15T13:04:44.740200+00:00"
+        },
+        {
+          "activity": "recommendation_submitted",
+          "outcome": "auto_approved",
+          "timestamp": "2026-09-15T13:04:44.751199+00:00"
+        }
+      ]
+    },
+    {
+      "incident_id": "INC-2026-003",
+      "title": "Vendor Feed Ingestion Pipeline Failure",
+      "pipeline_name": "vendor_feed_ingestion",
+      "severity": "Medium",
+      "reported_at": "2026-08-22T04:15:00",
+      "certain": false,
+      "recommendation": null,
+      "notification": {
+        "status": "sent",
+        "reason": "No known failure pattern matched this incident's logs; the root cause is uncertain and needs manual review."
+      },
+      "audit_entries": [
+        {
+          "activity": "log_analysis",
+          "outcome": "success",
+          "timestamp": "2026-09-15T13:04:44.764196+00:00"
+        },
+        {
+          "activity": "recommendation",
+          "outcome": "no_recommendation",
+          "timestamp": "2026-09-15T13:04:44.775194+00:00"
+        },
+        {
+          "activity": "notification_sent",
+          "outcome": "sent",
+          "timestamp": "2026-09-15T13:04:44.786194+00:00"
+        }
+      ]
+    }
+  ]
+}
