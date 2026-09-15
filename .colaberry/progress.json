@@ -221,21 +221,25 @@
       "criteria": [
         {
           "text": "Given an uncertain root cause, when identified, then a notification is sent.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a certain root cause, when identified, then no notification is sent.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Notifications are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/notification_service.py"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_notification_service.py"
+      ],
+      "notes": "\"Uncertain root cause\" is anchored to STORY-001's investigate(): recommendation is None -> uncertain -> notify; recommendation present -> certain -> no notification (STORY-005 already routes that case to approval). SqlIssue/DataQualityIssue only ever report 'issues', never a 'root cause' -- Recommendation is the only place that word is used in this codebase, so notification deliberately keys off it rather than SQL/DQ signals. notify_if_uncertain() retries delivery up to max_attempts (REQ-014's ops-tool integration is a pluggable send_fn seam; the default is an explicit stub since no real notification credentials exist here) and audits the outcome either way -- sent or, after exhausting retries, failed (raising NotificationDeliveryError, which still carries the audited record on .record). Each delivery attempt is audited under its own fresh correlation id rather than the investigation's correlation_id: unlike an approval decision, a notification can legitimately move from failed to sent across separate calls, and keying by the investigation's id would freeze the audit trail at 'failed' forever via record_activity's dedup. To stay idempotent regardless, notify_if_uncertain scans for the latest recorded attempt first and does not resend once one attempt has already succeeded. get_notification() mirrors approval_workflow's decide_approval pattern exactly for 'unauthorized access to notifications': a small ALLOWED_VIEWER_ROLES allow-list checked before any lookup happens (so a denied viewer learns nothing about whether a notification exists), denials audited under their own correlation id.",
+      "updated_at": "2026-09-15T05:13:54.022908+00:00",
       "verification": null
     },
     {
