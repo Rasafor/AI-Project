@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-005",
+  "incident_title": "Geo Enrichment DNS Failure",
+  "reported_at": "2026-09-05T05:00:00",
+  "severity": "High",
+  "incident_description": "The geo enrichment step could not reach its lookup service.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "geo_enrichment",
+    "environment": "production",
+    "failed_stage": "enrich_geo",
+    "stages": [
+      {
+        "name": "enrich_geo",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-05 02:00:01 INFO Pipeline geo_enrichment started",
+    "2026-09-05 02:00:02 INFO Effective config: spark.executor.oom.retry=true, spark.task.maxFailures=4",
+    "2026-09-05 02:00:05 ERROR java.net.UnknownHostException: geo-lookup.internal: Name or service not known",
+    "2026-09-05 02:00:06 INFO Pipeline marked FAILED"
+  ]
+}

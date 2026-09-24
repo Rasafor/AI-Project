@@ -1,0 +1,27 @@
+{
+  "incident_id": "HOLDOUT-004",
+  "incident_title": "BigQuery Model Unrecognized Name",
+  "reported_at": "2026-09-04T05:00:00",
+  "severity": "High",
+  "incident_description": "The BigQuery customer model stopped compiling after an upstream change.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "bq_customer_model",
+    "environment": "production",
+    "failed_stage": "silver_customers",
+    "stages": [
+      {
+        "name": "silver_customers",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-04 06:30:01 INFO Pipeline bq_customer_model started",
+    "2026-09-04 06:30:09 ERROR google.api_core.exceptions.BadRequest: 400 Unrecognized name: customer_type at [3:5]",
+    "2026-09-04 06:30:10 INFO Pipeline marked FAILED"
+  ]
+}

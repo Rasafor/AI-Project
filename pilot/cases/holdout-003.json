@@ -1,0 +1,27 @@
+{
+  "incident_id": "HOLDOUT-003",
+  "incident_title": "Snowflake Transform Invalid Identifier",
+  "reported_at": "2026-09-03T05:00:00",
+  "severity": "High",
+  "incident_description": "The Snowflake transformation broke after the source team renamed a field.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "snowflake_orders_transform",
+    "environment": "production",
+    "failed_stage": "silver_orders",
+    "stages": [
+      {
+        "name": "silver_orders",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-03 06:00:01 INFO Pipeline snowflake_orders_transform started",
+    "2026-09-03 06:01:12 ERROR SQL compilation error: error line 1 at position 27 invalid identifier 'CUST_TYPE'",
+    "2026-09-03 06:01:13 INFO Pipeline marked FAILED"
+  ]
+}

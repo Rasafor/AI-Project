@@ -1,0 +1,27 @@
+{
+  "incident_id": "HOLDOUT-006",
+  "incident_title": "Upstream File Missing",
+  "reported_at": "2026-09-06T05:00:00",
+  "severity": "High",
+  "incident_description": "The vendor prices load could not find today's file.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "vendor_prices_load",
+    "environment": "production",
+    "failed_stage": "extract_vendor_prices",
+    "stages": [
+      {
+        "name": "extract_vendor_prices",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-06 04:00:01 INFO Pipeline vendor_prices_load started",
+    "2026-09-06 04:00:02 ERROR java.io.FileNotFoundException: s3://vendor-drop/prices/2026-09-06.csv (No such file)",
+    "2026-09-06 04:00:03 INFO Pipeline marked FAILED"
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "run_id": "baseline",
+  "operator": "pilot-operator",
+  "total": 12,
+  "errors": 3,
+  "error_rate": 0.25,
+  "error_rate_threshold": 0.05,
+  "time_budget_seconds": 3600.0,
+  "max_seconds": 0.135021,
+  "median_seconds": 0.1247805,
+  "all_within_budget": true,
+  "passed": false,
+  "cases": [
+    {
+      "path": "data_engineering_incident_test.json",
+      "synthetic": false,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.132611,
+      "within_budget": true,
+      "investigation_id": "e172981a-7969-5227-bfb2-f4ee568f49bd",
+      "error_class": null
+    },
+    {
+      "path": "data_engineering_incident_test_2.json",
+      "synthetic": false,
+      "expected": "Resource Exhaustion",
+      "verdict": "Resource Exhaustion",
+      "correct": true,
+      "duration_seconds": 0.135021,
+      "within_budget": true,
+      "investigation_id": "b5d2ada6-613d-527d-87e0-e8c2b4d0309d",
+      "error_class": null
+    },
+    {
+      "path": "data_engineering_incident_test_3.json",
+      "synthetic": false,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.113703,
+      "within_budget": true,
+      "investigation_id": "2bdbaa11-266a-5a14-9a81-262ac501506a",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-001.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "Resource Exhaustion",
+      "correct": true,
+      "duration_seconds": 0.113137,
+      "within_budget": true,
+      "investigation_id": "0649bc32-279f-5b7e-9ada-27937d77e440",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-002.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.117895,
+      "within_budget": true,
+      "investigation_id": "eae7cfb4-122b-5a43-9d83-8230a54d71cb",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-003.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.114488,
+      "within_budget": true,
+      "investigation_id": "bfa48617-9d0c-572a-b0d6-5222d6b84d4e",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-004.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.123526,
+      "within_budget": true,
+      "investigation_id": "daf655a6-0cfa-5fb0-9d57-4a7af647b15c",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-005.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.126035,
+      "within_budget": true,
+      "investigation_id": "ea9e3268-cd33-5f52-8a57-e0c330032c5e",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-006.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.120198,
+      "within_budget": true,
+      "investigation_id": "bbdc0fb7-63c8-547b-a5ed-5c5dc32c6fd0",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-007.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.129565,
+      "within_budget": true,
+      "investigation_id": "1fc3c117-efea-5612-b74f-5b66daf191c4",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-008.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.12959,
+      "within_budget": true,
+      "investigation_id": "faf954cc-ec2d-5cdb-9f37-1f99167c077d",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-009.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "Resource Exhaustion",
+      "correct": false,
+      "duration_seconds": 0.134294,
+      "within_budget": true,
+      "investigation_id": "58d1cad1-0594-504f-97da-ec559134092f",
+      "error_class": null
+    }
+  ]
+}

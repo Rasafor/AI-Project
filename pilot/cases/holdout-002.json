@@ -1,0 +1,27 @@
+{
+  "incident_id": "HOLDOUT-002",
+  "incident_title": "Export Job Disk Full",
+  "reported_at": "2026-09-02T05:00:00",
+  "severity": "High",
+  "incident_description": "The nightly export failed while writing output files.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "nightly_export",
+    "environment": "production",
+    "failed_stage": "write_export",
+    "stages": [
+      {
+        "name": "write_export",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-02 01:00:01 INFO Pipeline nightly_export started",
+    "2026-09-02 01:22:10 ERROR OSError: [Errno 28] No space left on device: '/mnt/exports/part-00031.parquet'",
+    "2026-09-02 01:22:11 INFO Pipeline marked FAILED"
+  ]
+}

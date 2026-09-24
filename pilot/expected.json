@@ -74,6 +74,49 @@
       "synthetic": true,
       "expected": "uncertain",
       "why": "Connection timeout; the 'oom' in a config echo and ROOM_BOOKINGS are look-alikes, not memory failures."
+    },
+    {
+      "path": "pilot/cases/holdout-001.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "Resource Exhaustion",
+      "why": "Kubernetes killed the pod for exceeding its memory limit (OOMKilled, 137)."
+    },
+    {
+      "path": "pilot/cases/holdout-002.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "Resource Exhaustion",
+      "why": "The disk ran out of space: a resource limit was exceeded."
+    },
+    {
+      "path": "pilot/cases/holdout-003.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "Schema Change",
+      "why": "Snowflake cannot find a column the query references: the schema changed."
+    },
+    {
+      "path": "pilot/cases/holdout-004.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "Schema Change",
+      "why": "BigQuery cannot find a referenced column: the schema changed."
+    },
+    {
+      "path": "pilot/cases/holdout-005.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "uncertain",
+      "why": "DNS failure, not a cataloged pattern; 'oom' appears only in a config key."
+    },
+    {
+      "path": "pilot/cases/holdout-006.json",
+      "synthetic": true,
+      "holdout": true,
+      "expected": "uncertain",
+      "why": "Missing upstream file: not a cataloged pattern, escalate."
     }
-  ]
+  ],
+  "holdout_note": "Cases marked holdout=true were added 2026-09-24 after the baseline pilot (12 cases) failed at 25%, and committed BEFORE pattern_matcher.py was changed, so a fix tuned on the first 12 cases is also judged on cases it never saw."
 }

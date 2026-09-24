@@ -1,0 +1,27 @@
+{
+  "incident_id": "HOLDOUT-001",
+  "incident_title": "Feature Store Pod Killed",
+  "reported_at": "2026-09-01T05:00:00",
+  "severity": "High",
+  "incident_description": "The feature store refresh pod was terminated mid-run.",
+  "synthetic": true,
+  "holdout": true,
+  "synthetic_note": "Synthetic HELD-OUT pilot case written for STORY-009 on 2026-09-24, after the baseline pilot failed and BEFORE any change to pattern_matcher.py. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "feature_store_refresh",
+    "environment": "production",
+    "failed_stage": "silver_features",
+    "stages": [
+      {
+        "name": "silver_features",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-01 03:00:01 INFO Pipeline feature_store_refresh started",
+    "2026-09-01 03:14:55 WARN Pod feature-refresh-7c9d terminated: reason=OOMKilled, exitCode=137",
+    "2026-09-01 03:14:56 INFO Pipeline marked FAILED"
+  ]
+}
