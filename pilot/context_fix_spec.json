@@ -1,0 +1,20 @@
+{
+  "about": "Follow-up 2 to STORY-009: context-aware matching. Fixed on 2026-09-24 BEFORE any round-3 held-out case was written. Only what is listed here may be built; a rule added or changed after the follow-up-2 pilot run does not count toward a pass.",
+  "context_rule": {
+    "summary": "Judge only log lines that show something going wrong.",
+    "line_level": "The first of INFO / WARN / WARNING / ERROR / FATAL appearing as a whole word in the line; a line with none counts as INFO.",
+    "counts": {
+      "ERROR": "always",
+      "FATAL": "always",
+      "WARN / WARNING": "only if the line says something was killed, terminated, lost, exited or evicted (whole words, case-insensitive), or contains ExecutorLostFailure or OOMKilled",
+      "INFO": "never"
+    },
+    "winner": "Unchanged: the category with the most counted matching lines wins; none counted means 'uncertain'.",
+    "designed_against": "The 26 already-seen cases only. On them it fixes holdout-013 and changes no other verdict."
+  },
+  "wording_additions": [
+    {"category": "Resource Exhaustion", "wording": "Out of memory", "pattern": "\\bOut of memory\\b", "source": "Linux kernel OOM killer. Added after seeing holdout-008, so that case passing is not evidence."},
+    {"category": "Resource Exhaustion", "wording": "quota ... exceeded", "pattern": "\\bquota\\b.{0,80}\\bexceeded\\b", "source": "HDFS and storage quotas, words allowed in between. Added after seeing holdout-014, so that case passing is not evidence."}
+  ],
+  "pass_rule": "Unchanged: overall error rate <= 5% and every case within 3600 s. The user chose the 5% limit alone. The round-3 held-out error count (the only truly unseen cases) is always reported separately, but it is not an extra pass condition."
+}
