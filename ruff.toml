@@ -1,0 +1,24 @@
+# Coding-standards checks run on every pull request by
+# .github/workflows/pr-standards.yml. Run the same check locally with:
+#   ruff check <files>
+# Each rule below enforces a rule already written in CLAUDE.md.
+
+target-version = "py310"
+line-length = 120
+
+[lint]
+select = [
+    "E9",    # syntax errors: code that cannot even run
+    "F",     # real bugs: undefined names, unused imports and variables
+    "E722",  # bare `except:` -- catches everything, hides the root cause
+    "BLE001",# `except Exception` where a specific error class is expected
+    "S110",  # `try/except/pass` -- silently swallowed error (CLAUDE.md: production defect)
+    "S112",  # `try/except/continue` -- same, inside a loop
+    "S105",  # hardcoded password in a variable (CLAUDE.md: no secrets in code)
+    "S106",  # hardcoded password passed as an argument
+    "S107",  # hardcoded password as a default argument
+]
+
+[lint.per-file-ignores]
+# Test fixtures use obviously fake credentials on purpose.
+"**/test_*.py" = ["S105", "S106", "S107"]

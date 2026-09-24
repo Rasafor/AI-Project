@@ -1,0 +1,94 @@
+# Automatic coding-standards review for every pull request into main.
+#
+# What it checks (each one maps to a rule in CLAUDE.md):
+#   1. Style/safety rules in ruff.toml -- run only on the Python files the PR
+#      changes, so older, untouched code is "grandfathered until touched".
+#   2. File-size ceiling -- no changed Python file over 500 lines.
+#   3. The automated test suites still pass.
+# All three always run, so the author sees every problem in one pass instead
+# of fixing them one at a time. Problems show up as comments on the exact
+# lines in the PR's "Files changed" tab.
+#
+# Read-only: this workflow never pushes, merges, or comments with a token --
+# it only reports pass/fail.
+
+name: PR standards review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-standards-${{ github.event.pull_request.number }}
+  cancel-in-progress: true  # a newer push supersedes a stale run
+
+jobs:
+  standards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # hard ceiling: no run can hang indefinitely
+
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history, so we can diff against main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install the standards checker (pinned version)
+        run: python -m pip install --timeout 30 --retries 3 "ruff==0.16.8"
+
+      - name: List the Python files this PR changes
+        id: changed
+        run: |
+          git diff --name-only --diff-filter=ACMR \
+            "origin/${{ github.base_ref }}...HEAD" -- '*.py' > "$RUNNER_TEMP/changed_py.txt"
+          count=$(grep -c . "$RUNNER_TEMP/changed_py.txt" || true)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Changed Python files: $count"
+          cat "$RUNNER_TEMP/changed_py.txt"
+
+      - name: "Check 1 of 3: coding-standards rules"
+        if: ${{ !cancelled() && steps.changed.outputs.count != '0' }}
+        run: |
+          tr '\n' '\0' < "$RUNNER_TEMP/changed_py.txt" \
+            | xargs -0 ruff check --output-format=github
+
+      - name: "Check 2 of 3: file-size ceiling (500 lines)"
+        if: ${{ !cancelled() && steps.changed.outputs.count != '0' }}
+        run: |
+          status=0
+          while IFS= read -r file; do
+            lines=$(wc -l < "$file")
+            if [ "$lines" -gt 500 ]; then
+              echo "::error file=$file::$file is $lines lines; the limit is 500. Split it before adding more (CLAUDE.md: Modular Composition Rule)."
+              status=1
+            fi
+          done < "$RUNNER_TEMP/changed_py.txt"
+          exit $status
+
+      - name: "Check 3 of 3: automated tests"
+        if: ${{ !cancelled() }}
+        run: |
+          python -m unittest discover -s pipeline_incident_investigator/tests -t .
+          python -m unittest tests.test_generate_investigation_snapshot
+
+      - name: Write a plain-language summary
+        if: ${{ always() }}
+        run: |
+          {
+            echo "## PR standards review"
+            echo ""
+            echo "Python files checked: ${{ steps.changed.outputs.count }}"
+            echo ""
+            echo "- **${{ job.status == 'success' && 'All checks passed' || 'Something needs attention' }}**."
+            echo "- Any problems are marked on the exact lines in the **Files changed** tab."
+            echo "- Run the same style check locally with: \`ruff check <file>\`"
+          } >> "$GITHUB_STEP_SUMMARY"
