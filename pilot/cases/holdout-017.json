@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-017",
+  "incident_title": "Sales Rollup Redshift Column Missing",
+  "reported_at": "2026-07-17T05:00:00",
+  "severity": "High",
+  "incident_description": "The Redshift rollup started failing after a table rebuild.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "redshift_sales_rollup",
+    "environment": "production",
+    "failed_stage": "gold_sales_rollup",
+    "stages": [
+      {
+        "name": "gold_sales_rollup",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-17 05:30:01 INFO Pipeline redshift_sales_rollup started",
+    "2026-07-17 05:31:02 ERROR psycopg2.errors.UndefinedColumn: column \"region\" does not exist in sales",
+    "2026-07-17 05:31:03 INFO Pipeline marked FAILED"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-016",
+  "incident_title": "Search Index Pod Evicted",
+  "reported_at": "2026-07-16T05:00:00",
+  "severity": "High",
+  "incident_description": "The index builder pod disappeared mid-build.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "search_index_builder",
+    "environment": "production",
+    "failed_stage": "build_index",
+    "stages": [
+      {
+        "name": "build_index",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-16 01:00:01 INFO Pipeline search_index_builder started",
+    "2026-07-16 01:33:12 WARN Pod search-index-5d8f evicted: The node was low on resource: memory. Container builder was using 14Gi, request is 8Gi.",
+    "2026-07-16 01:33:13 INFO Pipeline marked FAILED"
+  ]
+}

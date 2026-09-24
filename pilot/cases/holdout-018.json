@@ -1,0 +1,29 @@
+{
+  "incident_id": "HOLDOUT-018",
+  "incident_title": "Product Sync Connection Reset",
+  "reported_at": "2026-07-18T05:00:00",
+  "severity": "High",
+  "incident_description": "The product sync dropped its connection; an optional enrichment also warned.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "product_sync",
+    "environment": "production",
+    "failed_stage": "sync_products",
+    "stages": [
+      {
+        "name": "sync_products",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-18 02:00:01 INFO Pipeline product_sync started",
+    "2026-07-18 02:00:40 WARN Optional enrichment skipped: SQL compilation error: invalid identifier 'BRAND_TIER'",
+    "2026-07-18 02:03:10 ERROR java.net.SocketException: Connection reset by peer",
+    "2026-07-18 02:03:11 INFO Pipeline marked FAILED"
+  ]
+}

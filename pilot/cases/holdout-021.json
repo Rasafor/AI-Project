@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-021",
+  "incident_title": "Segment Load Oracle Invalid Identifier",
+  "reported_at": "2026-07-21T05:00:00",
+  "severity": "High",
+  "incident_description": "The segment load broke after a CRM data model change.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "customer_segment_load",
+    "environment": "production",
+    "failed_stage": "load_segments",
+    "stages": [
+      {
+        "name": "load_segments",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-21 06:10:01 INFO Pipeline customer_segment_load started",
+    "2026-07-21 06:10:15 ERROR java.sql.SQLSyntaxErrorException: ORA-00904: \"CUST_SEG\": invalid identifier",
+    "2026-07-21 06:10:16 INFO Pipeline marked FAILED"
+  ]
+}

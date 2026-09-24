@@ -1,0 +1,29 @@
+{
+  "incident_id": "HOLDOUT-019",
+  "incident_title": "Invoice Parser Null Pointer",
+  "reported_at": "2026-07-19T05:00:00",
+  "severity": "High",
+  "incident_description": "The invoice parser crashed on a malformed record.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "invoice_parser",
+    "environment": "production",
+    "failed_stage": "parse_invoices",
+    "stages": [
+      {
+        "name": "parse_invoices",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-19 04:00:01 INFO Pipeline invoice_parser started",
+    "2026-07-19 04:00:02 INFO Retry policy: on OutOfMemoryError increase executor memory by 25% and retry once",
+    "2026-07-19 04:05:31 ERROR java.lang.NullPointerException at InvoiceParser.parseLine(InvoiceParser.java:88)",
+    "2026-07-19 04:05:32 INFO Pipeline marked FAILED"
+  ]
+}

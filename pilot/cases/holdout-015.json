@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-015",
+  "incident_title": "Attribution Driver Out Of Heap",
+  "reported_at": "2026-07-15T05:00:00",
+  "severity": "High",
+  "incident_description": "The attribution job failed at start-up.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "marketing_attribution",
+    "environment": "production",
+    "failed_stage": "silver_attribution",
+    "stages": [
+      {
+        "name": "silver_attribution",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-15 03:00:01 INFO Pipeline marketing_attribution started",
+    "2026-07-15 03:00:44 ERROR SparkContext: Error initializing SparkContext. java.lang.OutOfMemoryError: Java heap space",
+    "2026-07-15 03:00:45 INFO Pipeline marked FAILED"
+  ]
+}

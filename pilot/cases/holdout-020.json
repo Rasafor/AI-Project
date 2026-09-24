@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-020",
+  "incident_title": "Metrics Warehouse Postgres Fatal",
+  "reported_at": "2026-07-20T05:00:00",
+  "severity": "High",
+  "incident_description": "The metrics load lost its database session.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "metrics_warehouse_load",
+    "environment": "production",
+    "failed_stage": "load_metrics",
+    "stages": [
+      {
+        "name": "load_metrics",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-20 00:15:01 INFO Pipeline metrics_warehouse_load started",
+    "2026-07-20 00:41:20 FATAL: out of memory DETAIL: Failed on request of size 1073741824 in memory context",
+    "2026-07-20 00:41:21 INFO Pipeline marked FAILED"
+  ]
+}

@@ -180,8 +180,73 @@
       "holdout_round": 2,
       "expected": "Resource Exhaustion",
       "why": "HDFS disk-space quota exhausted: a resource limit was exceeded."
+    },
+    {
+      "path": "pilot/cases/holdout-015.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Resource Exhaustion",
+      "why": "The Spark driver ran out of JVM heap."
+    },
+    {
+      "path": "pilot/cases/holdout-016.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Resource Exhaustion",
+      "why": "Kubernetes evicted the pod because the node ran low on memory."
+    },
+    {
+      "path": "pilot/cases/holdout-017.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Schema Change",
+      "why": "Redshift: a referenced column no longer exists."
+    },
+    {
+      "path": "pilot/cases/holdout-018.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "uncertain",
+      "why": "The run died on a network reset; the skipped optional enrichment did not cause the failure."
+    },
+    {
+      "path": "pilot/cases/holdout-019.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "uncertain",
+      "why": "A code bug (NullPointerException); the retry-policy line only describes configuration."
+    },
+    {
+      "path": "pilot/cases/holdout-020.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Resource Exhaustion",
+      "why": "Postgres ran out of memory serving the load."
+    },
+    {
+      "path": "pilot/cases/holdout-021.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Schema Change",
+      "why": "Oracle ORA-00904: a referenced column no longer exists."
+    },
+    {
+      "path": "pilot/cases/holdout-022.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 3,
+      "expected": "Schema Change",
+      "why": "Postgres (via Go pq): a referenced column no longer exists; levels are lowercase logfmt."
     }
   ],
   "holdout_note": "Cases marked holdout=true were added 2026-09-24 after the baseline pilot (12 cases) failed at 25%, and committed BEFORE pattern_matcher.py was changed, so a fix tuned on the first 12 cases is also judged on cases it never saw.",
-  "holdout_round_2_note": "holdout-007..014 were added 2026-09-24 for follow-up 1, after the fix list pilot/pattern_fix_spec.json was committed (9046c2d) and BEFORE pattern_matcher.py was changed."
+  "holdout_round_2_note": "holdout-007..014 were added 2026-09-24 for follow-up 1, after the fix list pilot/pattern_fix_spec.json was committed (9046c2d) and BEFORE pattern_matcher.py was changed.",
+  "holdout_round_3_note": "holdout-015..022 were added 2026-09-24 for follow-up 2, after the context plan pilot/context_fix_spec.json was committed (0f52f98) and BEFORE pattern_matcher.py was changed. They are the only truly unseen cases for follow-up 2; their error count is reported separately."
 }

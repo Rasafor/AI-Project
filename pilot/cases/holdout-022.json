@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-022",
+  "incident_title": "Catalog Service Go Worker Query Fails",
+  "reported_at": "2026-07-22T05:00:00",
+  "severity": "High",
+  "incident_description": "The Go catalog worker's query started failing after a migration.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 3,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (round 3, follow-up 2, STORY-009) written 2026-09-24 after the context plan (pilot/context_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "catalog_go_worker",
+    "environment": "production",
+    "failed_stage": "refresh_catalog",
+    "stages": [
+      {
+        "name": "refresh_catalog",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-07-22 time=07:00:01 level=info msg=\"Pipeline catalog_go_worker started\"",
+    "2026-07-22 time=07:00:09 level=error msg=\"query failed\" err=\"pq: column \\\"sku\\\" does not exist\"",
+    "2026-07-22 time=07:00:10 level=info msg=\"Pipeline marked FAILED\""
+  ]
+}
