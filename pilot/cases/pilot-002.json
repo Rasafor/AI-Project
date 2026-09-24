@@ -1,0 +1,28 @@
+{
+  "incident_id": "PILOT-002",
+  "incident_title": "Nightly Billing Container Killed",
+  "reported_at": "2026-09-12T05:00:00",
+  "severity": "High",
+  "incident_description": "The nightly billing rollup was killed by the cluster manager partway through.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "nightly_billing_rollup",
+    "environment": "production",
+    "failed_stage": "silver_billing",
+    "stages": [
+      {
+        "name": "silver_billing",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-12 02:00:01 INFO Pipeline nightly_billing_rollup started",
+    "2026-09-12 02:11:30 INFO Starting silver_billing transformation",
+    "2026-09-12 02:37:12 WARN Container killed by YARN for exceeding memory limits. 10.4 GB of 10 GB physical memory used",
+    "2026-09-12 02:37:13 ERROR Stage 4 failed after container exit code 143",
+    "2026-09-12 02:37:14 INFO Pipeline marked FAILED"
+  ]
+}

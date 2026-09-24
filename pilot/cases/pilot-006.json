@@ -1,0 +1,27 @@
+{
+  "incident_id": "PILOT-006",
+  "incident_title": "Partner API Timeout",
+  "reported_at": "2026-09-16T05:00:00",
+  "severity": "Medium",
+  "incident_description": "The partner catalog pull could not reach the partner API.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "partner_catalog_pull",
+    "environment": "production",
+    "failed_stage": "extract_partner_catalog",
+    "stages": [
+      {
+        "name": "extract_partner_catalog",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-16 03:00:01 INFO Pipeline partner_catalog_pull started",
+    "2026-09-16 03:00:31 ERROR ReadTimeout: HTTPSConnectionPool(host='api.partner.example', port=443): Read timed out. (read timeout=30)",
+    "2026-09-16 03:01:02 ERROR ReadTimeout: HTTPSConnectionPool(host='api.partner.example', port=443): Read timed out. (read timeout=30)",
+    "2026-09-16 03:01:03 INFO Pipeline marked FAILED"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "incident_id": "PILOT-004",
+  "incident_title": "Warehouse Load Rejects Query",
+  "reported_at": "2026-09-14T05:00:00",
+  "severity": "Medium",
+  "incident_description": "The load into the Postgres reporting mart started failing after a schema migration.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "orders_to_postgres_mart",
+    "environment": "production",
+    "failed_stage": "mart_orders",
+    "stages": [
+      {
+        "name": "mart_orders",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-14 05:00:01 INFO Pipeline orders_to_postgres_mart started",
+    "2026-09-14 05:02:40 INFO Loading mart_orders",
+    "2026-09-14 05:02:41 ERROR psycopg2.errors.UndefinedColumn: column \"customer_type\" does not exist",
+    "2026-09-14 05:02:41 ERROR LINE 1: SELECT order_id, customer_type FROM staging.orders",
+    "2026-09-14 05:02:42 INFO Pipeline marked FAILED"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "about": "Correct verdict for every pilot case, recorded 2026-09-24 BEFORE the pilot first ran (STORY-009). A verdict is the root-cause category the system should assert, or 'uncertain' when the right behaviour is to assert nothing and escalate to a human. Real fixtures take their answer from their own expected_root_cause_for_testing block.",
+  "error_rate_threshold": 0.05,
+  "time_budget_seconds": 3600,
+  "cases": [
+    {
+      "path": "data_engineering_incident_test.json",
+      "synthetic": false,
+      "expected": "Schema Change",
+      "why": "Fixture's own label: upstream renamed customer_type."
+    },
+    {
+      "path": "data_engineering_incident_test_2.json",
+      "synthetic": false,
+      "expected": "Resource Exhaustion",
+      "why": "Fixture's own label: join ran out of executor memory."
+    },
+    {
+      "path": "data_engineering_incident_test_3.json",
+      "synthetic": false,
+      "expected": "uncertain",
+      "why": "Fixture's own label: category null (connection timeout, no known pattern)."
+    },
+    {
+      "path": "pilot/cases/pilot-001.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "why": "JVM OutOfMemoryError (GC overhead)."
+    },
+    {
+      "path": "pilot/cases/pilot-002.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "why": "YARN killed the container for exceeding memory limits."
+    },
+    {
+      "path": "pilot/cases/pilot-003.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "why": "Spark 3.4+ UNRESOLVED_COLUMN wording for a renamed column."
+    },
+    {
+      "path": "pilot/cases/pilot-004.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "why": "Postgres UndefinedColumn: the query references a column that no longer exists."
+    },
+    {
+      "path": "pilot/cases/pilot-005.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "why": "Three schema errors cause the failure; one executor loss during cleanup is secondary."
+    },
+    {
+      "path": "pilot/cases/pilot-006.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "why": "Network read timeout: not a cataloged pattern, escalate."
+    },
+    {
+      "path": "pilot/cases/pilot-007.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "why": "Expired credentials: not a cataloged pattern, escalate."
+    },
+    {
+      "path": "pilot/cases/pilot-008.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "why": "Run succeeded with no errors: nothing to assert."
+    },
+    {
+      "path": "pilot/cases/pilot-009.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "why": "Connection timeout; the 'oom' in a config echo and ROOM_BOOKINGS are look-alikes, not memory failures."
+    }
+  ]
+}

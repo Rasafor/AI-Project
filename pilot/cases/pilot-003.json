@@ -1,0 +1,27 @@
+{
+  "incident_id": "PILOT-003",
+  "incident_title": "Customer Tier Column Missing",
+  "reported_at": "2026-09-13T05:00:00",
+  "severity": "High",
+  "incident_description": "The customer tiering job failed right after an upstream CRM release.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "daily_customer_tiers",
+    "environment": "production",
+    "failed_stage": "silver_customer_tiers",
+    "stages": [
+      {
+        "name": "silver_customer_tiers",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-13 06:00:01 INFO Pipeline daily_customer_tiers started",
+    "2026-09-13 06:03:15 INFO Starting silver_customer_tiers transformation",
+    "2026-09-13 06:03:16 ERROR org.apache.spark.sql.AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column or function parameter with name `cust_tier` cannot be resolved. Did you mean `customer_tier`?",
+    "2026-09-13 06:03:17 INFO Pipeline marked FAILED"
+  ]
+}

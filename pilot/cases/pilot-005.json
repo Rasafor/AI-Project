@@ -1,0 +1,29 @@
+{
+  "incident_id": "PILOT-005",
+  "incident_title": "Returns Pipeline Mixed Failures",
+  "reported_at": "2026-09-15T05:00:00",
+  "severity": "High",
+  "incident_description": "The returns pipeline failed with several errors after a source change.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "daily_returns",
+    "environment": "production",
+    "failed_stage": "silver_returns",
+    "stages": [
+      {
+        "name": "silver_returns",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-15 06:00:01 INFO Pipeline daily_returns started",
+    "2026-09-15 06:04:10 ERROR AnalysisException: Cannot resolve column 'return_reason_code'",
+    "2026-09-15 06:04:11 ERROR AnalysisException: Cannot resolve column 'return_reason_code' in retry 1",
+    "2026-09-15 06:04:12 ERROR AnalysisException: Cannot resolve column 'return_reason_code' in retry 2",
+    "2026-09-15 06:04:30 WARN ExecutorLostFailure (executor 3 exited caused by one of the running tasks) during cleanup",
+    "2026-09-15 06:04:31 INFO Pipeline marked FAILED"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "incident_id": "PILOT-008",
+  "incident_title": "Inventory Snapshot Reported Late (Run Succeeded)",
+  "reported_at": "2026-09-18T05:00:00",
+  "severity": "Low",
+  "incident_description": "An analyst reported stale numbers, but the run itself shows no errors.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "inventory_snapshot",
+    "environment": "production",
+    "failed_stage": "gold_inventory",
+    "stages": [
+      {
+        "name": "gold_inventory",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-18 01:00:01 INFO Pipeline inventory_snapshot started",
+    "2026-09-18 01:08:20 INFO 88210 records written to gold_inventory",
+    "2026-09-18 01:08:21 INFO Pipeline marked SUCCESS"
+  ]
+}

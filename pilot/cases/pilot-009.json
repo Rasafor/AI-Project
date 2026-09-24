@@ -1,0 +1,28 @@
+{
+  "incident_id": "PILOT-009",
+  "incident_title": "Room Bookings Load Timeout",
+  "reported_at": "2026-09-19T05:00:00",
+  "severity": "Medium",
+  "incident_description": "The room bookings sync timed out; its config echo mentions memory settings.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "room_bookings_sync",
+    "environment": "production",
+    "failed_stage": "extract_room_bookings",
+    "stages": [
+      {
+        "name": "extract_room_bookings",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-19 02:00:01 INFO Pipeline room_bookings_sync started",
+    "2026-09-19 02:00:02 INFO Effective config: memory.oom.kill_disable=false, fetch.size=5000",
+    "2026-09-19 02:00:03 INFO Loading ROOM_BOOKINGS from facilities_db",
+    "2026-09-19 02:00:33 ERROR ConnectionTimeoutException: Timed out connecting to facilities_db after 30000ms",
+    "2026-09-19 02:00:34 INFO Pipeline marked FAILED"
+  ]
+}

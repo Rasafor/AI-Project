@@ -1,0 +1,26 @@
+{
+  "incident_id": "PILOT-007",
+  "incident_title": "Ads Spend Extract Auth Failure",
+  "reported_at": "2026-09-17T05:00:00",
+  "severity": "Medium",
+  "incident_description": "The ads spend extract failed at login.",
+  "synthetic": true,
+  "synthetic_note": "Synthetic pilot case written for STORY-009 on 2026-09-24. Not a real incident. Its correct verdict is recorded in pilot/expected.json and was decided before the pilot first ran.",
+  "pipeline_metadata": {
+    "pipeline_name": "ads_spend_extract",
+    "environment": "production",
+    "failed_stage": "extract_ads_spend",
+    "stages": [
+      {
+        "name": "extract_ads_spend",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-09-17 07:00:01 INFO Pipeline ads_spend_extract started",
+    "2026-09-17 07:00:02 ERROR AuthenticationError: 401 Unauthorized - access token expired",
+    "2026-09-17 07:00:03 INFO Pipeline marked FAILED"
+  ]
+}
