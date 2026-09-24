@@ -1,0 +1,18 @@
+{
+  "about": "Follow-up 1 to STORY-009. The exact failure wordings pattern_matcher.py will learn, fixed on 2026-09-24 BEFORE any new held-out pilot case was written, based on how common platforms word these errors rather than on any test case. Only these wordings may be added; a rule added or changed after the follow-up pilot run does not count toward a pass.",
+  "pass_rule": "Unchanged from pilot/expected.json: overall error rate <= 5% and every case within 3600 s. The user chose the 5% limit alone (no extra zero-error rule on the new held-out cases).",
+  "additions": [
+    {"category": "Resource Exhaustion", "wording": "OOMKilled", "source": "Kubernetes pod termination reason"},
+    {"category": "Resource Exhaustion", "wording": "exit code 137", "source": "Container killed by SIGKILL, typically the OOM killer"},
+    {"category": "Resource Exhaustion", "wording": "Java heap space", "source": "JVM OutOfMemoryError detail"},
+    {"category": "Resource Exhaustion", "wording": "memory limit exceeded", "source": "Generic container and runtime wording"},
+    {"category": "Resource Exhaustion", "wording": "No space left on device", "source": "Linux ENOSPC message (disk full)"},
+    {"category": "Resource Exhaustion", "wording": "ENOSPC", "source": "Linux error code for disk full"},
+    {"category": "Resource Exhaustion", "wording": "disk quota exceeded", "source": "Linux EDQUOT and common storage wording"},
+    {"category": "Schema Change", "wording": "invalid identifier", "source": "Snowflake and Oracle, for an unknown column"},
+    {"category": "Schema Change", "wording": "Unrecognized name", "source": "BigQuery, for an unknown column"},
+    {"category": "Schema Change", "wording": "Unknown column", "source": "MySQL error 1054"},
+    {"category": "Schema Change", "wording": "Invalid column name", "source": "SQL Server error 207"},
+    {"category": "Schema Change", "wording": "no such column", "source": "SQLite"}
+  ]
+}
