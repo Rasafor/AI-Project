@@ -312,7 +312,7 @@
       "criteria": [
         {
           "text": "Given a pilot test, when conducted, then error rates are low.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a pilot test, when completed, then investigation time is reduced to 1 hour.",
