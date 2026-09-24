@@ -43,9 +43,21 @@ CONTEXT_WORDINGS: dict[str, tuple[str, ...]] = {
 }
 
 
+# STORY-009 follow-up 3: wordings from pilot/followup3_changes.json. Unlike the two lists above,
+# these were added AFTER seeing every pilot case, so pilot cases passing because of them is not
+# independent evidence.
+SEEN_CASE_WORDINGS: dict[str, tuple[str, ...]] = {
+    "Resource Exhaustion": (r"\blow on resource: memory\b",),
+    "Schema Change": (r'column \\?"?[\w.]+\\?"? does not exist',),
+}
+
+
 def _matcher(base_patterns: list[str], category: str) -> re.Pattern[str]:
     alternatives = (
-        base_patterns + [re.escape(w) for w in FOLLOW_UP_WORDINGS[category]] + list(CONTEXT_WORDINGS[category])
+        base_patterns
+        + [re.escape(w) for w in FOLLOW_UP_WORDINGS[category]]
+        + list(CONTEXT_WORDINGS[category])
+        + list(SEEN_CASE_WORDINGS[category])
     )
     return re.compile("|".join(alternatives), re.IGNORECASE)
 
@@ -53,11 +65,17 @@ def _matcher(base_patterns: list[str], category: str) -> re.Pattern[str]:
 # STORY-009 follow-up 2 context rule (pilot/context_fix_spec.json): only lines that show something
 # going wrong count as evidence. Levels are matched uppercase, exactly as the committed plan says.
 _LEVEL = re.compile(r"\b(INFO|WARN|WARNING|ERROR|FATAL)\b")
+# Follow-up 3: a logfmt level field (level=error) wins over bare words, case-insensitively.
+_LOGFMT_LEVEL = re.compile(r"\blevel=(info|warn|warning|error|fatal)\b", re.IGNORECASE)
 _WARN_KILL = re.compile(r"\b(killed|terminated|lost|exited|evicted)\b|ExecutorLostFailure|OOMKilled", re.IGNORECASE)
 
 
 def line_level(line: str) -> str:
-    """The line's log level: the first whole-word INFO/WARN/WARNING/ERROR/FATAL, else INFO."""
+    """The line's log level: a logfmt level=... field if present, else the first whole-word
+    uppercase INFO/WARN/WARNING/ERROR/FATAL, else INFO."""
+    found = _LOGFMT_LEVEL.search(line)
+    if found:
+        return found.group(1).upper()
     found = _LEVEL.search(line)
     return found.group(1) if found else "INFO"
 

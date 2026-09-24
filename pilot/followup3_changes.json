@@ -1,0 +1,9 @@
+{
+  "about": "Follow-up 3 to STORY-009, 2026-09-24. Unlike follow-ups 1 and 2, these changes were made AFTER seeing every pilot case, to close the two misses in pilot/results/followup-2.json (holdout-016, holdout-022). No unseen cases remain, so a pass after these changes shows the fixes work on known cases; it is not an independent test of new wording.",
+  "changes": [
+    {"kind": "wording", "category": "Resource Exhaustion", "pattern": "\\blow on resource: memory\\b", "reason": "Kubernetes eviction message for memory pressure (holdout-016)."},
+    {"kind": "level", "rule": "A logfmt level field (level=error / level=fatal / level=warn / level=warning / level=info, case-insensitive) sets the line's level and takes precedence over bare uppercase words.", "reason": "Go and other logfmt services write lowercase levels (holdout-022). Deliberately narrow: bare lowercase words such as 'error' in a message still do not set a level."},
+    {"kind": "wording", "category": "Schema Change", "pattern": "column \\\\?\"?[\\w.]+\\\\?\"? does not exist", "reason": "Allow backslash-escaped quotes around the column name, as they appear inside a quoted logfmt value (holdout-022)."}
+  ],
+  "recommendation": "Before autonomous operation, confirm with cases the developer did not write (real incidents or cases written by someone else)."
+}

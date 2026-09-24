@@ -6,6 +6,7 @@ from pipeline_incident_investigator.log_source import load_incident_logs
 from pipeline_incident_investigator.pattern_matcher import (
     CONTEXT_WORDINGS,
     FOLLOW_UP_WORDINGS,
+    SEEN_CASE_WORDINGS,
     counts_as_evidence,
     line_level,
     match_patterns,
@@ -68,7 +69,9 @@ class ContextRuleTests(unittest.TestCase):
     def test_line_levels(self):
         cases = {"2026 ERROR boom": "ERROR", "2026 FATAL: x": "FATAL", "2026 WARN y": "WARN",
                  "2026 WARNING y": "WARNING", "2026 INFO z": "INFO", "no level here": "INFO",
-                 'level=error msg="x"': "INFO"}  # lowercase levels are not recognized, per the plan
+                 'level=error msg="x"': "ERROR",  # follow-up 3: logfmt levels
+                 'level=info msg="retry after error"': "INFO",  # the field wins over words in the message
+                 "2026 validated 0 error rows": "INFO"}  # bare lowercase words still set no level
         for line, level in cases.items():
             with self.subTest(line=line):
                 self.assertEqual(line_level(line), level)
@@ -92,6 +95,28 @@ class ContextRuleTests(unittest.TestCase):
         self.assertEqual([m.category for m in match_patterns(
             ["ERROR DSQuotaExceededException: The DiskSpace quota of /user/etl is exceeded: quota = 1 TB"])],
             ["Resource Exhaustion"])
+
+
+class SeenCaseChangesTests(unittest.TestCase):
+    """STORY-009 follow-up 3: changes made after seeing every case, pinned to pilot/followup3_changes.json."""
+
+    CHANGES = json.loads((REPO_ROOT / "pilot" / "followup3_changes.json").read_text(encoding="utf-8"))
+
+    def test_code_wordings_are_exactly_the_recorded_changes(self):
+        recorded = [(c["category"], c["pattern"]) for c in self.CHANGES["changes"] if c["kind"] == "wording"]
+        code = [(cat, p) for cat, patterns in SEEN_CASE_WORDINGS.items() for p in patterns]
+        self.assertEqual(sorted(code), sorted(recorded))
+
+    def test_kubernetes_memory_eviction(self):
+        line = "WARN Pod p evicted: The node was low on resource: memory. Container c was using 14Gi"
+        self.assertEqual([m.category for m in match_patterns([line])], ["Resource Exhaustion"])
+
+    def test_logfmt_error_with_escaped_quotes(self):
+        line = 'time=07:00:09 level=error msg="query failed" err="pq: column \\"sku\\" does not exist"'
+        self.assertEqual([m.category for m in match_patterns([line])], ["Schema Change"])
+
+    def test_logfmt_info_line_is_still_ignored(self):
+        self.assertEqual(match_patterns(['level=info msg="column \\"sku\\" does not exist, will create it"']), [])
 
 
 class FollowUpSpecTests(unittest.TestCase):
