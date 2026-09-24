@@ -1,0 +1,213 @@
+{
+  "run_id": "run-2026-09-24",
+  "operator": "regina",
+  "total": 18,
+  "errors": 4,
+  "error_rate": 0.2222222222222222,
+  "error_rate_threshold": 0.05,
+  "time_budget_seconds": 3600.0,
+  "max_seconds": 0.139589,
+  "median_seconds": 0.0896665,
+  "all_within_budget": true,
+  "passed": false,
+  "cases": [
+    {
+      "path": "data_engineering_incident_test.json",
+      "synthetic": false,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.07444,
+      "within_budget": true,
+      "investigation_id": "d17dc4f1-5433-5dd7-a6aa-065707b3777c",
+      "error_class": null
+    },
+    {
+      "path": "data_engineering_incident_test_2.json",
+      "synthetic": false,
+      "expected": "Resource Exhaustion",
+      "verdict": "Resource Exhaustion",
+      "correct": true,
+      "duration_seconds": 0.07817,
+      "within_budget": true,
+      "investigation_id": "58f08656-8fa6-54a4-b7b6-7d054cc0c2fa",
+      "error_class": null
+    },
+    {
+      "path": "data_engineering_incident_test_3.json",
+      "synthetic": false,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.078721,
+      "within_budget": true,
+      "investigation_id": "a725bb09-3629-519b-9952-5a02125177a3",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-001.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "Resource Exhaustion",
+      "correct": true,
+      "duration_seconds": 0.082811,
+      "within_budget": true,
+      "investigation_id": "8c15c1c3-0278-5523-a5ec-f8bdbbf11488",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-002.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "Resource Exhaustion",
+      "correct": true,
+      "duration_seconds": 0.083849,
+      "within_budget": true,
+      "investigation_id": "57aceb54-3d83-54fb-95ea-4f0934f6d289",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-003.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.084407,
+      "within_budget": true,
+      "investigation_id": "10e22c24-192b-59c6-af00-94689c62154b",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-004.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.085716,
+      "within_budget": true,
+      "investigation_id": "806b53a4-a38f-5b4c-8891-4a278839849b",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-005.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "Schema Change",
+      "correct": true,
+      "duration_seconds": 0.08736,
+      "within_budget": true,
+      "investigation_id": "a4eb572f-392c-5e36-be33-568340f8ca99",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-006.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.129176,
+      "within_budget": true,
+      "investigation_id": "d3842031-655b-5f6a-8406-ab52ec4d69c1",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-007.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.088641,
+      "within_budget": true,
+      "investigation_id": "1c29dc3a-0e65-5031-9ea1-6c9a16d79e1a",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-008.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.090692,
+      "within_budget": true,
+      "investigation_id": "92f05abf-815e-542d-b322-931df097746f",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/pilot-009.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.139589,
+      "within_budget": true,
+      "investigation_id": "c7e76d40-e72e-55ba-9d84-ec834f55143c",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-001.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.092623,
+      "within_budget": true,
+      "investigation_id": "e01ca739-ce41-5c3d-b3d2-88845a6e0737",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-002.json",
+      "synthetic": true,
+      "expected": "Resource Exhaustion",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.09263,
+      "within_budget": true,
+      "investigation_id": "7d960e39-0f07-5b3e-9635-c98f844dced8",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-003.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.095537,
+      "within_budget": true,
+      "investigation_id": "68271ef9-cc19-53ba-8e40-238dc8d903cf",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-004.json",
+      "synthetic": true,
+      "expected": "Schema Change",
+      "verdict": "uncertain",
+      "correct": false,
+      "duration_seconds": 0.096451,
+      "within_budget": true,
+      "investigation_id": "1d1cbfd0-f252-5f9d-aeaf-1160a52c40ae",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-005.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.097606,
+      "within_budget": true,
+      "investigation_id": "f8e73bc7-94f6-5d83-91d2-e18cfe05ec3c",
+      "error_class": null
+    },
+    {
+      "path": "pilot/cases/holdout-006.json",
+      "synthetic": true,
+      "expected": "uncertain",
+      "verdict": "uncertain",
+      "correct": true,
+      "duration_seconds": 0.098868,
+      "within_budget": true,
+      "investigation_id": "8e13500b-c184-5ca0-a80c-95730c571964",
+      "error_class": null
+    }
+  ]
+}
