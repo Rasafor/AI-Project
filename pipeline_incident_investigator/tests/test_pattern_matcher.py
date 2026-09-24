@@ -3,7 +3,13 @@ import unittest
 from pathlib import Path
 
 from pipeline_incident_investigator.log_source import load_incident_logs
-from pipeline_incident_investigator.pattern_matcher import FOLLOW_UP_WORDINGS, match_patterns
+from pipeline_incident_investigator.pattern_matcher import (
+    CONTEXT_WORDINGS,
+    FOLLOW_UP_WORDINGS,
+    counts_as_evidence,
+    line_level,
+    match_patterns,
+)
 from pipeline_incident_investigator.tests.fixtures import CLEAN_LOGS
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -47,6 +53,45 @@ class MatchPatternsTests(unittest.TestCase):
 
     def test_bare_oom_still_matches(self):
         self.assertEqual(self._categories("ERROR executor 4 lost: OOM"), ["Resource Exhaustion"])
+
+
+class ContextRuleTests(unittest.TestCase):
+    """STORY-009 follow-up 2: only lines that show something going wrong count."""
+
+    SPEC = json.loads((REPO_ROOT / "pilot" / "context_fix_spec.json").read_text(encoding="utf-8"))
+
+    def test_code_wordings_are_exactly_the_committed_context_spec(self):
+        spec = [(w["category"], w["pattern"]) for w in self.SPEC["wording_additions"]]
+        code = [(cat, p) for cat, patterns in CONTEXT_WORDINGS.items() for p in patterns]
+        self.assertEqual(code, spec)
+
+    def test_line_levels(self):
+        cases = {"2026 ERROR boom": "ERROR", "2026 FATAL: x": "FATAL", "2026 WARN y": "WARN",
+                 "2026 WARNING y": "WARNING", "2026 INFO z": "INFO", "no level here": "INFO",
+                 'level=error msg="x"': "INFO"}  # lowercase levels are not recognized, per the plan
+        for line, level in cases.items():
+            with self.subTest(line=line):
+                self.assertEqual(line_level(line), level)
+
+    def test_which_lines_count_as_evidence(self):
+        self.assertTrue(counts_as_evidence("ERROR AnalysisException: x"))
+        self.assertTrue(counts_as_evidence("FATAL: out of memory"))
+        self.assertTrue(counts_as_evidence("WARN Container killed by YARN for exceeding memory limits"))
+        self.assertTrue(counts_as_evidence("WARN Pod p terminated: reason=OOMKilled"))
+        self.assertFalse(counts_as_evidence("WARN Data quality: 3 rows had an unknown column value"))
+        self.assertFalse(counts_as_evidence("INFO Retry policy: on OutOfMemoryError retry once"))
+
+    def test_keyword_on_a_non_fatal_warning_does_not_decide_the_cause(self):
+        logs = ["WARN Data quality: 3 rows had an unknown column value in field country",
+                "ERROR requests.exceptions.HTTPError: 503 Server Error: Service Unavailable"]
+        self.assertEqual(match_patterns(logs), [])
+
+    def test_new_context_wordings(self):
+        self.assertEqual([m.category for m in match_patterns(["ERROR kernel: Out of memory: Killed process 1"])],
+                         ["Resource Exhaustion"])
+        self.assertEqual([m.category for m in match_patterns(
+            ["ERROR DSQuotaExceededException: The DiskSpace quota of /user/etl is exceeded: quota = 1 TB"])],
+            ["Resource Exhaustion"])
 
 
 class FollowUpSpecTests(unittest.TestCase):

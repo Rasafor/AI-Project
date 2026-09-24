@@ -333,7 +333,8 @@
         "pipeline_incident_investigator/audit_log.py",
         "docs/stories/STORY-009.md",
         "PROGRESS.md",
-        "pilot/pattern_fix_spec.json"
+        "pilot/pattern_fix_spec.json",
+        "pilot/context_fix_spec.json"
       ],
       "tests_added": [
         "pipeline_incident_investigator/tests/test_pilot.py",
@@ -341,8 +342,8 @@
         "pipeline_incident_investigator/tests/test_audit_log.py (2 tests)",
         "pipeline_incident_investigator/tests/golden_audit_trail.jsonl"
       ],
-      "notes": "PILOT FAILED on error rate: 4/18 wrong (22.2%) vs the 5% limit fixed before the first run (pilot/expected.json, committed bc3f573). Baseline 3/12 (25%) incl. one confident wrong answer; after a pattern_matcher fix the original 12 all pass and no case gets a confident wrong answer, but 4 of 6 held-out cases (committed before the fix) are safe misses escalated to a human (Kubernetes OOMKilled, disk full, Snowflake/BigQuery missing-column wording). Time criterion measured as automated time to a ready report: slowest 0.142 s vs 3600 s; human approval time not included and the 4-hour baseline is the requirement's figure. Audit write optimized to one read pass (byte-identical output, 1.18x faster; file opens dominate). System should stay supervised until error rate is met. Session CC-20260923-h5t2. FOLLOW-UP 1 (2026-09-24): learned the 12 wordings in pilot/pattern_fix_spec.json (committed 9046c2d before 8 new held-out cases, 6c4c1b1). Pilot followup-1: 3/26 wrong (11.5%) vs 5% -- still FAILED, error-rate criterion stays false. All 18 earlier cases now pass; misses are holdout-008 (Linux 'Out of memory: Killed process') and holdout-014 (HDFS DiskSpace quota), and holdout-013 is a confident wrong answer: the new 'Unknown column' rule matched a data-quality warning. Keyword matching has reached its limit; next step needs context (error-line severity, not any mention).",
-      "updated_at": "2026-09-24T05:14:52.795829+00:00",
+      "notes": "PILOT FAILED on error rate: 4/18 wrong (22.2%) vs the 5% limit fixed before the first run (pilot/expected.json, committed bc3f573). Baseline 3/12 (25%) incl. one confident wrong answer; after a pattern_matcher fix the original 12 all pass and no case gets a confident wrong answer, but 4 of 6 held-out cases (committed before the fix) are safe misses escalated to a human (Kubernetes OOMKilled, disk full, Snowflake/BigQuery missing-column wording). Time criterion measured as automated time to a ready report: slowest 0.142 s vs 3600 s; human approval time not included and the 4-hour baseline is the requirement's figure. Audit write optimized to one read pass (byte-identical output, 1.18x faster; file opens dominate). System should stay supervised until error rate is met. Session CC-20260923-h5t2. FOLLOW-UP 1 (2026-09-24): learned the 12 wordings in pilot/pattern_fix_spec.json (committed 9046c2d before 8 new held-out cases, 6c4c1b1). Pilot followup-1: 3/26 wrong (11.5%) vs 5% -- still FAILED, error-rate criterion stays false. All 18 earlier cases now pass; misses are holdout-008 (Linux 'Out of memory: Killed process') and holdout-014 (HDFS DiskSpace quota), and holdout-013 is a confident wrong answer: the new 'Unknown column' rule matched a data-quality warning. Keyword matching has reached its limit; next step needs context (error-line severity, not any mention). FOLLOW-UP 2 (2026-09-24): context rule from pilot/context_fix_spec.json (0f52f98; round-3 held-out cases 81c856e committed before code). Pilot followup-2: 2/34 wrong (5.9%) vs 5% -- FAILED by one case; error-rate criterion stays false. All 26 earlier cases correct, zero confident wrong answers; both errors are round-3 safe misses predicted before the run (holdout-016 Kubernetes eviction 'low on resource: memory', holdout-022 lowercase logfmt levels).",
+      "updated_at": "2026-09-24T05:20:42.807935+00:00",
       "verification": null
     },
     {

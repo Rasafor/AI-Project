@@ -30,7 +30,7 @@ the same criteria out of `.colaberry/progress.json`, which Claude Code keeps in
 step (see the managed block in CLAUDE.md). Ticking something you have not
 actually met only misleads you.
 
-- [ ] Given a pilot test, when conducted, then error rates are low. _Not met: 11.5% errors (3/26) vs a 5% limit after follow-up 1 — see pilot/results/followup-1.json._
+- [ ] Given a pilot test, when conducted, then error rates are low. _Not met: 5.9% errors (2/34) vs a 5% limit after follow-up 2 — see pilot/results/followup-2.json._
 - [x] Given a pilot test, when completed, then investigation time is reduced to 1 hour.
 - [x] Trust: Pilot test results are logged for audit.
 
