@@ -30,8 +30,8 @@ the same criteria out of `.colaberry/progress.json`, which Claude Code keeps in
 step (see the managed block in CLAUDE.md). Ticking something you have not
 actually met only misleads you.
 
-- [ ] Given a pilot test, when conducted, then error rates are low.
-- [ ] Given a pilot test, when completed, then investigation time is reduced to 1 hour.
-- [ ] Trust: Pilot test results are logged for audit.
+- [ ] Given a pilot test, when conducted, then error rates are low. _Not met: 22.2% errors (4/18) vs a 5% limit — see pilot/results/optimized.json._
+- [x] Given a pilot test, when completed, then investigation time is reduced to 1 hour.
+- [x] Trust: Pilot test results are logged for audit.
 
 When every box above is ticked, stop and show the demo.

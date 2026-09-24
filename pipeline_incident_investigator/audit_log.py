@@ -55,7 +55,7 @@ def record_activity(
     """
     log_path = Path(log_path)
 
-    existing = _find_existing(log_path, correlation_id, activity)
+    existing, prev_hash = _scan(log_path, correlation_id, activity)
     if existing is not None:
         return existing
 
@@ -71,7 +71,6 @@ def record_activity(
 
     try:
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        prev_hash = _last_entry_hash(log_path)
         record = {
             **entry_fields,
             "prev_hash": prev_hash,
@@ -129,9 +128,17 @@ def verify_log_integrity(log_path: str | Path) -> list[AuditEntry]:
     return entries
 
 
-def _find_existing(log_path: Path, correlation_id: str, activity: str) -> AuditEntry | None:
+def _scan(log_path: Path, correlation_id: str, activity: str) -> tuple[AuditEntry | None, str]:
+    """One pass over the trail: the entry already recorded for (correlation_id, activity), if
+    any, and the last entry's hash to chain the next write from.
+
+    STORY-009 optimization: this replaces two separate full reads per write. It stops early
+    on a dedup hit, where the hash is not needed. Output is byte-identical to the two-pass
+    version (pinned by tests/golden_audit_trail.jsonl).
+    """
+    last_hash = GENESIS_HASH
     if not log_path.exists():
-        return None
+        return None, last_hash
 
     with log_path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -140,24 +147,10 @@ def _find_existing(log_path: Path, correlation_id: str, activity: str) -> AuditE
                 continue
             record = json.loads(line)
             if record.get("correlation_id") == correlation_id and record.get("activity") == activity:
-                return AuditEntry(**_entry_fields(record))
+                return AuditEntry(**_entry_fields(record)), last_hash
+            last_hash = record.get("entry_hash", last_hash)
 
-    return None
-
-
-def _last_entry_hash(log_path: Path) -> str:
-    last_hash = GENESIS_HASH
-    if not log_path.exists():
-        return last_hash
-
-    with log_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            last_hash = json.loads(line).get("entry_hash", last_hash)
-
-    return last_hash
+    return None, last_hash
 
 
 def _entry_fields(record: dict) -> dict:

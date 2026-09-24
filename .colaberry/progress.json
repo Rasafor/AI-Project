@@ -316,17 +316,32 @@
         },
         {
           "text": "Given a pilot test, when completed, then investigation time is reduced to 1 hour.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Pilot test results are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/pilot.py",
+        "scripts/run_pilot.py",
+        "pilot/expected.json",
+        "pilot/cases/",
+        "pilot/results/",
+        "pipeline_incident_investigator/pattern_matcher.py",
+        "pipeline_incident_investigator/audit_log.py",
+        "docs/stories/STORY-009.md",
+        "PROGRESS.md"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_pilot.py",
+        "pipeline_incident_investigator/tests/test_pattern_matcher.py (4 tests)",
+        "pipeline_incident_investigator/tests/test_audit_log.py (2 tests)",
+        "pipeline_incident_investigator/tests/golden_audit_trail.jsonl"
+      ],
+      "notes": "PILOT FAILED on error rate: 4/18 wrong (22.2%) vs the 5% limit fixed before the first run (pilot/expected.json, committed bc3f573). Baseline 3/12 (25%) incl. one confident wrong answer; after a pattern_matcher fix the original 12 all pass and no case gets a confident wrong answer, but 4 of 6 held-out cases (committed before the fix) are safe misses escalated to a human (Kubernetes OOMKilled, disk full, Snowflake/BigQuery missing-column wording). Time criterion measured as automated time to a ready report: slowest 0.142 s vs 3600 s; human approval time not included and the 4-hour baseline is the requirement's figure. Audit write optimized to one read pass (byte-identical output, 1.18x faster; file opens dominate). System should stay supervised until error rate is met. Session CC-20260923-h5t2.",
+      "updated_at": "2026-09-24T04:55:04.932655+00:00",
       "verification": null
     },
     {

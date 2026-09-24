@@ -27,13 +27,18 @@ KNOWN_PATTERNS: tuple[LogPattern, ...] = (
         id="schema_mismatch",
         category="Schema Change",
         description="A query references a column that no longer exists in the source schema.",
-        matcher=re.compile(r"AnalysisException|Cannot resolve column", re.IGNORECASE),
+        # `column "x" does not exist` is Postgres's wording (added after the STORY-009 baseline pilot).
+        matcher=re.compile(r"AnalysisException|Cannot resolve column|column \"?[\w.]+\"? does not exist", re.IGNORECASE),
     ),
     LogPattern(
         id="resource_exhaustion",
         category="Resource Exhaustion",
         description="An executor ran out of memory or another resource limit was exceeded.",
-        matcher=re.compile(r"OutOfMemory|\bOOM\b|ExecutorLostFailure", re.IGNORECASE),
+        # STORY-009 baseline pilot: "exceeding memory limits" is YARN's wording, and a bare OOM
+        # must not match inside a dotted config key such as memory.oom.kill_disable.
+        matcher=re.compile(
+            r"OutOfMemory|(?<![\w.])OOM(?![\w.])|ExecutorLostFailure|exceeding memory limits", re.IGNORECASE
+        ),
     ),
 )
 
