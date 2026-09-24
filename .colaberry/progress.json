@@ -281,21 +281,28 @@
       "criteria": [
         {
           "text": "Given an investigation, when completed, then a detailed report is generated.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Given a failed investigation, when reported, then failure details are included.",
-          "passed": false
+          "passed": true
         },
         {
           "text": "Trust: Reports are logged for audit.",
-          "passed": false
+          "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
-      "updated_at": null,
+      "files_touched": [
+        "pipeline_incident_investigator/investigation_report.py",
+        "pipeline_incident_investigator/tests/test_investigation_report.py",
+        "docs/stories/STORY-008.md",
+        "PROGRESS.md"
+      ],
+      "tests_added": [
+        "pipeline_incident_investigator/tests/test_investigation_report.py"
+      ],
+      "notes": "Reports are rebuilt from the hash-verified audit trail (not an in-memory result), so they can be regenerated any time and include later approvals/notifications; a tampered trail is refused. JSON output via InvestigationReport.to_dict(). report_generated audit entries are keyed by (investigation id, content hash): an unchanged report is logged once, a changed one again. Access is a small role allow-list (REQ-018 full RBAC still unfulfilled), denials audited. Performance is by design (one pass over the trail, no index), documented rather than benchmarked. Session CC-20260923-h5t2.",
+      "updated_at": "2026-09-24T02:27:04.082876+00:00",
       "verification": null
     },
     {

@@ -29,8 +29,8 @@ the same criteria out of `.colaberry/progress.json`, which Claude Code keeps in
 step (see the managed block in CLAUDE.md). Ticking something you have not
 actually met only misleads you.
 
-- [ ] Given an investigation, when completed, then a detailed report is generated.
-- [ ] Given a failed investigation, when reported, then failure details are included.
-- [ ] Trust: Reports are logged for audit.
+- [x] Given an investigation, when completed, then a detailed report is generated.
+- [x] Given a failed investigation, when reported, then failure details are included.
+- [x] Trust: Reports are logged for audit.
 
 When every box above is ticked, stop and show the demo.
