@@ -1,0 +1,29 @@
+{
+  "incident_id": "HOLDOUT-013",
+  "incident_title": "Country Enrichment Upstream 503",
+  "reported_at": "2026-08-13T05:00:00",
+  "severity": "High",
+  "incident_description": "The enrichment step failed calling the reference-data service.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "country_enrichment",
+    "environment": "production",
+    "failed_stage": "enrich_country",
+    "stages": [
+      {
+        "name": "enrich_country",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-13 03:00:01 INFO Pipeline country_enrichment started",
+    "2026-08-13 03:00:09 WARN Data quality: 3 rows had an unknown column value in field country; defaulting to NULL",
+    "2026-08-13 03:00:12 ERROR requests.exceptions.HTTPError: 503 Server Error: Service Unavailable for url: https://refdata.internal/countries",
+    "2026-08-13 03:00:13 INFO Pipeline marked FAILED"
+  ]
+}

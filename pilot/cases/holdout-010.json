@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-010",
+  "incident_title": "Store Dimension SQL Server Refresh Fails",
+  "reported_at": "2026-08-10T05:00:00",
+  "severity": "High",
+  "incident_description": "The store dimension refresh failed after the ERP upgrade.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "dim_store_refresh",
+    "environment": "production",
+    "failed_stage": "load_dim_store",
+    "stages": [
+      {
+        "name": "load_dim_store",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-10 04:30:01 INFO Pipeline dim_store_refresh started",
+    "2026-08-10 04:30:40 ERROR pyodbc.ProgrammingError: ('42S22', \"[Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid column name 'StoreKey'. (207)\")",
+    "2026-08-10 04:30:41 INFO Pipeline marked FAILED"
+  ]
+}

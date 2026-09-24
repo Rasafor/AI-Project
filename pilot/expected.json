@@ -116,7 +116,72 @@
       "holdout": true,
       "expected": "uncertain",
       "why": "Missing upstream file: not a cataloged pattern, escalate."
+    },
+    {
+      "path": "pilot/cases/holdout-007.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "Schema Change",
+      "why": "MySQL 1054: the query references a column that no longer exists."
+    },
+    {
+      "path": "pilot/cases/holdout-008.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "Resource Exhaustion",
+      "why": "The Linux OOM killer ended the process: memory exhausted."
+    },
+    {
+      "path": "pilot/cases/holdout-009.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "Schema Change",
+      "why": "Delta cannot find a referenced column: the schema changed."
+    },
+    {
+      "path": "pilot/cases/holdout-010.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "Schema Change",
+      "why": "SQL Server 207: a referenced column no longer exists."
+    },
+    {
+      "path": "pilot/cases/holdout-011.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "uncertain",
+      "why": "Permissions problem: not a cataloged pattern, escalate."
+    },
+    {
+      "path": "pilot/cases/holdout-012.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "uncertain",
+      "why": "Database deadlock: not a cataloged pattern, escalate."
+    },
+    {
+      "path": "pilot/cases/holdout-013.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "uncertain",
+      "why": "Upstream service unavailable; the 'unknown column value' warning is data quality, not a schema change."
+    },
+    {
+      "path": "pilot/cases/holdout-014.json",
+      "synthetic": true,
+      "holdout": true,
+      "holdout_round": 2,
+      "expected": "Resource Exhaustion",
+      "why": "HDFS disk-space quota exhausted: a resource limit was exceeded."
     }
   ],
-  "holdout_note": "Cases marked holdout=true were added 2026-09-24 after the baseline pilot (12 cases) failed at 25%, and committed BEFORE pattern_matcher.py was changed, so a fix tuned on the first 12 cases is also judged on cases it never saw."
+  "holdout_note": "Cases marked holdout=true were added 2026-09-24 after the baseline pilot (12 cases) failed at 25%, and committed BEFORE pattern_matcher.py was changed, so a fix tuned on the first 12 cases is also judged on cases it never saw.",
+  "holdout_round_2_note": "holdout-007..014 were added 2026-09-24 for follow-up 1, after the fix list pilot/pattern_fix_spec.json was committed (9046c2d) and BEFORE pattern_matcher.py was changed."
 }

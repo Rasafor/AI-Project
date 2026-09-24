@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-008",
+  "incident_title": "Scoring Worker Killed By Kernel",
+  "reported_at": "2026-08-08T05:00:00",
+  "severity": "High",
+  "incident_description": "The churn scoring worker died without a Python traceback.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "churn_scoring",
+    "environment": "production",
+    "failed_stage": "score_customers",
+    "stages": [
+      {
+        "name": "score_customers",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-08 02:00:01 INFO Pipeline churn_scoring started",
+    "2026-08-08 02:41:09 ERROR kernel: Out of memory: Killed process 4121 (python3) total-vm:31254120kB",
+    "2026-08-08 02:41:10 INFO Pipeline marked FAILED"
+  ]
+}

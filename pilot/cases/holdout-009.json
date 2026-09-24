@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-009",
+  "incident_title": "Promotions Delta Table Missing Column",
+  "reported_at": "2026-08-09T05:00:00",
+  "severity": "High",
+  "incident_description": "The promotions merge failed after marketing dropped a field.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "promotions_delta",
+    "environment": "production",
+    "failed_stage": "silver_promotions",
+    "stages": [
+      {
+        "name": "silver_promotions",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-09 06:00:01 INFO Pipeline promotions_delta started",
+    "2026-08-09 06:02:33 ERROR com.databricks.sql.transaction.tahoe.DeltaAnalysisException: [DELTA_MISSING_COLUMN] Cannot find promo_code in table columns: promo_id, discount_pct, starts_at",
+    "2026-08-09 06:02:34 INFO Pipeline marked FAILED"
+  ]
+}

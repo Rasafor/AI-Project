@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-011",
+  "incident_title": "Clickstream Extract Access Denied",
+  "reported_at": "2026-08-11T05:00:00",
+  "severity": "High",
+  "incident_description": "The clickstream extract could not read its input bucket.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "clickstream_s3_extract",
+    "environment": "production",
+    "failed_stage": "extract_clickstream",
+    "stages": [
+      {
+        "name": "extract_clickstream",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-11 01:00:01 INFO Pipeline clickstream_s3_extract started",
+    "2026-08-11 01:00:03 ERROR botocore.exceptions.ClientError: An error occurred (AccessDenied) when calling the GetObject operation: User arn:aws:sts::000000000000:assumed-role/etl is not authorized to perform s3:GetObject",
+    "2026-08-11 01:00:04 INFO Pipeline marked FAILED"
+  ]
+}

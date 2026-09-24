@@ -1,0 +1,29 @@
+{
+  "incident_id": "HOLDOUT-012",
+  "incident_title": "Ledger Upsert Deadlock",
+  "reported_at": "2026-08-12T05:00:00",
+  "severity": "High",
+  "incident_description": "The ledger upsert failed during a busy period.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "ledger_upsert",
+    "environment": "production",
+    "failed_stage": "upsert_ledger",
+    "stages": [
+      {
+        "name": "upsert_ledger",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-12 23:00:01 INFO Pipeline ledger_upsert started",
+    "2026-08-12 23:04:17 ERROR psycopg2.errors.DeadlockDetected: deadlock detected",
+    "2026-08-12 23:04:17 ERROR DETAIL: Process 812 waits for ShareLock on transaction 99231; blocked by process 790.",
+    "2026-08-12 23:04:18 INFO Pipeline marked FAILED"
+  ]
+}

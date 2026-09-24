@@ -1,0 +1,28 @@
+{
+  "incident_id": "HOLDOUT-007",
+  "incident_title": "Regional Sales MySQL Load Fails",
+  "reported_at": "2026-08-07T05:00:00",
+  "severity": "High",
+  "incident_description": "The regional sales load broke after a reporting schema cleanup.",
+  "synthetic": true,
+  "holdout": true,
+  "holdout_round": 2,
+  "synthetic_note": "Synthetic HELD-OUT pilot case (follow-up 1, STORY-009) written 2026-09-24 after the fix list (pilot/pattern_fix_spec.json) was committed and BEFORE pattern_matcher.py was changed. Not a real incident. Verdict recorded in pilot/expected.json.",
+  "pipeline_metadata": {
+    "pipeline_name": "regional_sales_mysql",
+    "environment": "production",
+    "failed_stage": "load_regional_sales",
+    "stages": [
+      {
+        "name": "load_regional_sales",
+        "layer": "bronze_to_silver",
+        "status": "FAILED"
+      }
+    ]
+  },
+  "execution_logs": [
+    "2026-08-07 05:00:01 INFO Pipeline regional_sales_mysql started",
+    "2026-08-07 05:01:20 ERROR pymysql.err.OperationalError: (1054, \"Unknown column 'region_code' in 'field list'\")",
+    "2026-08-07 05:01:21 INFO Pipeline marked FAILED"
+  ]
+}
