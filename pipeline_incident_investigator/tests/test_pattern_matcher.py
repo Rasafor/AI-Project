@@ -1,8 +1,9 @@
+import json
 import unittest
 from pathlib import Path
 
 from pipeline_incident_investigator.log_source import load_incident_logs
-from pipeline_incident_investigator.pattern_matcher import match_patterns
+from pipeline_incident_investigator.pattern_matcher import FOLLOW_UP_WORDINGS, match_patterns
 from pipeline_incident_investigator.tests.fixtures import CLEAN_LOGS
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -46,6 +47,24 @@ class MatchPatternsTests(unittest.TestCase):
 
     def test_bare_oom_still_matches(self):
         self.assertEqual(self._categories("ERROR executor 4 lost: OOM"), ["Resource Exhaustion"])
+
+
+class FollowUpSpecTests(unittest.TestCase):
+    """STORY-009 follow-up 1: the code must learn exactly the committed list, no more and no less."""
+
+    SPEC = json.loads((REPO_ROOT / "pilot" / "pattern_fix_spec.json").read_text(encoding="utf-8"))
+
+    def test_code_wordings_are_exactly_the_committed_spec(self):
+        spec = {}
+        for addition in self.SPEC["additions"]:
+            spec.setdefault(addition["category"], []).append(addition["wording"])
+        self.assertEqual({k: list(v) for k, v in FOLLOW_UP_WORDINGS.items()}, spec)
+
+    def test_every_spec_wording_is_recognized_under_its_category(self):
+        for addition in self.SPEC["additions"]:
+            line = f"ERROR something failed: {addition['wording']} (details)"
+            with self.subTest(wording=addition["wording"]):
+                self.assertEqual([m.category for m in match_patterns([line])], [addition["category"]])
 
 
 if __name__ == "__main__":
