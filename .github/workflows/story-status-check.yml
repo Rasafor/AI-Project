@@ -1,0 +1,58 @@
+# Keeps the Colaberry Command Center's story statuses moving.
+#
+# The platform sets each story's status from pushed commits that carry a
+# `Story: STORY-nnn` trailer plus the passed flags in .colaberry/progress.json.
+# This workflow checks every new commit gives it both, and flags any that
+# would silently fail to credit a story. It is read-only: it never edits
+# progress.json (the platform owns the status itself) and never pushes.
+#
+# Warn-only by team choice: findings show as annotations; unknown story ids
+# turn the run red, but nothing blocks a merge (no branch protection).
+
+name: Story status check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  story-commits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Work out which commits are new
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            range="origin/$BASE_REF..HEAD"
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            range="HEAD~1..HEAD"
+          else
+            range="$BEFORE..HEAD"
+          fi
+          echo "range=$range" >> "$GITHUB_OUTPUT"
+          echo "Checking commits in $range"
+
+      - name: Check story commits
+        run: python scripts/check_story_commits.py "${{ steps.range.outputs.range }}"
