@@ -78,7 +78,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           python -m unittest discover -s pipeline_incident_investigator/tests -t .
-          python -m unittest tests.test_generate_investigation_snapshot tests.test_check_story_commits tests.test_format_status_report
+          python -m unittest tests.test_generate_investigation_snapshot tests.test_check_story_commits tests.test_format_status_report tests.test_build_weekly_update
 
       - name: Write a plain-language summary
         if: ${{ always() }}

@@ -1,0 +1,151 @@
+# Weekly stakeholder update -- a headless Claude Code routine.
+#
+# Every Friday, GitHub runs Claude Code with no one at the keyboard ("headless",
+# `claude -p`). Claude runs the /update-summary command on the last 7 days of
+# work, scripts/build_weekly_update.py checks and tidies the result, and it is
+# posted as a GitHub issue that @mentions the stakeholders, so GitHub emails
+# them.
+#
+# Setup (one time, in the repo's Settings > Secrets and variables > Actions):
+#   - Secret   ANTHROPIC_API_KEY          required; billed per run (cents/week)
+#   - Variable WEEKLY_UPDATE_RECIPIENTS   optional; e.g. "@Rasafor, @alex"
+#                                         (default: @Rasafor)
+#
+# Try it by hand: Actions tab > Weekly stakeholder update > Run workflow.
+# Manual runs default to a dry run: the update appears on the run's summary page
+# and nothing is posted.
+#
+# Failure handling:
+#   - One issue per ISO week (the title carries e.g. "2026-W39"). If this week's
+#     issue already exists the run stops before calling Claude, so a rerun
+#     never double-sends and never double-bills.
+#   - A week with no commits skips Claude and posts a short "quiet week" note.
+#   - A Claude error, a timeout (10 min), or a summary missing any of the seven
+#     sections fails the run and posts nothing. GitHub then emails the repo
+#     owner that the run failed; fix the problem and choose "Re-run jobs" (safe
+#     because of the one-issue-per-week check). No automatic retries: a
+#     failed weekly send is best looked at by a person.
+
+name: Weekly stakeholder update
+
+on:
+  schedule:
+    - cron: "0 21 * * 5"  # Fridays 21:00 UTC = 4pm US Central in summer (3pm in winter)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview only: show the update on the run page, post nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: weekly-update
+  cancel-in-progress: false  # never cut off a run that may be mid-post
+
+jobs:
+  weekly-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RECIPIENTS: ${{ vars.WEEKLY_UPDATE_RECIPIENTS || '@Rasafor' }}
+      DRY_RUN: ${{ inputs.dry_run == true }}
+      LABEL: weekly-update
+
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Work out this week's title and count this week's changes
+        id: week
+        run: |
+          title=$(python -c "import sys, datetime; sys.path.insert(0, 'scripts'); import build_weekly_update as w; print(w.week_title(datetime.date.today()))")
+          key=$(echo "$title" | grep -oE '[0-9]{4}-W[0-9]{2}')
+          commits=$(git log --since="7 days ago" --oneline | wc -l | tr -d ' ')
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "commits=$commits" >> "$GITHUB_OUTPUT"
+          echo "This week: $title ($commits commits in the last 7 days)"
+
+      - name: Stop if this week's update was already posted
+        id: existing
+        run: |
+          number=$(gh issue list --state all --label "$LABEL" --search "\"${{ steps.week.outputs.key }}\" in:title" \
+                     --json number --jq '.[0].number // empty')
+          if [ -n "$number" ] && [ "$DRY_RUN" != "true" ]; then
+            echo "Already posted as issue #$number; nothing to do."
+            echo "Already posted this week as issue #$number; nothing sent." >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check the Anthropic API key is set
+        if: steps.existing.outputs.skip != 'true' && steps.week.outputs.commits != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::Add the ANTHROPIC_API_KEY secret (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Set up Node
+        if: steps.existing.outputs.skip != 'true' && steps.week.outputs.commits != '0'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Claude Code (pinned version)
+        if: steps.existing.outputs.skip != 'true' && steps.week.outputs.commits != '0'
+        run: npm install -g --fetch-timeout=30000 --fetch-retries=3 @anthropic-ai/claude-code@2.1.282
+
+      - name: Ask Claude (headless) to summarize the last 7 days
+        if: steps.existing.outputs.skip != 'true' && steps.week.outputs.commits != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Read-only tools only: Claude can read the records but cannot change,
+          # commit, or send anything itself.
+          timeout 600 claude -p "/update-summary last 7 days" \
+            --output-format json \
+            --max-turns 25 \
+            --allowedTools "Bash(git log:*)" "Bash(git show:*)" "Read" "Grep" "Glob" \
+            > "$RUNNER_TEMP/claude.json"
+
+      - name: Check and tidy the update
+        if: steps.existing.outputs.skip != 'true'
+        run: |
+          args=()
+          if [ "${{ steps.week.outputs.commits }}" != "0" ]; then args=(--claude-json "$RUNNER_TEMP/claude.json"); fi
+          python scripts/build_weekly_update.py \
+            --commits "${{ steps.week.outputs.commits }}" \
+            --recipients "$RECIPIENTS" \
+            "${args[@]}" \
+            --out-title "$RUNNER_TEMP/title.txt" \
+            --out-body "$RUNNER_TEMP/body.md"
+          {
+            echo "## $(cat "$RUNNER_TEMP/title.txt")"
+            [ "$DRY_RUN" = "true" ] && echo "_Dry run: preview only, nothing posted._"
+            echo ""
+            cat "$RUNNER_TEMP/body.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post the update as a GitHub issue (GitHub emails everyone mentioned)
+        if: steps.existing.outputs.skip != 'true' && env.DRY_RUN != 'true'
+        run: |
+          gh label create "$LABEL" --color 0E8A16 --description "Automatic weekly stakeholder update" --force
+          url=$(gh issue create --title "$(cat "$RUNNER_TEMP/title.txt")" \
+                                --body-file "$RUNNER_TEMP/body.md" --label "$LABEL")
+          echo "Posted: $url"
+          echo "Posted: $url" >> "$GITHUB_STEP_SUMMARY"
