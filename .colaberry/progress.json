@@ -38,9 +38,18 @@
           "passed": true
         }
       ],
-      "files_touched": [],
-      "tests_added": [],
-      "notes": null,
+      "files_touched": [
+        "index.html",
+        "command-center/assets/app.js",
+        "command-center/assets/tabs.js",
+        "command-center/assets/styles.css",
+        ".github/workflows/pr-standards.yml"
+      ],
+      "tests_added": [
+        "tests/test_command_center_render.py",
+        "tests/command_center_render.js"
+      ],
+      "notes": "2026-09-27 repair: the 2026-09-13 sync moved plan.json to schema v2 (schedule and dates null, roles as plain names, owner_agent instead of owner, verification null until checked) and 5 tabs crashed to a blank page. Tabs now read v2 (dates shown when set, otherwise plan week numbers; null verification shown as \"Not checked yet\"), text that claimed 0 points and no investigation runs now comes from the data, and Knowledge Base rows drill down. tests/test_command_center_render.py renders every tab and drill-down in both modes against the real files.",
       "updated_at": null,
       "verification": {
         "state": "verified",

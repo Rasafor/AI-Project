@@ -33,7 +33,7 @@ TAB_RENDERERS.overview = {
       phase: 'Building', phaseNote: 'Sample: shown as if the build were mid-way through r1.',
       stories_verified: 6, stories_total: 10, criteria_passed: 22, criteria_total: 30, points_awarded: 340,
     } : {
-      phase: schedulePhase(plan.schedule), phaseNote: null,
+      phase: plan.schedule ? schedulePhase(plan.schedule) : 'Dates not set', phaseNote: null,
       stories_verified: progress.totals.stories_verified, stories_total: progress.totals.stories_total,
       criteria_passed: progress.totals.criteria_passed, criteria_total: progress.totals.criteria_total,
       points_awarded: progress.totals.points_awarded,
@@ -46,7 +46,9 @@ TAB_RENDERERS.overview = {
         <button class="cc-card" data-detail="schedule">
           <span class="kicker">Schedule</span>
           <span class="big">${escapeHtml(nums.phase)}</span>
-          <span class="caption">${isSample ? escapeHtml(nums.phaseNote) : `Build ${plan.schedule.build_start} &rarr; ${plan.schedule.build_end} · Demo ${plan.schedule.demo_day}`}</span>
+          <span class="caption">${isSample ? escapeHtml(nums.phaseNote)
+            : plan.schedule ? `Build ${escapeHtml(plan.schedule.build_start)} &rarr; ${escapeHtml(plan.schedule.build_end)} · Demo ${escapeHtml(plan.schedule.demo_day)}`
+            : 'plan.json carries no build or demo dates yet'}</span>
           <span class="arrow">View schedule &rarr;</span>
         </button>
         <button class="cc-card" data-detail="stories">
@@ -79,10 +81,13 @@ TAB_RENDERERS.overview = {
           <h3>Release schedule</h3>
           ${isSample ? '<p class="cc-footnote" style="margin-top:0">Sample mode — the phase above is illustrative, but the dates below are your real plan.json dates.</p>' : ''}
           <table>
-            <thead><tr><th>Release</th><th>Name</th><th>Starts</th><th>Ends</th><th>Demo target</th></tr></thead>
-            <tbody>${plan.releases.map(r => `<tr><td>${escapeHtml(r.key)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.starts_on)}</td><td>${escapeHtml(r.ends_on)}</td><td>${r.is_demo_target ? '<span class="cc-pill green">Yes</span>' : ''}</td></tr>`).join('')}</tbody>
+            <thead><tr><th>Release</th><th>Name</th><th>When</th><th>Demo target</th></tr></thead>
+            <tbody>${plan.releases.map(r => `<tr><td>${escapeHtml(r.key)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(releaseSpan(r))}</td><td>${r.is_demo_target ? '<span class="cc-pill green">Yes</span>' : ''}</td></tr>`).join('')}</tbody>
           </table>
-          <p class="cc-footnote">Demo day: ${escapeHtml(plan.schedule.demo_day)}. Full Gantt view lives on the Project Management tab.</p>
+          <p class="cc-footnote">${plan.schedule
+            ? `Demo day: ${escapeHtml(plan.schedule.demo_day)}.`
+            : 'No calendar dates in plan.json yet — releases are shown by the week numbers the plan does carry.'}
+          Full Gantt view lives on the Project Management tab.</p>
         </div>`;
     }
     if (key === 'stories') {
@@ -99,10 +104,16 @@ TAB_RENDERERS.overview = {
         <div class="cc-detail">
           <button class="back" data-back>&larr; Back</button>
           <h3>Acceptance criteria</h3>
-          <p>This counts every acceptance criterion across every story, and how many are marked passed in <code>.colaberry/progress.json</code>.</p>
-          ${progress.totals.criteria_total === 0 && !isSample
-            ? '<p><strong>Currently 0 of 0.</strong> None of the 10 project stories have acceptance criteria defined in progress.json yet — that happens as each story is built, not before. This is not a bug.</p>'
-            : ''}
+          <p>This counts every acceptance criterion across every story, and how many the platform has counted as passed in <code>.colaberry/progress.json</code>.</p>
+          ${isSample ? '' : `
+            <p><strong>${progress.totals.criteria_passed} of ${progress.totals.criteria_total}</strong> passed, as of the data stamp above.</p>
+            <table><thead><tr><th>Story</th><th>Ticked in progress.json</th><th>Platform check</th></tr></thead><tbody>
+              ${progress.stories.map(s => `<tr><td>${escapeHtml(s.id)}</td>
+                <td>${s.criteria.filter(c => c.passed).length} / ${s.criteria.length}</td>
+                <td>${statePill(s.verification ? s.verification.state : 'not_checked')}</td></tr>`).join('')}
+            </tbody></table>
+            <p class="cc-footnote">A tick is the developer's claim; the platform check is what the headline counts. When they
+            disagree, sync from the portal.</p>`}
         </div>`;
     }
     if (key === 'points') {
@@ -111,7 +122,8 @@ TAB_RENDERERS.overview = {
           <button class="back" data-back>&larr; Back</button>
           <h3>Points</h3>
           <p>Points are awarded per story in <code>.colaberry/progress.json</code> once its acceptance criteria are verified.
-          ${!isSample ? '<strong>0 awarded so far</strong> — no story has been verified yet.' : ''}</p>
+          ${isSample ? '' : `<strong>${progress.totals.points_awarded} awarded so far</strong>, across ${progress.totals.stories_verified} verified
+          stor${progress.totals.stories_verified === 1 ? 'y' : 'ies'} of ${progress.totals.stories_total}.`}</p>
         </div>`;
     }
     return '';
@@ -160,20 +172,25 @@ TAB_RENDERERS.outcomes = {
     const { plan, isSample } = ctx;
     const m = (plan.derived.measures || []).find(x => x.id === key);
     if (!m) return '';
+    const req = plan.requirements.find(r => r.id === m.id);
+    const fulfilledBy = req ? req.fulfilled_by : [];
     return `
       <div class="cc-detail">
         <button class="back" data-back>&larr; Back</button>
         <h3>${escapeHtml(m.id)} — ${escapeHtml(m.statement)}</h3>
-        <p>Calculated as wall-clock time from investigation start to a recommendation being delivered,
-        averaged per week, measured against a 4-hour baseline and a 1-hour target.</p>
         ${isSample ? `
           ${sparklineSvg([4.0, 3.8, 3.3, 3.0, 2.9, 2.7, 2.6, 2.6], 1.0)}
-          <p class="cc-footnote">Sample trend, 8 illustrative weeks. Dashed line is the 1-hour target.</p>
+          <p class="cc-footnote">Sample trend, 8 illustrative weeks. Not a measurement.</p>
         ` : `
-          <p><strong>Not measured yet.</strong> No investigation has run, so there is no timing data to
-          average. This becomes real once the analysis stories (STORY-001, STORY-003, STORY-004, STORY-010)
-          and the pilot (STORY-009) are built and producing timed runs.</p>
+          <p><strong>No measured value is reported into this Command Center.</strong> The plan states the target;
+          it carries no measurement, and this page does not invent one. Any figure from a run belongs in the
+          evidence of the stories below, not on this card.</p>
         `}
+        ${fulfilledBy.length ? `<table><thead><tr><th>Story that moves this</th><th>Title</th><th>State</th></tr></thead><tbody>
+          ${fulfilledBy.map(id => {
+            const s = plan.stories.find(x => x.id === id);
+            return `<tr><td>${escapeHtml(id)}</td><td>${escapeHtml(s ? s.title : '')}</td><td>${statePill(effectiveStoryState(id, ctx))}</td></tr>`;
+          }).join('')}</tbody></table>` : '<p>No story in the plan fulfils this measure yet.</p>'}
       </div>`;
   },
 };
@@ -185,7 +202,7 @@ TAB_RENDERERS.outcomes = {
 TAB_RENDERERS.users = {
   render(ctx) {
     const { plan, isSample } = ctx;
-    const roles = plan.derived.roles || [];
+    const roles = planRoles(plan);
     return `
       ${sampleStrip(isSample, 'Role list and story counts are your real plan — nothing here is fabricated even in Sample mode.')}
       <div class="cc-section-title"><h1>Users &amp; Use Case</h1></div>
@@ -204,7 +221,7 @@ TAB_RENDERERS.users = {
   },
   detail(key, ctx) {
     const { plan } = ctx;
-    const r = (plan.derived.roles || []).find(x => x.role === key);
+    const r = planRoles(plan).find(x => x.role === key);
     if (!r) return '';
     const stories = r.story_ids.map(id => plan.stories.find(s => s.id === id)).filter(Boolean);
     return `
@@ -212,7 +229,7 @@ TAB_RENDERERS.users = {
         <button class="back" data-back>&larr; Back</button>
         <h3>${escapeHtml(key)}</h3>
         ${stories.length ? stories.map(s => `<p><strong>${escapeHtml(s.id)}</strong> — ${escapeHtml(s.narrative)}</p>`).join('')
-          : '<p><strong>No story currently gives this role a voice.</strong> That lines up with REQ-018 (role-based access control) having no fulfilling story yet — see the Guardrails and Knowledge Base tabs.</p>'}
+          : '<p><strong>No story narrative in the plan starts "As a ' + escapeHtml(key) + '".</strong> The role is listed in the plan, but no story gives it a voice yet.</p>'}
       </div>`;
   },
 };
@@ -321,30 +338,49 @@ TAB_RENDERERS.systems = {
 TAB_RENDERERS.pm = {
   render(ctx) {
     const { plan, isSample } = ctx;
-    const rangeStart = plan.schedule.build_start;
-    const rangeEnd = plan.schedule.demo_day;
-    const totalDays = daysBetween(rangeStart, rangeEnd) || 1;
-    const todayPct = Math.min(100, Math.max(0, (daysBetween(rangeStart, new Date().toISOString().slice(0, 10)) / totalDays) * 100));
+    // Scale by calendar dates when the plan has them for every release;
+    // otherwise by the week numbers every release carries.
+    const byDate = !!plan.schedule && plan.releases.every(r => r.starts_on && r.ends_on);
+    let pos, todayPct = null;
+    if (byDate) {
+      const rangeStart = plan.schedule.build_start;
+      const totalDays = daysBetween(rangeStart, plan.schedule.demo_day) || 1;
+      pos = r => ({
+        left: (daysBetween(rangeStart, r.starts_on) / totalDays) * 100,
+        width: Math.max(2, (daysBetween(r.starts_on, r.ends_on) + 1) / totalDays * 100),
+      });
+      const t = (daysBetween(rangeStart, new Date().toISOString().slice(0, 10)) / totalDays) * 100;
+      if (t >= 0 && t <= 100) todayPct = t;
+    } else {
+      const first = Math.min(...plan.releases.map(r => r.week_start ?? 1));
+      const last = Math.max(...plan.releases.map(r => r.week_end ?? r.week_start ?? 1));
+      const weeks = last - first + 1;
+      pos = r => ({
+        left: (((r.week_start ?? first) - first) / weeks) * 100,
+        width: Math.max(2, (((r.week_end ?? r.week_start ?? first) - (r.week_start ?? first) + 1) / weeks) * 100),
+      });
+    }
+    const dueCell = d => d ? escapeHtml(d) : '<span class="cc-footnote">not set</span>';
 
     const ganttRows = plan.releases.map(r => {
-      const leftPct = (daysBetween(rangeStart, r.starts_on) / totalDays) * 100;
-      const widthPct = Math.max(2, (daysBetween(r.starts_on, r.ends_on) + 1) / totalDays * 100);
+      const p = pos(r);
       return `
         <div class="cc-gantt-row">
           <div class="cc-gantt-label">${escapeHtml(r.key)} · ${escapeHtml(r.name)}</div>
           <div class="cc-gantt-track">
-            <button class="cc-gantt-bar ${r.is_demo_target ? 'demo' : ''}" style="left:${leftPct}%;width:${widthPct}%"
-              data-detail="rel:${escapeHtml(r.key)}">${escapeHtml(r.starts_on)} &rarr; ${escapeHtml(r.ends_on)}</button>
+            ${todayPct !== null ? `<div class="cc-gantt-today" style="left:${todayPct}%" title="Today"></div>` : ''}
+            <button class="cc-gantt-bar ${r.is_demo_target ? 'demo' : ''}" style="left:${p.left}%;width:${p.width}%"
+              data-detail="rel:${escapeHtml(r.key)}">${escapeHtml(releaseSpan(r))}</button>
           </div>
         </div>`;
     }).join('');
 
     const storyRows = plan.stories.map(s => {
-      const slip = s.due_on !== s.due_baseline_on;
+      const slip = !!(s.due_on && s.due_baseline_on && s.due_on !== s.due_baseline_on);
       return `<tr>
         <td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.title)}</td><td>${escapeHtml(s.release)}</td>
-        <td>${escapeHtml(s.due_baseline_on)}</td>
-        <td>${escapeHtml(s.due_on)}${slip ? ' <span class="cc-pill amber">slipped</span>' : ''}</td>
+        <td>${dueCell(s.due_baseline_on)}</td>
+        <td>${dueCell(s.due_on)}${slip ? ' <span class="cc-pill amber">slipped</span>' : ''}</td>
         <td>${statePill(effectiveStoryState(s.id, ctx))}</td>
         <td><button class="cc-card" style="padding:.25rem .6rem;box-shadow:none" data-detail="story:${escapeHtml(s.id)}">Open &rarr;</button></td>
       </tr>`;
@@ -353,10 +389,12 @@ TAB_RENDERERS.pm = {
     return `
       ${sampleStrip(isSample, 'Release dates and due dates are your real plan.json data. Only the story STATE column is illustrative in Sample mode.')}
       <div class="cc-section-title"><h1>Project Management</h1></div>
-      <p class="cc-section-sub">Build ${plan.schedule.build_start} &rarr; ${plan.schedule.build_end} · Demo day ${plan.schedule.demo_day}</p>
+      <p class="cc-section-sub">${plan.schedule
+        ? `Build ${escapeHtml(plan.schedule.build_start)} &rarr; ${escapeHtml(plan.schedule.build_end)} · Demo day ${escapeHtml(plan.schedule.demo_day)}`
+        : 'No calendar dates in plan.json yet — releases are laid out by plan week, and due dates show as "not set" until the plan carries them.'}</p>
       <div class="cc-gantt">
         ${ganttRows}
-        <div class="cc-footnote">Click a bar for the stories in that release. Red marker (if visible) is today.</div>
+        <div class="cc-footnote">Click a bar for the stories in that release.${todayPct !== null ? ' The red line is today.' : ''}</div>
       </div>
       <table>
         <thead><tr><th>ID</th><th>Title</th><th>Release</th><th>Due (baseline)</th><th>Due (current)</th><th>State</th><th></th></tr></thead>
@@ -375,9 +413,10 @@ TAB_RENDERERS.pm = {
         <div class="cc-detail">
           <button class="back" data-back>&larr; Back</button>
           <h3>${escapeHtml(r.key)} — ${escapeHtml(r.name)}</h3>
-          <p>${escapeHtml(r.starts_on)} &rarr; ${escapeHtml(r.ends_on)}${r.is_demo_target ? ' · <strong>demo target release</strong>' : ''}</p>
+          <p>${escapeHtml(releaseSpan(r))}${r.is_demo_target ? ' · <strong>demo target release</strong>' : ''}</p>
+          ${r.goal ? `<p><strong>Goal:</strong> ${escapeHtml(r.goal)}</p>` : ''}
           <table><thead><tr><th>ID</th><th>Title</th><th>Due</th><th>State</th></tr></thead><tbody>
-            ${stories.map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.title)}</td><td>${escapeHtml(s.due_on)}</td><td>${statePill(effectiveStoryState(s.id, ctx))}</td></tr>`).join('')}
+            ${stories.map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${escapeHtml(s.title)}</td><td>${escapeHtml(s.due_on || 'not set')}</td><td>${statePill(effectiveStoryState(s.id, ctx))}</td></tr>`).join('')}
           </tbody></table>
         </div>`;
     }
@@ -390,8 +429,9 @@ TAB_RENDERERS.pm = {
           <button class="back" data-back>&larr; Back</button>
           <h3>${escapeHtml(s.id)} — ${escapeHtml(s.title)}</h3>
           <p>${escapeHtml(s.narrative)}</p>
-          <p>Release ${escapeHtml(s.release)} · Owner: ${escapeHtml(s.owner)} · Due ${escapeHtml(s.due_on)}
-          (baseline ${escapeHtml(s.due_baseline_on)}) · ${statePill(effectiveStoryState(s.id, ctx))}</p>
+          <p>Release ${escapeHtml(s.release)} · Owner: ${escapeHtml(storyOwner(s))} · Due ${escapeHtml(s.due_on || 'not set')}
+          (baseline ${escapeHtml(s.due_baseline_on || 'not set')}) · ${statePill(effectiveStoryState(s.id, ctx))}</p>
+          ${(s.acceptance || []).length ? `<p><strong>Acceptance criteria</strong></p><ul>${s.acceptance.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>` : ''}
         </div>`;
     }
     return '';
@@ -405,7 +445,7 @@ TAB_RENDERERS.pm = {
 TAB_RENDERERS.agents = {
   render(ctx) {
     const { plan, isSample } = ctx;
-    const owners = plan.derived.owners || [];
+    const owners = storyOwners(plan);
     return `
       ${sampleStrip(isSample, 'Story states below follow the Sample toggle like elsewhere, but skills and run history stay honest either way — these are story owners, not scoped agents, so there is nothing to fabricate a run history for.')}
       <div class="cc-section-title"><h1>AI Agents</h1></div>
@@ -425,7 +465,7 @@ TAB_RENDERERS.agents = {
   },
   detail(owner, ctx) {
     const { plan } = ctx;
-    const o = (plan.derived.owners || []).find(x => x.owner === owner);
+    const o = storyOwners(plan).find(x => x.owner === owner);
     if (!o) return '';
     const stories = o.story_ids.map(id => plan.stories.find(s => s.id === id)).filter(Boolean);
     return `
@@ -447,11 +487,11 @@ TAB_RENDERERS.agents = {
 function kbSearchIndex(plan) {
   const items = [];
   plan.requirements.forEach(r => items.push({ tab: 'Knowledge Base', text: `${r.id} ${r.statement} ${r.kind} ${r.priority}`, answer: `${r.id} (${r.kind}, ${r.priority}): ${r.statement}` }));
-  plan.stories.forEach(s => items.push({ tab: 'Project Management', text: `${s.id} ${s.title} ${s.narrative} ${s.owner}`, answer: `${s.id} — ${s.title}. ${s.narrative} Owned by ${s.owner}, due ${s.due_on}.` }));
+  plan.stories.forEach(s => items.push({ tab: 'Project Management', text: `${s.id} ${s.title} ${s.narrative} ${storyOwner(s)}`, answer: `${s.id} — ${s.title}. ${s.narrative} Owned by ${storyOwner(s)}, due ${s.due_on || 'date not set'}.` }));
   (plan.derived.guardrails || []).forEach(g => items.push({ tab: 'Guardrails', text: `${g.id} ${g.statement} guardrail`, answer: `Guardrail ${g.id}: ${g.statement}` }));
   (plan.derived.measures || []).forEach(m => items.push({ tab: 'Outcomes', text: `${m.id} ${m.statement} measure outcome`, answer: `Outcome ${m.id}: ${m.statement}` }));
   (plan.derived.systems || []).forEach(sys => items.push({ tab: 'Systems', text: `${sys} system connection`, answer: `${sys} is a listed system dependency. No connection status is known from this repo.` }));
-  (plan.derived.owners || []).forEach(o => items.push({ tab: 'AI Agents', text: `${o.owner} owner stories`, answer: `${o.owner} owns ${o.story_ids.join(', ')}.` }));
+  storyOwners(plan).forEach(o => items.push({ tab: 'AI Agents', text: `${o.owner} owner stories`, answer: `${o.owner} owns ${o.story_ids.join(', ')}.` }));
   return items;
 }
 
@@ -484,6 +524,7 @@ TAB_RENDERERS.kb = {
         <td>${escapeHtml(r.id)}</td><td>${escapeHtml(r.statement)}</td>
         <td>${escapeHtml(r.kind)}</td><td>${escapeHtml(r.priority)}</td>
         <td>${stories || '<span class="cc-pill red">none</span>'}</td>
+        <td><button class="cc-card" style="padding:.25rem .6rem;box-shadow:none" data-detail="${escapeHtml(r.id)}">Open &rarr;</button></td>
       </tr>`;
     }).join('');
     return `
@@ -492,7 +533,7 @@ TAB_RENDERERS.kb = {
       <p class="cc-section-sub">Everything the project knows about itself — requirements, stories, and a traceability
       view. Rows highlighted red are a <code>must</code> requirement with no story covering it yet.</p>
       <table>
-        <thead><tr><th>Req</th><th>Statement</th><th>Kind</th><th>Priority</th><th>Fulfilled by</th></tr></thead>
+        <thead><tr><th>Req</th><th>Statement</th><th>Kind</th><th>Priority</th><th>Fulfilled by</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <div class="cc-kb-ask">
@@ -503,7 +544,24 @@ TAB_RENDERERS.kb = {
       </div>
     `;
   },
-  detail() { return ''; },
+  detail(key, ctx) {
+    const { plan } = ctx;
+    const r = plan.requirements.find(x => x.id === key);
+    if (!r) return '';
+    return `
+      <div class="cc-detail">
+        <button class="back" data-back>&larr; Back</button>
+        <h3>${escapeHtml(r.id)} — ${escapeHtml(r.statement)}</h3>
+        <p>${escapeHtml(r.kind)} · ${escapeHtml(r.priority)}${r.cluster ? ` · ${escapeHtml(r.cluster)}` : ''}</p>
+        ${r.fulfilled_by.length === 0
+          ? `<p><strong>No story covers this requirement.</strong>${r.priority === 'must' ? ' It is a <code>must</code>, so this is a real gap in the plan.' : ''}</p>`
+          : `<table><thead><tr><th>Story</th><th>Title</th><th>State</th></tr></thead><tbody>
+              ${r.fulfilled_by.map(id => {
+                const s = plan.stories.find(x => x.id === id);
+                return `<tr><td>${escapeHtml(id)}</td><td>${escapeHtml(s ? s.title : '(not in plan)')}</td><td>${statePill(effectiveStoryState(id, ctx))}</td></tr>`;
+              }).join('')}</tbody></table>`}
+      </div>`;
+  },
   wire(ctx) {
     const form = document.getElementById('kb-form');
     if (!form) return;

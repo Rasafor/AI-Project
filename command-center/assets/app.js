@@ -105,15 +105,57 @@ function statePill(st) {
     in_progress: ['amber', 'In progress'],
     submitted: ['amber', 'Submitted'],
     verified: ['green', 'Verified'],
+    not_checked: ['grey', 'Not checked yet'],
   };
   const [cls, label] = map[st] || ['grey', st];
   return `<span class="cc-pill ${cls}">${escapeHtml(label)}</span>`;
 }
 
+// progress.json `verification` is null until the platform has run a
+// verification for that story (see docs/DATA_CONTRACT.md). That is
+// "not checked yet" — a different fact from "not started".
 function effectiveStoryState(storyId, ctx) {
   if (ctx.isSample) return SAMPLE_STORY_STATES[storyId] || 'not_started';
   const p = ctx.progress.stories.find(ps => ps.id === storyId);
-  return p ? p.verification.state : 'not_started';
+  if (!p) return 'not_started';
+  return p.verification ? p.verification.state : 'not_checked';
+}
+
+// plan.json schema v2 names the owner `owner_agent`; v1 used `owner`.
+function storyOwner(story) {
+  return story.owner_agent || story.owner || 'Unassigned';
+}
+
+// Group plan.stories by owner. plan.derived.owners is used when the
+// plan carries it; otherwise it is derived from the stories themselves.
+function storyOwners(plan) {
+  if (plan.derived && Array.isArray(plan.derived.owners)) return plan.derived.owners;
+  const byOwner = new Map();
+  plan.stories.forEach(s => {
+    const o = storyOwner(s);
+    if (!byOwner.has(o)) byOwner.set(o, []);
+    byOwner.get(o).push(s.id);
+  });
+  return [...byOwner].map(([owner, story_ids]) => ({ owner, story_ids }));
+}
+
+// plan.derived.roles is a list of names (schema v2) or of
+// { role, story_ids } (v1). For names, the stories are the ones whose
+// narrative begins "As a <role>".
+function planRoles(plan) {
+  return ((plan.derived && plan.derived.roles) || []).map(r => {
+    if (typeof r !== 'string') return r;
+    const re = new RegExp(`^\\s*As an?\\s+${r.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    return { role: r, story_ids: plan.stories.filter(s => re.test(s.narrative || '')).map(s => s.id) };
+  });
+}
+
+// Release start/end as shown on screen: dates when the plan has them,
+// otherwise the plan's week numbers.
+function releaseSpan(r) {
+  if (r.starts_on && r.ends_on) return `${r.starts_on} → ${r.ends_on}`;
+  if (r.week_start != null) return r.week_start === r.week_end ? `Week ${r.week_start}` : `Weeks ${r.week_start}–${r.week_end}`;
+  return 'Dates not set';
 }
 
 function sampleStrip(isSample, note) {
@@ -199,9 +241,22 @@ function renderTabBody() {
     investigations: state.data.investigations,
     isSample: state.mode === 'sample',
   };
-  const bodyHtml = entry.render(ctx);
-  const detailHtml = state.detail ? entry.detail(state.detail, ctx) : '';
-  main.innerHTML = bodyHtml + detailHtml;
+  try {
+    const bodyHtml = entry.render(ctx);
+    const detailHtml = state.detail ? entry.detail(state.detail, ctx) : '';
+    main.innerHTML = bodyHtml + detailHtml;
+  } catch (err) {
+    // A tab that cannot render must say so, not leave a blank page.
+    console.error(`Tab "${tabDef.id}" failed to render`, err);
+    main.innerHTML = `
+      <div class="cc-error">
+        <strong>The ${escapeHtml(tabDef.label)} tab could not render.</strong>
+        ${escapeHtml(err.message)}<br><br>
+        This usually means <code>.colaberry/plan.json</code> or <code>progress.json</code> has a shape this page
+        does not expect yet. The other tabs still work.
+      </div>`;
+    return;
+  }
   wireDetailButtons();
   if (entry.wire) entry.wire(ctx);
 }
