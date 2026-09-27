@@ -1,0 +1,13 @@
+{
+  "name": "reliability-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Order desk reliability lab: a stand-in vendor and a desk that confirms orders.",
+  "main": "desk.js",
+  "scripts": {
+    "confirm": "node desk.js confirm",
+    "test": "node tests/check-quality-gate.js && node tests/check-idempotency.js",
+    "test:idempotency": "node tests/check-idempotency.js"
+  },
+  "dependencies": {}
+}

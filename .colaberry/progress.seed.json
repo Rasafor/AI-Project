@@ -1,0 +1,288 @@
+{
+  "schema_version": 2,
+  "project": "Agentic AI System for Data Pipeline Incident Investigation",
+  "totals": {
+    "stories_total": 11,
+    "stories_verified": 0,
+    "stories_submitted": 0,
+    "stories_in_progress": 0,
+    "stories_not_started": 11,
+    "criteria_total": 35,
+    "criteria_passed": 0,
+    "points_awarded": 0
+  },
+  "stories": [
+    {
+      "id": "STORY-000",
+      "release": null,
+      "acceptance_total": 5,
+      "criteria": [
+        {
+          "text": "Given the Command Center, when it is opened, then every tab is reachable and every card drills down one level.",
+          "passed": false
+        },
+        {
+          "text": "Given sample mode, when any tab is shown, then the sample data is visibly labelled as sample.",
+          "passed": false
+        },
+        {
+          "text": "Given the Command Center, when any tab renders, then .colaberry/plan.json and .colaberry/progress.json are both committed in this repo and every tab reads its content from them at runtime rather than from hard-coded values.",
+          "passed": false
+        },
+        {
+          "text": "Given the Command Center, when any tab is shown, then .colaberry/manifest.json is committed in this repo and every tab shows how old that data is and warns when the age exceeds a week.",
+          "passed": false
+        },
+        {
+          "text": "Trust — no tab shows a number, a connection or a result the project has not actually produced.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-001",
+      "release": "r0",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given a pipeline incident, when logs are analyzed, then a recommendation is generated.",
+          "passed": false
+        },
+        {
+          "text": "Given a log with no common patterns, when analyzed, then no recommendation is generated.",
+          "passed": false
+        },
+        {
+          "text": "Trust: All log analysis activities are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-002",
+      "release": "r0",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given an investigation, when it is conducted, then all activities are logged.",
+          "passed": false
+        },
+        {
+          "text": "Given a failed investigation, when it is logged, then failure details are included.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Logs are immutable and timestamped.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-003",
+      "release": "r1",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given a SQL query, when analyzed, then potential issues are identified.",
+          "passed": false
+        },
+        {
+          "text": "Given a SQL query with no issues, when analyzed, then no issues are reported.",
+          "passed": false
+        },
+        {
+          "text": "Trust: SQL analysis results are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-004",
+      "release": "r1",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given data-quality metrics, when analyzed, then root causes are identified.",
+          "passed": false
+        },
+        {
+          "text": "Given data with no quality issues, when analyzed, then no root causes are reported.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Data-quality analysis results are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-005",
+      "release": "r2",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given a recommendation, when it is major, then it requires human approval.",
+          "passed": false
+        },
+        {
+          "text": "Given a minor recommendation, when generated, then it is auto-approved.",
+          "passed": false
+        },
+        {
+          "text": "Trust: All recommendations and approvals are logged.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-006",
+      "release": "r2",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given an uncertain root cause, when identified, then a notification is sent.",
+          "passed": false
+        },
+        {
+          "text": "Given a certain root cause, when identified, then no notification is sent.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Notifications are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-007",
+      "release": "r3",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given an ops team member, when accessing the dashboard, then the primary action completes in three clicks or fewer.",
+          "passed": false
+        },
+        {
+          "text": "Given an ops team member, when using the interface, then response times are under 2 seconds for any action.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Given any user action, when logged, then the audit trail records the action with a timestamp.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-008",
+      "release": "r3",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given an investigation, when completed, then a detailed report is generated.",
+          "passed": false
+        },
+        {
+          "text": "Given a failed investigation, when reported, then failure details are included.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Reports are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-009",
+      "release": "r4",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given a pilot test, when conducted, then error rates are low.",
+          "passed": false
+        },
+        {
+          "text": "Given a pilot test, when completed, then investigation time is reduced to 1 hour.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Pilot test results are logged for audit.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    },
+    {
+      "id": "STORY-010",
+      "release": "r1",
+      "acceptance_total": 3,
+      "criteria": [
+        {
+          "text": "Given a set of pipeline dependencies, when agents are coordinated, then the analysis completes successfully.",
+          "passed": false
+        },
+        {
+          "text": "Given a failure in agent coordination, when retried, then the system recovers without data loss.",
+          "passed": false
+        },
+        {
+          "text": "Trust: Given any coordination task, when executed, then the audit trail logs the task with a timestamp.",
+          "passed": false
+        }
+      ],
+      "files_touched": [],
+      "tests_added": [],
+      "notes": null,
+      "updated_at": null,
+      "verification": null
+    }
+  ]
+}
