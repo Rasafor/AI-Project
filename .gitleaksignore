@@ -1,0 +1,6 @@
+# Known false alarms for the secret scan (.github/workflows/secret-scan.yml).
+# One fingerprint per line, each with a comment saying why it is safe.
+
+# Example request body in the field guide: "clm_9f3a7b21-triage-1" is a sample
+# idempotency key, not a credential.
+31cfb6f7aeb3e38d80dc0cf11d54831b82e8e93a:IntegrationEngineer_FieldGuide.html:generic-api-key:706
