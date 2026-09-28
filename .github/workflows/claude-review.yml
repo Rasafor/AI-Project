@@ -60,7 +60,10 @@ jobs:
 
       - name: Claude reviews the changes
         if: env.HAS_KEY == 'true'
-        uses: anthropics/claude-code-action@v1
+        # Pinned to an exact commit (what the v1 tag pointed to on 2026-09-27)
+        # so the code that handles the API key cannot change underneath us.
+        # To upgrade: gh api repos/anthropics/claude-code-action/commits/v1 --jq .sha
+        uses: anthropics/claude-code-action@756cc22e19660d20e8cc9496b4f242475a7f7790 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
