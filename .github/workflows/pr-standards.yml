@@ -78,7 +78,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           python -m unittest tests.test_command_center_render
-          python -m unittest tests.test_story_commit_guard
+          python -m unittest tests.test_story_commit_guard tests.test_progress_entry_gate
           python -m unittest discover -s pipeline_incident_investigator/tests -t .
           python -m unittest tests.test_generate_investigation_snapshot tests.test_check_story_commits
 

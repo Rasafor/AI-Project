@@ -120,7 +120,7 @@ jobs:
           set -o pipefail
           {
             python -m unittest tests.test_command_center_render &&
-            python -m unittest tests.test_story_commit_guard &&
+            python -m unittest tests.test_story_commit_guard tests.test_progress_entry_gate &&
             python -m unittest discover -s pipeline_incident_investigator/tests -t . &&
             python -m unittest tests.test_generate_investigation_snapshot tests.test_check_story_commits
           } 2>&1 | tee "$OUT/tests.txt"
@@ -158,12 +158,19 @@ jobs:
             https://api.anthropic.com/v1/messages \
             -H "x-api-key: $ANTHROPIC_API_KEY" -H "anthropic-version: 2023-06-01" \
             -H "content-type: application/json" --data-binary @"$OUT/request.json") || code="curl-error"
-          if [ "$code" = "200" ] && jq -e '.content[0].text' "$OUT/response.json" > /dev/null; then
+          # The model thinks before answering, so content[0] is a `thinking` block (empty text
+          # by default). Success = HTTP 200 AND at least one non-empty `text` block anywhere.
+          # (Checking content[0].text reported every successful review as "DID NOT RUN".)
+          stop=$(jq -r '.stop_reason // "none"' "$OUT/response.json" 2>/dev/null || echo none)
+          if [ "$code" = "200" ] && [ "$stop" = "refusal" ]; then
+            echo "DID NOT RUN: the model declined to review this diff (stop_reason refusal, category $(jq -r '.stop_details.category // "none"' "$OUT/response.json")). This is not a pass." > "$OUT/ai.md"
+          elif [ "$code" = "200" ] && jq -e '[.content[]? | select(.type=="text") | .text | select(length > 0)] | length > 0' "$OUT/response.json" > /dev/null; then
             jq -r '[.content[] | select(.type=="text") | .text] | join("\n")' "$OUT/response.json" > "$OUT/ai.md"
-            if [ "$(jq -r '.stop_reason' "$OUT/response.json")" = "max_tokens" ]; then echo "_(review cut off at the length limit)_" >> "$OUT/ai.md"; fi
+            if [ "$stop" = "max_tokens" ]; then echo "_(review cut off at the length limit)_" >> "$OUT/ai.md"; fi
           else
-            err=$(jq -r '.error.type // "unknown"' "$OUT/response.json" 2>/dev/null || echo unknown)
-            echo "DID NOT RUN: Anthropic API returned $code ($err). This is not a pass -- re-run the job." > "$OUT/ai.md"
+            err=$(jq -r '.error.type // "no text in response"' "$OUT/response.json" 2>/dev/null || echo unknown)
+            types=$(jq -r '[.content[]?.type] | join(",")' "$OUT/response.json" 2>/dev/null || echo none)
+            echo "DID NOT RUN: Anthropic API returned $code ($err; stop_reason $stop; blocks: ${types:-none}). This is not a pass -- re-run the job." > "$OUT/ai.md"
           fi
           rm -f "$OUT/request.json" "$OUT/response.json" "$OUT/diff.txt"
 
