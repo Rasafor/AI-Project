@@ -525,3 +525,9 @@ completion is tracked in `.colaberry/progress.json`, joined against `.colaberry/
   - What changed: `.github/workflows/push-review.yml` step 6 checked `.content[0].text`, but `claude-sonnet-5` thinks first, so `content[0]` is an empty `thinking` block. Every successful (HTTP 200, billed) review since 2026-09-28 was discarded and reported as "DID NOT RUN". Success now means a 200 with at least one non-empty `text` block; a refusal is reported as declined; failure messages name the stop_reason and block types. Added `tests.test_progress_entry_gate` to the test lists in `push-review.yml` and `pr-standards.yml`.
   - Verification: Both workflows parse as YAML. Commit comments on 70609b2, 1c6374f, 4ca82a3 and ea1f1d0 all show the old false "DID NOT RUN (200)". jq isn't installed locally, so the new check is proven only by the next push's comment.
   - Notes: Repo-wide credential scan (working tree including ignored files, every git blob on all refs of both remotes, GitHub secret-scanning alerts): the only credential is a real Anthropic key in `.env`, which is gitignored and in no commit. `.colaberry/connect.txt` pairing codes are committed by design (the portal reads them) and are not credentials.
+
+- [x] Push review: give the AI review room to answer (16000 max_tokens, effort medium, 300 s timeout)
+  - Date: 2026-10-03
+  - Session: CC-20261003-r7qe
+  - What changed: The live run after the previous fix reported "200 (no text in response; stop_reason max_tokens; blocks: thinking)": the 2000-token cap was used up by thinking. Raised `max_tokens` to 16000, set `output_config.effort` to medium to bound thinking and cost, and raised the curl cap from 120 s to 300 s.
+  - Verification: Run 37156658597's commit comment showed the new diagnostic that exposed the cause; YAML parses; the comment on this commit's run shows whether the review now completes.
