@@ -7,6 +7,58 @@
   "truth_revision": null,
   "files": [
     {
+      "path": ".colaberry/plan.json",
+      "sha256": "30d478a5f62d3b0792926224de3f059afc1bf5d080eca67f37a33615e9e2d5b3"
+    },
+    {
+      "path": ".colaberry/profile.json",
+      "sha256": "3bc7862f1c9e57577c7792c89585975c5538a081be9467be519005649bd4d264"
+    },
+    {
+      "path": ".colaberry/progress.json",
+      "sha256": "11160ae268e42a2fdf0297320461417af795be734378527ca9e349652cb8e68d"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "ded579731722710795da0a084627134c4dca6d70ffd252f462a9bfebfade3c06"
+    },
+    {
+      "path": "artifacts/INDEX.md",
+      "sha256": "4332fca1124f62d8c718314c3ef5d3d1e52a85e8f79701fa6487232d60d557dd"
+    },
+    {
+      "path": "artifacts/week-01/claude-standards.md",
+      "sha256": "43d095c5d294662046e7fa935440e5c09132e79100dceaeefa1fd0c39e5b1482"
+    },
+    {
+      "path": "artifacts/week-02/skill-template.pdf",
+      "sha256": "ed3f73f876a7491f50710d55a2c7ae9e390e8309e228cc9380945ef21c6aabee"
+    },
+    {
+      "path": "artifacts/week-03/business-workflow-assistant.pdf",
+      "sha256": "47dcec622d1714a5d2596e6edb25b0b679128eda50ed9b1d0708ec6a9f85adc0"
+    },
+    {
+      "path": "artifacts/week-04/contributing.md",
+      "sha256": "aaab509e403be5a32bb14983e21992b82c3a7eb6b51de1eb0865de6cfcdcb3f2"
+    },
+    {
+      "path": "artifacts/week-05/readme.md",
+      "sha256": "1e027732eb8f1f45077f2714216e6283e6597686ed49847aab95aaa8f900ffc9"
+    },
+    {
+      "path": "artifacts/week-06/readme.md",
+      "sha256": "5865c5eab70d8a668772618a52ac21bfbf721222175e4edcfb379fb0ea46c83e"
+    },
+    {
+      "path": "artifacts/week-09/reliability.md",
+      "sha256": "af94544d1467520de01ddf084c31a4fdea142605e03be4330f1035a822d8a986"
+    },
+    {
+      "path": "docs/DATA_CONTRACT.md",
+      "sha256": "d56e89edcfe36725945d961cf3479b646507d1fa855bba0dcdfff3f8f8a658b0"
+    },
+    {
       "path": "docs/REQUIREMENTS.md",
       "sha256": "ce7ca1173bc387cb49f5905909f07fc1f9e934431153617b63a8648b2a53e646"
     },
@@ -19,12 +71,8 @@
       "sha256": "55af08d8a8aac38b51b7751632c2b87e2d45070732345a103142f561807d875c"
     },
     {
-      "path": "docs/DATA_CONTRACT.md",
-      "sha256": "d56e89edcfe36725945d961cf3479b646507d1fa855bba0dcdfff3f8f8a658b0"
-    },
-    {
-      "path": "CLAUDE.md",
-      "sha256": "ded579731722710795da0a084627134c4dca6d70ffd252f462a9bfebfade3c06"
+      "path": "docs/stories/STORY-000.md",
+      "sha256": "931a339c9c825c292227c91aa0b8e51144d50b94a6e7f253c387aecf6f541ffc"
     },
     {
       "path": "docs/stories/STORY-001.md",
@@ -65,22 +113,6 @@
     {
       "path": "docs/stories/STORY-010.md",
       "sha256": "7dde669d364d0ef7e5c66ea65b573d9d1ffeab62f04b29de1b980fffe7851a59"
-    },
-    {
-      "path": "docs/stories/STORY-000.md",
-      "sha256": "931a339c9c825c292227c91aa0b8e51144d50b94a6e7f253c387aecf6f541ffc"
-    },
-    {
-      "path": ".colaberry/plan.json",
-      "sha256": "30d478a5f62d3b0792926224de3f059afc1bf5d080eca67f37a33615e9e2d5b3"
-    },
-    {
-      "path": ".colaberry/progress.json",
-      "sha256": "11160ae268e42a2fdf0297320461417af795be734378527ca9e349652cb8e68d"
-    },
-    {
-      "path": ".colaberry/profile.json",
-      "sha256": "3bc7862f1c9e57577c7792c89585975c5538a081be9467be519005649bd4d264"
     }
   ]
 }
