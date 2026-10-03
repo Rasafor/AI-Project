@@ -9,3 +9,5 @@ Set the vendor's behavior with the `VENDOR_MODE` env var: `ok` (default, ~50ms, 
 Example: `VENDOR_MODE=down node desk.js confirm 1001`
 
 Protections: 2s timeout per attempt, 3 retries, a circuit breaker (`data/breaker.json`), a template fallback when the vendor is down, and a dead-letter file (`data/dead-letter.jsonl`) that `node desk.js replay` re-sends.
+
+Idempotency: each send is keyed `order:<orderId>` in `data/keys.json`, claimed before the vendor is called, so a repeat (or a simultaneous duplicate) returns the stored result with `"duplicate": true` instead of sending again. Re-check it any time with `npm test` (or `node tests/check-idempotency.js`); it exits non-zero on failure.

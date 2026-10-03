@@ -31,7 +31,7 @@ const {
 // LAB_DATA_DIR lets tests run against a scratch directory instead of data/.
 const DATA_DIR = process.env.LAB_DATA_DIR || path.join(__dirname, 'data');
 const LOG_FILE = path.join(DATA_DIR, 'sent.log');
-const PROCESSED_FILE = path.join(DATA_DIR, 'processed.json');
+const KEYS_FILE = path.join(DATA_DIR, 'keys.json');
 
 const ATTEMPT_TIMEOUT_MS = 2000;
 const RETRY_ATTEMPTS = 3;
@@ -57,6 +57,10 @@ class SendFailed extends Error {
     super(message);
     this.name = 'SendFailed';
   }
+}
+
+function idempotencyKey(orderId) {
+  return `order:${orderId}`;
 }
 
 function expectedMessage(orderId) {
@@ -173,9 +177,13 @@ async function processOrder(orderId) {
 
   let outcome;
   let error = null;
+  let duplicate = false;
   try {
     // Duplicates return here, before the gate: a stored result was gated once.
-    const once = await runOnce(orderId, () => produceAndSend(orderId, run), { storePath: PROCESSED_FILE });
+    // The key is the ORDER, never the run: every arrival of order 4001 must map to
+    // the same key, or a retry looks like a brand-new order and sends again.
+    const once = await runOnce(idempotencyKey(orderId), () => produceAndSend(orderId, run), { storePath: KEYS_FILE });
+    duplicate = once.duplicate;
     if (once.duplicate) {
       run.gateScore = once.result.gateScore ?? null;
       run.logger.log(`Duplicate: order ${orderId} was already sent (run ${once.result.correlationId}); nothing re-sent`);
@@ -196,6 +204,7 @@ async function processOrder(orderId) {
     breakerState: breaker.state().state,
     gateScore: run.gateScore,
     outcome,
+    duplicate,
     error,
   };
   console.log(JSON.stringify(receipt));

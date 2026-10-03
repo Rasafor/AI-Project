@@ -215,27 +215,121 @@ function qualityGate(message, id, { threshold = QUALITY_THRESHOLD } = {}) {
   return detail;
 }
 
-// Runs fn at most once per idempotency key. A key whose earlier run succeeded
-// returns the stored result with duplicate=true and fn is not called. Failed
-// runs store nothing, so they can be retried or replayed.
-// Not handled: a crash between fn's side effect and the store write (the
-// next run would repeat the side effect), or two processes racing on one key.
-async function runOnce(key, fn, { storePath }) {
-  const load = () => {
+class ClaimPending extends Error {
+  constructor(key, claimedAt) {
+    super(`Key ${key} was claimed at ${claimedAt} and that run has not finished`);
+    this.name = 'ClaimPending';
+  }
+}
+
+class KeyStoreBusy extends Error {
+  constructor(lockPath) {
+    super(`Could not lock ${lockPath} in time`);
+    this.name = 'KeyStoreBusy';
+  }
+}
+
+const DEFAULT_KEYS_PATH = path.join(__dirname, 'data', 'keys.json');
+
+// Runs fn at most once per idempotency key, across separate processes.
+//   1. CLAIM: under a file lock, if the key is new, write it as "claimed" BEFORE
+//      fn runs. A second arrival now sees the claim instead of "not sent yet".
+//   2. RUN fn once.
+//   3. STORE: mark the key "done" with fn's result. Later calls return that
+//      result with duplicate=true and never call fn.
+// A caller that finds someone else's claim waits (up to waitMs) for it to
+// finish and then returns the stored result. If fn fails, the claim is
+// released, so a retry or replay can run it again.
+// Not handled automatically: a process killed after fn's side effect but before
+// STORE leaves the key "claimed" forever. Later calls fail with ClaimPending
+// (and are dead-lettered) rather than risk a second send; a person checks
+// sent.log and removes the key from keys.json.
+async function runOnce(key, fn, { storePath = DEFAULT_KEYS_PATH, waitMs = 10000, pollMs = 50 } = {}) {
+  const lockPath = `${storePath}.lock`;
+  const update = (change) =>
+    withFileLock(lockPath, () => {
+      const store = readJson(storePath);
+      const outcome = change(store);
+      writeJsonAtomic(storePath, store);
+      return outcome;
+    });
+
+  const deadline = Date.now() + waitMs;
+  for (;;) {
+    const existing = update((store) => {
+      if (store[key]) return store[key];
+      store[key] = { state: 'claimed', claimedAt: new Date().toISOString(), pid: process.pid };
+      return null;
+    });
+    if (existing === null) break; // the claim is ours
+    if (existing.state === 'done') return { duplicate: true, result: existing.result };
+    if (Date.now() >= deadline) throw new ClaimPending(key, existing.claimedAt);
+    await sleep(pollMs);
+  }
+
+  let result;
+  try {
+    result = await fn();
+  } catch (err) {
     try {
-      return JSON.parse(fs.readFileSync(storePath, 'utf8'));
+      update((store) => {
+        delete store[key];
+      });
+    } catch (releaseErr) {
+      console.error(`runOnce: could not release claim ${key} (${releaseErr.name}: ${releaseErr.message})`);
+      err.claimReleaseError = releaseErr;
+    }
+    throw err;
+  }
+
+  update((store) => {
+    store[key] = { state: 'done', result, completedAt: new Date().toISOString() };
+  });
+  return { duplicate: false, result };
+}
+
+function readJson(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') return {};
+    throw err;
+  }
+}
+
+// Mutual exclusion across processes: creating the lock file with 'wx' fails if
+// it already exists, and the OS makes that check-and-create atomic. A lock older
+// than staleMs belongs to a process that died holding it and is removed.
+// Gives up with KeyStoreBusy after timeoutMs rather than waiting forever.
+function withFileLock(lockPath, fn, { timeoutMs = 3000, staleMs = 5000 } = {}) {
+  fs.mkdirSync(path.dirname(lockPath), { recursive: true });
+  const start = Date.now();
+  for (;;) {
+    try {
+      fs.closeSync(fs.openSync(lockPath, 'wx'));
+      break;
     } catch (err) {
-      if (err.code === 'ENOENT') return {};
+      if (err.code !== 'EEXIST') throw err;
+    }
+    let age;
+    try {
+      age = Date.now() - fs.statSync(lockPath).mtimeMs;
+    } catch (err) {
+      if (err.code === 'ENOENT') continue; // released between our two calls; try again
       throw err;
     }
-  };
-
-  const stored = load()[key];
-  if (stored) return { duplicate: true, result: stored.result };
-
-  const result = await fn();
-  writeJsonAtomic(storePath, { ...load(), [key]: { result, completedAt: new Date().toISOString() } });
-  return { duplicate: false, result };
+    if (age > staleMs) {
+      fs.rmSync(lockPath, { force: true });
+      continue;
+    }
+    if (Date.now() - start > timeoutMs) throw new KeyStoreBusy(lockPath);
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5); // short synchronous pause
+  }
+  try {
+    return fn();
+  } finally {
+    fs.rmSync(lockPath, { force: true });
+  }
 }
 
 // Dead-letter file (one JSON object per line), keyed so the same item is
@@ -289,6 +383,8 @@ module.exports = {
   score,
   qualityGate,
   runOnce,
+  ClaimPending,
+  KeyStoreBusy,
   TimeoutError,
   UpstreamUnavailable,
   BadResponse,
