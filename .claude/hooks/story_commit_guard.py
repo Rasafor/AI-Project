@@ -13,13 +13,25 @@ snapshot (what will actually be committed, not the working tree):
   - every criterion of STORY-nnn in progress.json has a line in the story doc's
     Acceptance section, and each `[x]`/`[ ]` matches that criterion's `passed`
 
-Read-only by construction: git is run with an argument list (no shell), with
-GIT_OPTIONAL_LOCKS=0 so read commands never refresh/lock .git/index, and with
-core.fsmonitor disabled so no configured program runs. The hook writes nothing.
+For EVERY commit that stages tracked work it also requires a complete PROGRESS.md
+entry in the staged additions (see progress_entry_check.py).
+
+Read-only by construction, and narrowed to the least it needs:
+  - git only, argument list (no shell), and only the read subcommands in GIT_READ_ONLY;
+    anything else raises before a process starts.
+  - no programs from git config: fsmonitor off, and diff runs with --no-ext-diff
+    --no-textconv (a "read-only" diff otherwise runs any diff.external/textconv driver
+    the repo or user config names).
+  - no network: protocol.allow=never and GIT_NO_LAZY_FETCH=1, so a partial clone
+    cannot fetch missing objects while the hook reads them.
+  - minimal environment: git gets only the variables in KEEP_ENV, never the API or
+    GitHub tokens in the session environment.
+  - GIT_OPTIONAL_LOCKS=0 so reads never refresh or lock .git/index. The hook writes nothing.
 
 Exit 0 = allow. Exit 2 = block, reason on stderr (shown to Claude). Anything
 the hook cannot determine (git fails, unreadable JSON, unparseable command)
-also exits 2: a guard that silently allows when confused is not a guard.
+also exits 2, including an unexpected crash: Claude Code treats any exit other than 2
+as a non-blocking error and lets the commit through, so main() never exits 1.
 """
 
 from __future__ import annotations
@@ -31,7 +43,12 @@ import shlex
 import subprocess
 import sys
 
+from progress_entry_check import check as check_progress_entry
+
 GIT_TIMEOUT_SECONDS = 10
+GIT_READ_ONLY = {"diff", "show", "ls-files"}
+KEEP_ENV = ("PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC", "HOME", "USERPROFILE",
+            "HOMEDRIVE", "HOMEPATH", "TEMP", "TMP", "LANG", "LC_ALL")
 RECORDS = (".colaberry/progress.json", "PROGRESS.md")
 JUNK = re.compile(
     r"(^|/)\.colaberry/\.colaberry/"      # nested seed copies (c69d95d)
@@ -46,13 +63,24 @@ class GuardError(Exception):
     """The hook could not establish what is being committed."""
 
 
+def run_git(args: list[str]) -> subprocess.CompletedProcess:
+    """The only way this hook starts a process: a read-only git subcommand, no shell,
+    no configured programs, no network, a minimal environment."""
+    if not args or args[0] not in GIT_READ_ONLY:
+        raise GuardError(f"refusing git {args[:1]}: only {sorted(GIT_READ_ONLY)} are allowed")
+    if args[0] == "diff":
+        args = ["diff", "--no-ext-diff", "--no-textconv", *args[1:]]
+    env = {k: os.environ[k] for k in KEEP_ENV if k in os.environ}
+    env.update(GIT_OPTIONAL_LOCKS="0", GIT_NO_LAZY_FETCH="1", GIT_TERMINAL_PROMPT="0")
+    return subprocess.run(
+        ["git", "-c", "core.fsmonitor=false", "-c", "protocol.allow=never", *args],
+        capture_output=True, env=env, timeout=GIT_TIMEOUT_SECONDS, check=False,
+    )
+
+
 def git(*args: str) -> str:
-    env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
     try:
-        out = subprocess.run(
-            ["git", "-c", "core.fsmonitor=false", *args],
-            capture_output=True, env=env, timeout=GIT_TIMEOUT_SECONDS, check=False,
-        )
+        out = run_git(list(args))
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise GuardError(f"git {' '.join(args)} failed: {type(exc).__name__}: {exc}") from exc
     if out.returncode != 0:
@@ -61,10 +89,8 @@ def git(*args: str) -> str:
 
 
 def staged_bytes(path: str) -> bytes:
-    env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
     try:
-        out = subprocess.run(["git", "-c", "core.fsmonitor=false", "show", f":{path}"],
-                             capture_output=True, env=env, timeout=GIT_TIMEOUT_SECONDS, check=False)
+        out = run_git(["show", f":{path}"])
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise GuardError(f"git show :{path} failed: {type(exc).__name__}: {exc}") from exc
     if out.returncode != 0:
@@ -223,8 +249,16 @@ def main() -> int:
         problems = check_leftovers(files)
         for story in sorted(set(STORY_ID.findall(commit_message_text(command, args)))):
             problems += check_story(story, files)
+        added = [ln[1:] for ln in git("diff", "--cached", "--", "PROGRESS.md").splitlines()
+                 if ln.startswith("+") and not ln.startswith("+++")] if "PROGRESS.md" in files else []
+        head = run_git(["show", "HEAD:PROGRESS.md"])  # nonzero: no commit or no file yet
+        committed = head.stdout.decode("utf-8", errors="replace") if head.returncode == 0 else ""
+        problems += check_progress_entry(files, added, committed)
     except (GuardError, OSError) as exc:
         print(f"story_commit_guard BLOCKED (could not verify): {exc}", file=sys.stderr)
+        return 2
+    except Exception as exc:  # noqa: BLE001 - an unexpected bug must block, never fall through to exit 1
+        print(f"story_commit_guard BLOCKED (internal error, fix the hook): {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
 
     if problems:
@@ -234,4 +268,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        code = main()
+    except Exception as exc:  # noqa: BLE001 - e.g. a malformed payload; block, never exit 1
+        print(f"story_commit_guard BLOCKED (internal error, fix the hook): {type(exc).__name__}: {exc}", file=sys.stderr)
+        code = 2
+    sys.exit(code)

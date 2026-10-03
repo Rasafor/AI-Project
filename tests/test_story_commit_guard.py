@@ -24,12 +24,20 @@ def progress(passed: list[bool]) -> str:
     return json.dumps({"stories": [story]}, indent=2) + "\n"
 
 
+# A complete PROGRESS.md entry (progress_entry_check.py); every commit of work needs one.
+def entry(title: str = "STORY-001 done") -> str:
+    return (f"- [x] {title}\n  - Date: 2026-10-03\n  - Session: CC-20261003-ab12\n"
+            f"  - What changed: test change\n  - Verification: unit tests pass\n")
+
+
 def story_doc(boxes: list[str]) -> str:
     lines = "\n".join(f"- [{b}] {t}" for b, t in zip(boxes, CRITERIA))
     return f"# STORY-001\n\n## Acceptance\n\n{lines}\n"
 
 
-class GuardTests(unittest.TestCase):
+class RepoFixture(unittest.TestCase):
+    """A throwaway repo with seeded records, plus helpers. Holds no tests itself."""
+
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.repo = Path(self._tmp.name)
@@ -58,7 +66,8 @@ class GuardTests(unittest.TestCase):
         return subprocess.run([sys.executable, str(HOOK)], input=payload.encode(), cwd=self.repo,
                               capture_output=True, timeout=60, env=dict(os.environ))
 
-    def stage_story(self, passed: list[bool], boxes: list[str], progress_line: str = "- [x] STORY-001 done") -> None:
+    def stage_story(self, passed: list[bool], boxes: list[str], progress_line: str | None = None) -> None:
+        progress_line = entry() if progress_line is None else progress_line
         self.write(".colaberry/progress.json", progress(passed))
         self.write("docs/stories/STORY-001.md", story_doc(boxes))
         self.write("PROGRESS.md", f"# Progress\n\n{progress_line}\n")
@@ -68,6 +77,8 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stderr.decode())
         self.assertIn(fragment, result.stderr.decode())
 
+
+class GuardTests(RepoFixture):
     # happy paths
     def test_non_commit_command_is_ignored(self):
         self.assertEqual(self.run_hook("git status").returncode, 0)
@@ -79,8 +90,10 @@ class GuardTests(unittest.TestCase):
 
     def test_plain_commit_without_story_is_allowed(self):
         self.write("notes.txt", "hi\n")
-        self.git("add", "notes.txt")
-        self.assertEqual(self.run_hook('git commit -m "notes"').returncode, 0)
+        self.write("PROGRESS.md", f"# Progress\n\n{entry('notes')}")
+        self.git("add", "notes.txt", "PROGRESS.md")
+        r = self.run_hook('git commit -m "notes"')
+        self.assertEqual(r.returncode, 0, r.stderr.decode())
 
     # failure paths
     def test_missing_records_block(self):
@@ -116,7 +129,7 @@ class GuardTests(unittest.TestCase):
         self.assertBlocked(self.run_hook('git commit -m "STORY-001: x"'), "records disagree")
 
     def test_progress_md_entry_for_other_story_blocks(self):
-        self.stage_story([True, True], ["x", "x"], progress_line="- [x] STORY-002 done")
+        self.stage_story([True, True], ["x", "x"], progress_line=entry("STORY-002 done"))
         self.assertBlocked(self.run_hook('git commit -m "STORY-001: x"'), "none of its added lines")
 
     def test_criterion_missing_from_doc_blocks(self):
@@ -153,7 +166,8 @@ class GuardTests(unittest.TestCase):
         # real false positive, 2026-09-27: a heredoc message saying "refuses commit -a",
         # with an apostrophe, was blocked as if -a were passed
         self.write("notes.txt", "hi\n")
-        self.git("add", "notes.txt")
+        self.write("PROGRESS.md", f"# Progress\n\n{entry('notes')}")
+        self.git("add", "notes.txt", "PROGRESS.md")
         heredoc = "git commit -q -F - <<'EOF'\nGuard refuses commit -a; a story commit's records\nEOF\n"
         r = self.run_hook(heredoc)
         self.assertEqual(r.returncode, 0, r.stderr.decode())

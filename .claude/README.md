@@ -30,6 +30,7 @@ It **blocks** a commit, with the reason shown, when:
 - **Any commit:**
   - A leftover file is staged: `.colaberry/.colaberry/…`, `copy*`, `old_*`, `*.bak`, `*.orig` or `*~`.
   - A file under `.colaberry/` is UTF-16, which is the `connect.txt` bug.
+  - The commit changes work (any path outside `.colaberry/`, `artifacts/` and `PROGRESS.md`) without a new, complete PROGRESS.md entry in the staged lines. A complete entry has `- [x]` or `- [ ]`, a real `Date:`, `Session: CC-YYYYMMDD-xxxx`, `What changed:`, and for `[x]`, a `Verification:` that isn't a placeholder (TBD, TODO, pending, n/a, "will test…"). Re-pasting an already-committed entry doesn't count. ([`hooks/progress_entry_check.py`](hooks/progress_entry_check.py))
 - **A commit naming `STORY-nnn`:**
   - `progress.json`, `PROGRESS.md` or `docs/stories/STORY-nnn.md` isn't staged.
   - `PROGRESS.md`'s new lines don't mention the story.
@@ -37,14 +38,23 @@ It **blocks** a commit, with the reason shown, when:
   - It compares the staged versions, not your working files.
 - It also refuses `git add … && git commit` on one line, and `git commit -a`. In both cases it can't see what will actually be committed.
 
-**Read-only by design:** it runs git without a shell, with index locking turned off and fsmonitor disabled. It never writes to `.git/index`.
-**Blocks when unsure:** if it can't check a commit, it blocks it with a "could not verify" reason.
+**Read-only, narrowed:**
+- It can only start `git diff`, `git show` or `git ls-files`, with no shell.
+- Git runs with no configured programs (`--no-ext-diff --no-textconv`, fsmonitor off) and no network (`protocol.allow=never`, `GIT_NO_LAZY_FETCH`).
+- Git gets only a minimal environment, never your tokens.
+- Index locking is off. A test hashes every file in the repo, including `.git`, before and after a run.
+
+**Fails closed:**
+- A problem it can't check or an internal crash returns exit 2.
+- `settings.json` ends the command with `|| exit 2`, so a missing `python`, a missing hook file or an import error also blocks. Claude Code would let any other exit code through.
 **Does not check:**
 - Whether a criterion is really met. It only checks that the records agree.
-- The wording of notes.
+- The wording of notes, or whether a `Verification:` line is true. It only checks that one is there and isn't a placeholder.
+- Whether the PROGRESS entry describes *this* change. Any new complete entry satisfies it.
+- Bash commands that run longer than the 30-second hook timeout. Claude Code treats a timeout as non-blocking.
 - Commits you make in your own terminal. It only sees commits Claude runs.
 
-Tests: `python -m unittest tests.test_story_commit_guard` (20 tests).
+Tests: `python -m unittest tests.test_story_commit_guard tests.test_progress_entry_gate` (44 tests).
 
 ## The CI reviewer: push review
 
