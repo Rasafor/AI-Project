@@ -538,3 +538,10 @@ completion is tracked in `.colaberry/progress.json`, joined against `.colaberry/
   - Session: CC-20261003-r7qe
   - What changed: The live run after the previous fix reported "200 (no text in response; stop_reason max_tokens; blocks: thinking)": the 2000-token cap was used up by thinking. Raised `max_tokens` to 16000, set `output_config.effort` to medium to bound thinking and cost, and raised the curl cap from 120 s to 300 s.
   - Verification: Run 37156658597's commit comment showed the new diagnostic that exposed the cause; YAML parses; the comment on this commit's run shows whether the review now completes.
+
+- [x] Redact the MCP Inspector token from the Week 5 PDF
+  - Date: 2026-10-03
+  - Session: CC-20261003-r7qe
+  - What changed: `mcp-server/artifacts/week-05/MCP Inspector.pdf` printed the Inspector URL, including `MCP_INSPECTOR_API_TOKEN=<64 hex>`, in its page footer (committed in 7538e58 on 2026-09-03; public on both remotes). Removed that one text block (the footer URL line); the rest of the page is unchanged.
+  - Verification: Extracted text of the new PDF has no token parameter and no 64-character hex string; the raw bytes don't contain the parameter; the only word lost is the footer URL; the page was viewed and looks the same apart from the missing footer line.
+  - Notes: The old version stays in git history, which is acceptable only because the token is dead. The Inspector generates a new random token at each launch; it isn't pinned (no `MCP_INSPECTOR_API_TOKEN` in the user environment or any repo file), and nothing listens on 6274/6277. Never pin it. The CI secret scan can't read PDFs, which is how this got through.
